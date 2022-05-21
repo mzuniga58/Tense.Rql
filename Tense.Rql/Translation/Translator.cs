@@ -52,7 +52,7 @@ namespace Tense.Rql
 		/// <returns></returns>
 		public IEnumerable<string> TranslateMemberR2E(Type TResource, string resourceMember)
 		{
-			var entityAttribute = TResource.GetCustomAttribute<Entity>();
+			var entityAttribute = TResource.GetCustomAttribute<EntityAttribute>();
 
 			if (entityAttribute != null)
 			{
@@ -93,7 +93,7 @@ namespace Tense.Rql
         /// <returns></returns>
         public object TranslateValueR2E<TResource>(RqlNode resourceMember, string entityMember, object originalValue)
 		{
-			if (typeof(TResource).GetCustomAttribute<Entity>() is not null)
+			if (typeof(TResource).GetCustomAttribute<EntityAttribute>() is not null)
 			{
 				if (GetInstance<TResource>() is TResource resource)
 				{
@@ -173,7 +173,7 @@ namespace Tense.Rql
 				return node;
 
 			RqlNode? result = null;
-			var entityAttribute = typeof(TResource).GetCustomAttribute<Entity>();
+			var entityAttribute = typeof(TResource).GetCustomAttribute<EntityAttribute>();
 
 			if (entityAttribute != null)
 			{
@@ -1886,7 +1886,7 @@ namespace Tense.Rql
 		/// <returns></returns>
 		public Type GetEntityType<TResource>()
 		{
-			var entityAttribute = typeof(TResource).GetCustomAttribute<Entity>();
+			var entityAttribute = typeof(TResource).GetCustomAttribute<EntityAttribute>();
 
 			if (entityAttribute == null)
 				throw new InvalidCastException($"{typeof(TResource).Name} is not a resource model.");
@@ -1901,7 +1901,7 @@ namespace Tense.Rql
 		/// <returns></returns>
 		public Type GetEntityType(Type resourceType)
 		{
-			var entityAttribute = resourceType.GetCustomAttribute<Entity>();
+			var entityAttribute = resourceType.GetCustomAttribute<EntityAttribute>();
 
 			if (entityAttribute == null)
 				throw new InvalidCastException($"{resourceType.Name} is not a resource model.");
