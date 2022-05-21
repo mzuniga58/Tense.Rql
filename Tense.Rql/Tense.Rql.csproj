@@ -10,7 +10,7 @@
 	  <Description>A library to add RQL support to RESTful Web Services</Description>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <RepositoryUrl>https://github.com/mzuniga58/Tense.Rql</RepositoryUrl>
-	  <Version>0.0.4-alpha</Version>
+	  <Version>0.0.5-alpha</Version>
 	  <PackageReleaseNotes>Pre-release. DO NOT USE.</PackageReleaseNotes>
 	  <PackageId>Tense.Rql</PackageId>
 	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -31,7 +31,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0" />
     <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
-    <PackageReference Include="Tense" Version="0.0.3-alpha" />
+    <PackageReference Include="Tense" Version="0.0.4-alpha" />
   </ItemGroup>
 
 	<ItemGroup>
