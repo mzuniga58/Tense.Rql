@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -38,6 +40,32 @@ namespace Tense.Rql
 
 			return RqlParser.Parse(inQueryString);
 		}
+		
+		/// <summary>
+		/// Validate the members in the RQL Statement
+		/// </summary>
+		/// <typeparam name="T">The type of member to check against.</typeparam>
+		/// <param name="serviceProvider">The <see cref="IServiceProvider"/> interface</param>
+		/// <param name="mapper">The <see cref="IMapper"/> interface.</param>
+		/// <param name="errors">The returned errors, if any</param>
+		/// <returns></returns>
+		public bool ValidateMembers<T>(IServiceProvider serviceProvider, IMapper mapper, ModelStateDictionary errors)
+		{
+			var translator = new Translator(serviceProvider, mapper);
+
+			if (!translator.CheckMembers<T>(this, out List<string> badMembers))
+			{
+				foreach (var badMember in badMembers)
+				{
+					errors.AddModelError(badMember, $"Not a member of {typeof(T).Name}");
+				}
+
+				return false;
+			}
+
+			return true;
+		}
+
 
 		/// <summary>
 		/// Gets or sets the element at the specified index. The child element will either be an <see cref="RqlNode"/> or a value,

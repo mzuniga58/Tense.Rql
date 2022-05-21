@@ -1851,7 +1851,17 @@ namespace Tense.Rql
 					_state = LexicalState.DATETIME6;
 
 					if (_input.EndOfStream)
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+					{
+						try
+						{
+							_tokenStream.Push(new Token(Symbol.DATETIME, DateTime.Parse(yytext.ToString())));
+							yytext.Clear();
+						}
+						catch (Exception)
+						{
+							throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+						}
+					}
 				}
 				else
 					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
@@ -1872,7 +1882,9 @@ namespace Tense.Rql
 				_state = LexicalState.DATETIME7;
 
 				if (_input.EndOfStream)
+				{
 					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+				}
 			}
 			else
 				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");

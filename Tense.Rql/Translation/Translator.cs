@@ -96,7 +96,18 @@ namespace Tense.Rql
 				{
 					if (GetResourceProperty<TResource>(resourceMember) is PropertyInfo resourceProperty)
 					{
-						resourceProperty.SetValue(resource, originalValue);
+						if (resourceProperty.PropertyType == typeof(DateTimeOffset) &&
+							 originalValue.GetType() == typeof(DateTime))
+						{
+							resourceProperty.SetValue(resource, new DateTimeOffset((DateTime)originalValue));
+						}
+						else if (resourceProperty.PropertyType == typeof(DateTime) &&
+							 originalValue.GetType() == typeof(DateTimeOffset))
+						{
+							resourceProperty.SetValue(resource, ((DateTimeOffset)originalValue).UtcDateTime);
+						}
+						else
+							resourceProperty.SetValue(resource, originalValue);
 
 						if (_mapper.Map(resource, typeof(TResource), GetEntityType<TResource>()) is object entity)
 						{
