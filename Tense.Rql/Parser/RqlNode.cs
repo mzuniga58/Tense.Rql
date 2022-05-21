@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Tense.Rql
 {
@@ -45,25 +47,277 @@ namespace Tense.Rql
 		/// Validate the members in the RQL Statement
 		/// </summary>
 		/// <typeparam name="T">The type of member to check against.</typeparam>
-		/// <param name="serviceProvider">The <see cref="IServiceProvider"/> interface</param>
-		/// <param name="mapper">The <see cref="IMapper"/> interface.</param>
 		/// <param name="errors">The returned errors, if any</param>
 		/// <returns></returns>
-		public bool ValidateMembers<T>(IServiceProvider serviceProvider, IMapper mapper, ModelStateDictionary errors)
+		public bool ValidateMembers<T>(ModelStateDictionary errors)
 		{
-			var translator = new Translator(serviceProvider, mapper);
+			bool result = true;
 
-			if (!translator.CheckMembers<T>(this, out List<string> badMembers))
+			switch (Operation)
 			{
-				foreach (var badMember in badMembers)
-				{
-					errors.AddModelError(badMember, $"Not a member of {typeof(T).Name}");
-				}
+				case RqlOperation.AND:
+					for (int i = 0; i < Count; i++)
+					{
+						var node = NonNullValue<RqlNode>(i);
+						result &= node.ValidateMembers<T>(errors);
+					}
+					break;
 
-				return false;
+				case RqlOperation.OR:
+					for (int i = 0; i < Count; i++)
+					{
+						var node = NonNullValue<RqlNode>(i);
+						result &= node.ValidateMembers<T>(errors);
+					}
+					break;
+
+				case RqlOperation.VALUES:
+					{
+						for (int i = 0; i < Count; i++)
+						{
+							var propertyNode = NonNullValue<RqlNode>(i);
+							var propertyType = typeof(T);
+
+							for (int j = 0; j < propertyNode.Count; j++)
+							{
+								var propertyName = propertyNode.NonNullValue<string>(j);
+								var property = FindProperty(propertyType, propertyName);
+
+								if (property == null)
+								{
+									errors.AddModelError(propertyNode.PropertyName, $"Not a member of {typeof(T).Name}");
+									result = false;
+								}
+								else
+								{
+									propertyType = property.GetNonNullableType();
+								}
+							}
+						}
+					}
+					break;
+
+				case RqlOperation.EQ:
+				case RqlOperation.NE:
+				case RqlOperation.LT:
+				case RqlOperation.LE:
+				case RqlOperation.GT:
+				case RqlOperation.GE:
+					{
+						var propertyNode = NonNullValue<RqlNode>(0);
+						var propertyType = typeof(T);
+
+						for (int j = 0; j < propertyNode.Count; j++)
+						{
+							var propertyName = propertyNode.NonNullValue<string>(j);
+							var property = FindProperty(propertyType, propertyName);
+
+							if (property == null)
+							{
+								errors.AddModelError(propertyNode.PropertyName, $"Not a member of {typeof(T).Name}");
+								result = false;
+							}
+							else
+							{
+								propertyType = property.GetNonNullableType();
+							}
+						}
+					}
+					break;
+
+				case RqlOperation.LIKE:
+				case RqlOperation.CONTAINS:
+				case RqlOperation.EXCLUDES:
+				case RqlOperation.IN:
+				case RqlOperation.OUT:
+					{
+						var propertyNode = NonNullValue<RqlNode>(0);
+						var propertyType = typeof(T);
+
+						for (int j = 0; j < propertyNode.Count; j++)
+						{
+							var propertyName = propertyNode.NonNullValue<string>(j);
+							var property = FindProperty(propertyType, propertyName);
+
+							if (property == null)
+							{
+								errors.AddModelError(propertyNode.PropertyName, $"Not a member of {typeof(T).Name}");
+								result = false;
+							}
+							else
+							{
+								propertyType = property.GetNonNullableType();
+							}
+						}
+					}
+					break;
+
+				case RqlOperation.SORT:
+					{
+						foreach (RqlNode member in this)
+						{
+							var sortPropertyNode = member;
+							var propertyNode = sortPropertyNode.NonNullValue<RqlNode>(1);
+							var propertyType = typeof(T);
+
+							for (int j = 0; j < propertyNode.Count; j++)
+							{
+								var propertyName = propertyNode.NonNullValue<string>(j);
+								var property = FindProperty(propertyType, propertyName);
+
+								if (property == null)
+								{
+									errors.AddModelError(propertyNode.PropertyName, $"Not a member of {typeof(T).Name}");
+									result = false;
+								}
+								else
+								{
+									propertyType = property.GetNonNullableType();
+								}
+							}
+						}
+					}
+					break;
+
+				case RqlOperation.SELECT:
+					{
+						foreach (RqlNode member in this)
+						{
+							var propertyNode = member;
+							var propertyType = typeof(T);
+
+							for (int j = 0; j < propertyNode.Count; j++)
+							{
+								var propertyName = propertyNode.NonNullValue<string>(j);
+								var property = FindProperty(propertyType, propertyName);
+
+								if (property == null)
+								{
+									errors.AddModelError(propertyNode.PropertyName, $"Not a member of {typeof(T).Name}");
+									result = false;
+								}
+								else
+								{
+									propertyType = property.GetNonNullableType();
+								}
+							}
+						}
+					}
+					break;
+
+				case RqlOperation.COUNT:
+					{
+						for (int i = 0; i < Count; i++)
+						{
+							var propertyNode = NonNullValue<RqlNode>(i);
+							var propertyType = typeof(T);
+
+							for (int j = 0; j < propertyNode.Count; j++)
+							{
+								var propertyName = propertyNode.NonNullValue<string>(j);
+								var property = FindProperty(propertyType, propertyName);
+
+								if (property == null)
+								{
+									errors.AddModelError(propertyNode.PropertyName, $"Not a member of {typeof(T).Name}");
+									result = false;
+								}
+								else
+								{
+									propertyType = property.GetNonNullableType();
+								}
+							}
+						}
+					}
+					break;
+
+				case RqlOperation.MIN:
+				case RqlOperation.MAX:
+				case RqlOperation.MEAN:
+				case RqlOperation.SUM:
+					{
+						for (int i = 0; i < Count; i++)
+						{
+							var propertyNode = NonNullValue<RqlNode>(i);
+							var propertyType = typeof(T);
+
+							for (int j = 0; j < propertyNode.Count; j++)
+							{
+								var propertyName = propertyNode.NonNullValue<string>(j);
+								var property = FindProperty(propertyType, propertyName);
+
+								if (property == null)
+								{
+									errors.AddModelError(propertyNode.PropertyName, $"Not a member of {typeof(T).Name}");
+									result = false;
+								}
+								else
+								{
+									propertyType = property.GetNonNullableType();
+								}
+							}
+						}
+					}
+					break;
+
+				case RqlOperation.AGGREGATE:
+					{
+						for (int i = 0; i < Count; i++)
+						{
+							var propertyNode = NonNullValue<RqlNode>(i);
+
+							if (propertyNode.Operation == RqlOperation.PROPERTY)
+							{
+								var propertyType = typeof(T);
+
+								for (int j = 0; j < propertyNode.Count; j++)
+								{
+									var propertyName = propertyNode.NonNullValue<string>(j);
+									var property = FindProperty(propertyType, propertyName);
+
+									if (property == null)
+									{
+										errors.AddModelError(propertyNode.PropertyName, $"Not a member of {typeof(T).Name}");
+										result = false;
+									}
+									else
+									{
+										propertyType = property.GetNonNullableType();
+									}
+								}
+							}
+						}
+					}
+					break;
 			}
 
-			return true;
+			return result;
+		}
+
+		/// <summary>
+		/// Returns the property for the name
+		/// </summary>
+		/// <param name="propertyType"></param>
+		/// <param name="propertyName"></param>
+		/// <returns></returns>
+		internal PropertyInfo? FindProperty(Type propertyType, string propertyName)
+		{
+			var properties = propertyType.GetProperties();
+
+			foreach (var property in properties)
+			{
+				var candidateName = property.Name;
+
+				var jsonName = property.GetCustomAttribute<JsonPropertyNameAttribute>();
+
+				if (jsonName != null)
+					candidateName = jsonName.Name;
+
+				if (string.Equals(candidateName, propertyName, StringComparison.OrdinalIgnoreCase))
+					return property;
+			}
+
+			return null;
 		}
 
 

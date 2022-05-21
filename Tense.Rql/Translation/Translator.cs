@@ -31,13 +31,15 @@ namespace Tense.Rql
 			_mapper = mapper;
         }
 
-		/// <summary>
-		/// Returns the list of entity members that are used to construct this resource member
-		/// </summary>
-		/// <typeparam name="TResource">The resource type</typeparam>
-		/// <param name="resourceMember">The resource member property node</param>
-		/// <returns></returns>
-		public IEnumerable<string> TranslateMemberR2E<TResource>(in RqlNode resourceMember)
+        #region Translation Functions
+        #region Translate Member Functions
+        /// <summary>
+        /// Returns the list of entity members that are used to construct this resource member
+        /// </summary>
+        /// <typeparam name="TResource">The resource type</typeparam>
+        /// <param name="resourceMember">The resource member property node</param>
+        /// <returns></returns>
+        public IEnumerable<string> TranslateMemberR2E<TResource>(in RqlNode resourceMember)
 		{
 			return TranslateMemberR2E(typeof(TResource), resourceMember.NonNullValue<string>(0));
 		}
@@ -78,17 +80,18 @@ namespace Tense.Rql
 
 			throw new InvalidCastException($"The class {TResource.Name} is not a resource model");
 		}
-		
+        #endregion
 
-		/// <summary>
-		/// Translate value from resource to entity
-		/// </summary>
-		/// <typeparam name="TResource">The resource type</typeparam>
-		/// <param name="resourceMember">The resource property node</param>
-		/// <param name="entityMember">The entity member</param>
-		/// <param name="originalValue">The original resource value</param>
-		/// <returns></returns>
-		public object TranslateValueR2E<TResource>(RqlNode resourceMember, string entityMember, object originalValue)
+        #region Translate Value Functions
+        /// <summary>
+        /// Translate value from resource to entity
+        /// </summary>
+        /// <typeparam name="TResource">The resource type</typeparam>
+        /// <param name="resourceMember">The resource property node</param>
+        /// <param name="entityMember">The entity member</param>
+        /// <param name="originalValue">The original resource value</param>
+        /// <returns></returns>
+        public object TranslateValueR2E<TResource>(RqlNode resourceMember, string entityMember, object originalValue)
 		{
 			if (typeof(TResource).GetCustomAttribute<Entity>() is not null)
 			{
@@ -121,124 +124,6 @@ namespace Tense.Rql
 			throw new InvalidCastException($"The class {typeof(TResource).Name} is not a resource model.");
 		}
 
-        internal List<string> ExtractMembersFromExpression(RqlNode property, int level, Expression expression)
-		{
-			var results = new List<string>();
-
-			if (expression is ConditionalExpression conditionalExpression)
-			{
-				if (conditionalExpression.IfTrue != null)
-				{
-					var expressionCollection = ExtractMembersFromExpression(property, level + 1, conditionalExpression.IfTrue);
-
-					foreach (var memberName in expressionCollection)
-						if (!results.Contains(memberName))
-							results.Add(memberName);
-				}
-
-				if (conditionalExpression.IfFalse != null)
-				{
-					var expressionCollection = ExtractMembersFromExpression(property, level + 1, conditionalExpression.IfFalse);
-
-					foreach (var memberName in expressionCollection)
-						if (!results.Contains(memberName))
-							results.Add(memberName);
-				}
-
-				if (conditionalExpression.Test != null)
-				{
-					var expressionCollection = ExtractMembersFromExpression(property, level + 1, conditionalExpression.Test);
-
-					foreach (var memberName in expressionCollection)
-						if (!results.Contains(memberName))
-							results.Add(memberName);
-				}
-			}
-			else if (expression is MemberInitExpression memberInitExpression)
-			{
-				foreach (var binding in memberInitExpression.Bindings)
-				{
-					if (binding is MemberAssignment memberAssignment)
-					{
-						if (level < property.Count)
-						{
-							if (string.Equals(property.Value<string>(level+1), binding.Member.Name, StringComparison.OrdinalIgnoreCase))
-							{
-								var collection = ExtractMembersFromExpression(property, level+1, memberAssignment.Expression);
-
-								foreach (var memberName in collection)
-									if (!results.Contains(memberName))
-										results.Add(memberName);
-							}
-						}
-						else
-						{
-							var collection = ExtractMembersFromExpression(property, level, memberAssignment.Expression);
-
-							foreach (var memberName in collection)
-								if (!results.Contains(memberName))
-									results.Add(memberName);
-						}
-					}
-				}
-			}
-			else if (expression is MemberExpression memberExpression)
-			{
-				var collection = ExtractMembersFromExpression(property, level, memberExpression.Expression);
-
-				foreach (var memberName in collection)
-					if (!results.Contains(memberName))
-						results.Add(memberName);
-
-				if (!string.Equals(memberExpression.Member.Name, "value", StringComparison.OrdinalIgnoreCase) &&
-					!string.Equals(memberExpression.Member.Name, "hasvalue", StringComparison.OrdinalIgnoreCase))
-					if (!results.Contains(memberExpression.Member.Name))
-						results.Add(memberExpression.Member.Name);
-			}
-			else if (expression is NewExpression newExpression)
-			{
-				results.Add(newExpression.Type.Name);
-
-				foreach (var exp in newExpression.Arguments)
-				{
-					var expressionCollection = ExtractMembersFromExpression(property, level, exp);
-
-					foreach (var memberName in expressionCollection)
-						if (!results.Contains(memberName))
-							results.Add(memberName);
-				}
-			}
-			else if (expression is UnaryExpression unaryExpression)
-			{
-				var expressionCollection = ExtractMembersFromExpression(property, level, unaryExpression.Operand);
-
-				foreach (var memberName in expressionCollection)
-					if (!results.Contains(memberName))
-						results.Add(memberName);
-			}
-
-			else if (expression is MethodCallExpression methodCallExpression)
-			{
-				try
-				{
-					foreach (var exp in methodCallExpression.Arguments)
-					{
-						var expressionCollection = ExtractMembersFromExpression(property, level, exp);
-
-						foreach (var memberName in expressionCollection)
-							if (!results.Contains(memberName))
-								results.Add(memberName);
-					}
-				}
-				catch (Exception)
-				{
-				}
-			}
-
-			return results;
-		}
-
-        #region Translation Functions
 		/// <summary>
 		/// Translate a query string from resource to Entity
 		/// </summary>
@@ -249,11 +134,13 @@ namespace Tense.Rql
 		{
 			return TranslateQueryR2E<TResource>(RqlParser.Parse(queryString));
 		}
+		#endregion
 
+		#region Translate Query Functions
 		/// <summary>
-		/// Translate a query string from resource to Entity
+		/// Translate an RQL Statement obtained from the query string of the request from Resource to Entity representation
 		/// </summary>
-		/// <typeparam name="TResource">The domain type</typeparam>
+		/// <typeparam name="TResource">The Resource type</typeparam>
 		/// <param name="request">The <see cref="HttpRequestMessage"/> that contains the query string.</param>
 		/// <returns></returns>
 		public RqlNode TranslateQueryStringR2E<TResource>(HttpRequestMessage request)
@@ -262,13 +149,25 @@ namespace Tense.Rql
 			return TranslateQueryR2E<TResource>(RqlParser.Parse(queryString));
 		}
 
-        /// <summary>
-        /// Translate Nodes from resource to entity
-        /// </summary>
-        /// <typeparam name="TResource"></typeparam>
-        /// <param name="node">The <see cref="RqlNode"/> that represents the query</param>
-        /// <returns></returns>
-        public RqlNode TranslateQueryR2E<TResource>(RqlNode node)
+		/// <summary>
+		/// Translate an RQL Statement from Resource to Entity representation
+		/// </summary>
+		/// <typeparam name="TResource">The Resource type</typeparam>
+		/// <param name="rqlStatement">The RQL Statement to translate.</param>
+		/// <returns></returns>
+		public RqlNode TranslateRQLR2E<TResource>(string rqlStatement)
+		{
+			var queryString = HttpUtility.UrlDecode(rqlStatement);
+			return TranslateQueryR2E<TResource>(RqlParser.Parse(queryString));
+		}
+
+		/// <summary>
+		/// Translate an RqlNode from resource to entity
+		/// </summary>
+		/// <typeparam name="TResource">The Resource Type</typeparam>
+		/// <param name="node">The <see cref="RqlNode"/> that represents the query</param>
+		/// <returns></returns>
+		public RqlNode TranslateQueryR2E<TResource>(RqlNode node)
 		{
 			if (node.Operation == RqlOperation.NOOP)
 				return node;
@@ -530,17 +429,20 @@ namespace Tense.Rql
 
 			return result ?? new RqlNode(RqlOperation.NOOP);
 		}
+        #endregion
+        #endregion
 
-		/// <summary>
-		/// Translates a list of key/value pairs from resource to entity representation
-		/// </summary>
-		/// <param name="keys">The list of keys to translate</param>
-		/// <returns></returns>
-		public IEnumerable<KeyValuePair<string, object>> TranslateKeysR2E<TResource>(IEnumerable<KeyValuePair<string, object>> keys)
+        #region Translate Key Functions
+        /// <summary>
+        /// Translates a list of key/value pairs from resource to entity representation
+        /// </summary>
+        /// <param name="kvp">The list of key/value pairs to translate</param>
+        /// <returns></returns>
+        public IEnumerable<KeyValuePair<string, object>> TranslateKeysR2E<TResource>(IEnumerable<KeyValuePair<string, object>> kvp)
 		{
 			var newList = new List<KeyValuePair<string, object>>();
 
-			foreach (var pair in keys)
+			foreach (var pair in kvp)
 			{
 				var resourceMember = new RqlNode(RqlOperation.PROPERTY);
 				resourceMember.Add(pair.Key);
@@ -556,8 +458,17 @@ namespace Tense.Rql
 
 			return newList;
 		}
+        #endregion
 
-		internal object? TranslateValue(Type propertyType, object? value)
+        #region Translate Values
+		/// <summary>
+		/// Translates an object value to a specified type
+		/// </summary>
+		/// <param name="propertyType">The type of value to return</param>
+		/// <param name="value">The original value</param>
+		/// <returns></returns>
+		/// <exception cref="InvalidCastException"></exception>
+        public object? TranslateValue(Type propertyType, object? value)
 		{
 			if (value == default)
 				return default;
@@ -667,7 +578,7 @@ namespace Tense.Rql
 				throw new InvalidCastException("Unrecognized property value.");
 		}
 
-        private object? TranslateCharArray(object value)
+		internal object? TranslateCharArray(object value)
         {
             if (value == null)
                 return null;
@@ -716,7 +627,7 @@ namespace Tense.Rql
 				throw new InvalidCastException($"Cannot cast value {value} to char array.");
         }
 
-        private object? TranslateSByteArray(object value)
+		internal object? TranslateSByteArray(object value)
         {
             if (value == null)
                 return null;
@@ -758,7 +669,7 @@ namespace Tense.Rql
 				throw new InvalidCastException($"Cannot cast value {value} to sbyte array.");
         }
 
-        private object? TranslateByteArray(object value)
+		internal object? TranslateByteArray(object value)
         {
             if (value == null)
                 return null;
@@ -805,7 +716,7 @@ namespace Tense.Rql
                 throw new InvalidCastException($"Cannot cast value {value} to byte array.");
         }
 
-        private object? TranslateEnumValue(Type propertyType, object value)
+		internal object? TranslateEnumValue(Type propertyType, object value)
         {
             if (value.GetType() == typeof(string))
             {
@@ -882,7 +793,7 @@ namespace Tense.Rql
                 throw new InvalidCastException($"Cannot cast value {value} to {propertyType}.");
         }
 
-        private object? TranslateUriValue(object value)
+		internal object? TranslateUriValue(object value)
 		{
 			if (value.GetType() == typeof(string))
 			{
@@ -960,7 +871,7 @@ namespace Tense.Rql
 			}
 		}
 
-		private object? TranslateSByteValue(object value)
+		internal object? TranslateSByteValue(object value)
 		{
 			if (value.GetType() == typeof(string))
 			{
@@ -1008,7 +919,7 @@ namespace Tense.Rql
 			}
 		}
 
-		private object? TranslateShortValue(object value)
+		internal object? TranslateShortValue(object value)
         {
             if (value.GetType() == typeof(string))
             {
@@ -1057,7 +968,7 @@ namespace Tense.Rql
             }
         }
 
-        private object? TranslateUShortValue(object value)
+		internal object? TranslateUShortValue(object value)
         {
             if (value.GetType() == typeof(string))
             {
@@ -1104,7 +1015,7 @@ namespace Tense.Rql
             }
         }
 
-        private object? TranslateIntValue(object value)
+		internal object? TranslateIntValue(object value)
         {
             if (value.GetType() == typeof(string))
             {
@@ -1150,7 +1061,7 @@ namespace Tense.Rql
             }
         }
 
-        private object? TranslateUintValue(object value)
+		internal object? TranslateUintValue(object value)
         {
             if (value.GetType() == typeof(string))
             {
@@ -1197,7 +1108,7 @@ namespace Tense.Rql
             }
         }
 
-        private object? TranslateLongValue(object value)
+		internal object? TranslateLongValue(object value)
         {
             if (value.GetType() == typeof(string))
             {
@@ -1244,7 +1155,7 @@ namespace Tense.Rql
             }
         }
 
-        private object? TranslateULongValue(object value)
+		internal object? TranslateULongValue(object value)
         {
             if (value.GetType() == typeof(string))
             {
@@ -1290,7 +1201,7 @@ namespace Tense.Rql
             }
         }
 
-        private object? TranslateFloatValue(object value)
+		internal object? TranslateFloatValue(object value)
         {
             if (value.GetType() == typeof(string))
             {
@@ -1336,7 +1247,7 @@ namespace Tense.Rql
             }
         }
 
-        private object? TranslateDoubleValue(object value)
+		internal object? TranslateDoubleValue(object value)
         {
             if (value.GetType() == typeof(string))
             {
@@ -1382,7 +1293,7 @@ namespace Tense.Rql
             }
         }
 
-        private object? TranslateDecimalValue(object value)
+		internal object? TranslateDecimalValue(object value)
         {
             if (value.GetType() == typeof(string))
             {
@@ -1428,7 +1339,7 @@ namespace Tense.Rql
             }
         }
 
-        private object? TranslateCharValue(object value)
+		internal object? TranslateCharValue(object value)
         {
             if (value.GetType() == typeof(string))
             {
@@ -1467,7 +1378,7 @@ namespace Tense.Rql
             }
         }
 
-        private object? TranslateGuidValue(object value)
+		internal object? TranslateGuidValue(object value)
         {
             if (value == null)
                 return null;
@@ -1508,7 +1419,7 @@ namespace Tense.Rql
             }
         }
 
-        private object? TranslateDateTimeValue(object value)
+		internal object? TranslateDateTimeValue(object value)
         {
             if (value == null)
                 return null;
@@ -1554,7 +1465,7 @@ namespace Tense.Rql
             }
         }
 
-        private object? TranslateTimeSpanValue(object value)
+		internal object? TranslateTimeSpanValue(object value)
         {
             if (value == null)
                 return null;
@@ -1598,7 +1509,7 @@ namespace Tense.Rql
             }
         }
 
-        private object? TranslateDateTimeOffsetValue(object value)
+		internal object? TranslateDateTimeOffsetValue(object value)
         {
             if (value == null)
                 return null;
@@ -1644,7 +1555,7 @@ namespace Tense.Rql
             }
         }
 
-        private object? TranslateStringValue(object value)
+		internal object? TranslateStringValue(object value)
         {
             if (value.GetType() == typeof(string))
                 return value.ToString();
@@ -1663,7 +1574,7 @@ namespace Tense.Rql
 				throw new InvalidCastException($"Cannot cast value {value} to string.");
         }
 
-		private object? TranslateByteValue(object value)
+		internal object? TranslateByteValue(object value)
 		{
 			if (value.GetType() == typeof(string))
 			{
@@ -1709,7 +1620,7 @@ namespace Tense.Rql
 				}
 			}
 		}
-		private object? TranslateImageValue(object value)
+		internal object? TranslateImageValue(object value)
 		{
 			if (value.GetType() == typeof(string))
 			{
@@ -1745,7 +1656,7 @@ namespace Tense.Rql
 			}
 		}
 
-		private object? TranslateBooleanValue(object value)
+		internal object? TranslateBooleanValue(object value)
         {
             if (value.GetType() == typeof(string))
             {
@@ -1817,7 +1728,124 @@ namespace Tense.Rql
         }
 		#endregion
 
-        #region Helper Functions
+		#region Helper Functions
+		internal List<string> ExtractMembersFromExpression(RqlNode property, int level, Expression expression)
+		{
+			var results = new List<string>();
+
+			if (expression is ConditionalExpression conditionalExpression)
+			{
+				if (conditionalExpression.IfTrue != null)
+				{
+					var expressionCollection = ExtractMembersFromExpression(property, level + 1, conditionalExpression.IfTrue);
+
+					foreach (var memberName in expressionCollection)
+						if (!results.Contains(memberName))
+							results.Add(memberName);
+				}
+
+				if (conditionalExpression.IfFalse != null)
+				{
+					var expressionCollection = ExtractMembersFromExpression(property, level + 1, conditionalExpression.IfFalse);
+
+					foreach (var memberName in expressionCollection)
+						if (!results.Contains(memberName))
+							results.Add(memberName);
+				}
+
+				if (conditionalExpression.Test != null)
+				{
+					var expressionCollection = ExtractMembersFromExpression(property, level + 1, conditionalExpression.Test);
+
+					foreach (var memberName in expressionCollection)
+						if (!results.Contains(memberName))
+							results.Add(memberName);
+				}
+			}
+			else if (expression is MemberInitExpression memberInitExpression)
+			{
+				foreach (var binding in memberInitExpression.Bindings)
+				{
+					if (binding is MemberAssignment memberAssignment)
+					{
+						if (level < property.Count)
+						{
+							if (string.Equals(property.Value<string>(level + 1), binding.Member.Name, StringComparison.OrdinalIgnoreCase))
+							{
+								var collection = ExtractMembersFromExpression(property, level + 1, memberAssignment.Expression);
+
+								foreach (var memberName in collection)
+									if (!results.Contains(memberName))
+										results.Add(memberName);
+							}
+						}
+						else
+						{
+							var collection = ExtractMembersFromExpression(property, level, memberAssignment.Expression);
+
+							foreach (var memberName in collection)
+								if (!results.Contains(memberName))
+									results.Add(memberName);
+						}
+					}
+				}
+			}
+			else if (expression is MemberExpression memberExpression)
+			{
+				var collection = ExtractMembersFromExpression(property, level, memberExpression.Expression);
+
+				foreach (var memberName in collection)
+					if (!results.Contains(memberName))
+						results.Add(memberName);
+
+				if (!string.Equals(memberExpression.Member.Name, "value", StringComparison.OrdinalIgnoreCase) &&
+					!string.Equals(memberExpression.Member.Name, "hasvalue", StringComparison.OrdinalIgnoreCase))
+					if (!results.Contains(memberExpression.Member.Name))
+						results.Add(memberExpression.Member.Name);
+			}
+			else if (expression is NewExpression newExpression)
+			{
+				results.Add(newExpression.Type.Name);
+
+				foreach (var exp in newExpression.Arguments)
+				{
+					var expressionCollection = ExtractMembersFromExpression(property, level, exp);
+
+					foreach (var memberName in expressionCollection)
+						if (!results.Contains(memberName))
+							results.Add(memberName);
+				}
+			}
+			else if (expression is UnaryExpression unaryExpression)
+			{
+				var expressionCollection = ExtractMembersFromExpression(property, level, unaryExpression.Operand);
+
+				foreach (var memberName in expressionCollection)
+					if (!results.Contains(memberName))
+						results.Add(memberName);
+			}
+
+			else if (expression is MethodCallExpression methodCallExpression)
+			{
+				try
+				{
+					foreach (var exp in methodCallExpression.Arguments)
+					{
+						var expressionCollection = ExtractMembersFromExpression(property, level, exp);
+
+						foreach (var memberName in expressionCollection)
+							if (!results.Contains(memberName))
+								results.Add(memberName);
+					}
+				}
+				catch (Exception)
+				{
+				}
+			}
+
+			return results;
+		}
+
 		/// <summary>
 		/// Instantiates an instance of an object of type T
 		/// </summary>
@@ -1827,6 +1855,7 @@ namespace Tense.Rql
 		{
 			return (T)Activator.CreateInstance(typeof(T));
 		}
+
 		private PropertyInfo? GetResourceProperty<TResource>(RqlNode resourceMember)
 		{
 			PropertyInfo? resourceProperty = null;
@@ -1851,261 +1880,6 @@ namespace Tense.Rql
 		}
 
 		/// <summary>
-		/// Check the members of an <see cref="RqlNode"/> to ensure they are members of TResource
-		/// </summary>
-		/// <param name="node">The <see cref="RqlNode"/> to check</param>
-		/// <param name="badMembers">The list of bad members</param>
-		/// <returns></returns>
-		public bool CheckMembers<TResource>(RqlNode node, out List<string> badMembers)
-		{
-			badMembers = new List<string>();
-			bool result = true;
-
-			if (node == null)
-				return true;
-
-			switch (node.Operation)
-			{
-				case RqlOperation.AND:
-					for (int i = 0; i < node.Count; i++)
-					{
-						result &= CheckMembers<TResource>(node.NonNullValue<RqlNode>(i), out List<string> bad);
-						badMembers.AddRange(bad);
-					}
-					break;
-
-				case RqlOperation.OR:
-					for (int i = 0; i < node.Count; i++)
-					{
-						result &= CheckMembers<TResource>(node.NonNullValue<RqlNode>(i), out List<string> bad);
-						badMembers.AddRange(bad);
-					}
-					break;
-
-				case RqlOperation.VALUES:
-					{
-						for (int i = 0; i < node.Count; i++)
-						{
-							var propertyNode = node.NonNullValue<RqlNode>(i);
-							var propertyType = typeof(TResource);
-
-							for (int j = 0; j < propertyNode.Count; j++)
-							{
-								var propertyName = propertyNode.NonNullValue<string>(j);
-								var property = FindProperty(propertyType, propertyName);
-
-								if (property == null)
-								{
-									badMembers.Add(propertyNode.PropertyName);
-									result = false;
-								}
-								else
-								{
-									propertyType = property.GetNonNullableType();
-								}
-							}
-						}
-					}
-					break;
-
-				case RqlOperation.EQ:
-				case RqlOperation.NE:
-				case RqlOperation.LT:
-				case RqlOperation.LE:
-				case RqlOperation.GT:
-				case RqlOperation.GE:
-					{
-						var propertyNode = node.NonNullValue<RqlNode>(0);
-						var propertyType = typeof(TResource);
-
-						for (int j = 0; j < propertyNode.Count; j++)
-						{
-							var propertyName = propertyNode.NonNullValue<string>(j);
-							var property = FindProperty(propertyType, propertyName);
-
-							if (property == null)
-							{
-								badMembers.Add(propertyNode.PropertyName);
-								result = false;
-							}
-							else
-							{
-								propertyType = property.GetNonNullableType();
-							}
-						}
-					}
-					break;
-
-				case RqlOperation.LIKE:
-				case RqlOperation.CONTAINS:
-				case RqlOperation.EXCLUDES:
-				case RqlOperation.IN:
-				case RqlOperation.OUT:
-					{
-						var propertyNode = node.NonNullValue<RqlNode>(0);
-						var propertyType = typeof(TResource);
-
-						for (int j = 0; j < propertyNode.Count; j++)
-						{
-							var propertyName = propertyNode.NonNullValue<string>(j);
-							var property = FindProperty(propertyType, propertyName);
-
-							if (property == null)
-							{
-								badMembers.Add(propertyNode.PropertyName);
-								result = false;
-							}
-							else
-							{
-								propertyType = property.GetNonNullableType();
-							}
-						}
-					}
-					break;
-
-				case RqlOperation.SORT:
-					{
-						foreach (RqlNode member in node)
-						{
-							var sortPropertyNode = member;
-							var propertyNode = sortPropertyNode.NonNullValue<RqlNode>(1);
-							var propertyType = typeof(TResource);
-
-							for (int j = 0; j < propertyNode.Count; j++)
-							{
-								var propertyName = propertyNode.NonNullValue<string>(j);
-								var property = FindProperty(propertyType, propertyName);
-
-								if (property == null)
-								{
-									badMembers.Add(propertyNode.PropertyName);
-									result = false;
-								}
-								else
-								{
-									propertyType = property.GetNonNullableType();
-								}
-							}
-						}
-					}
-					break;
-
-				case RqlOperation.SELECT:
-					{
-						foreach (RqlNode member in node)
-						{
-							var propertyNode = member;
-							var propertyType = typeof(TResource);
-
-							for (int j = 0; j < propertyNode.Count; j++)
-							{
-								var propertyName = propertyNode.NonNullValue<string>(j);
-								var property = FindProperty(propertyType, propertyName);
-
-								if (property == null)
-								{
-									badMembers.Add(propertyNode.PropertyName);
-									result = false;
-								}
-								else
-								{
-									propertyType = property.GetNonNullableType();
-								}
-							}
-						}
-					}
-					break;
-
-				case RqlOperation.COUNT:
-					{
-						for (int i = 0; i < node.Count; i++)
-						{
-							var propertyNode = node.NonNullValue<RqlNode>(i);
-							var propertyType = typeof(TResource);
-
-							for (int j = 0; j < propertyNode.Count; j++)
-							{
-								var propertyName = propertyNode.NonNullValue<string>(j);
-								var property = FindProperty(propertyType, propertyName);
-
-								if (property == null)
-								{
-									badMembers.Add(propertyNode.PropertyName);
-									result = false;
-								}
-								else
-								{
-									propertyType = property.GetNonNullableType();
-								}
-							}
-						}
-					}
-					break;
-
-				case RqlOperation.MIN:
-				case RqlOperation.MAX:
-				case RqlOperation.MEAN:
-				case RqlOperation.SUM:
-					{
-						for (int i = 0; i < node.Count; i++)
-						{
-							var propertyNode = node.NonNullValue<RqlNode>(i);
-							var propertyType = typeof(TResource);
-
-							for (int j = 0; j < propertyNode.Count; j++)
-							{
-								var propertyName = propertyNode.NonNullValue<string>(j);
-								var property = FindProperty(propertyType, propertyName);
-
-								if (property == null)
-								{
-									badMembers.Add(propertyNode.PropertyName);
-									result = false;
-								}
-								else
-								{
-									propertyType = property.GetNonNullableType();
-								}
-							}
-						}
-					}
-					break;
-
-				case RqlOperation.AGGREGATE:
-					{
-						for (int i = 0; i < node.Count; i++)
-						{
-							var propertyNode = node.NonNullValue<RqlNode>(i);
-
-							if (propertyNode.Operation == RqlOperation.PROPERTY)
-							{
-								var propertyType = typeof(TResource);
-
-								for (int j = 0; j < propertyNode.Count; j++)
-								{
-									var propertyName = propertyNode.NonNullValue<string>(j);
-									var property = FindProperty(propertyType, propertyName);
-
-									if (property == null)
-									{
-										badMembers.Add(propertyNode.PropertyName);
-										result = false;
-									}
-									else
-									{
-										propertyType = property.GetNonNullableType();
-									}
-								}
-							}
-						}
-					}
-					break;
-			}
-
-			return result;
-		}
-
-		/// <summary>
 		/// Given a resource model, returns the associated entity model type
 		/// </summary>
 		/// <typeparam name="TResource">Type of the resource model</typeparam>
@@ -2115,7 +1889,7 @@ namespace Tense.Rql
 			var entityAttribute = typeof(TResource).GetCustomAttribute<Entity>();
 
 			if (entityAttribute == null)
-				throw new InvalidCastException($"{typeof(TResource).Name} is not a domain model.");
+				throw new InvalidCastException($"{typeof(TResource).Name} is not a resource model.");
 
 			return entityAttribute.EntityType;
 		}
@@ -2130,7 +1904,7 @@ namespace Tense.Rql
 			var entityAttribute = resourceType.GetCustomAttribute<Entity>();
 
 			if (entityAttribute == null)
-				throw new InvalidCastException($"{resourceType.Name} is not a domain model.");
+				throw new InvalidCastException($"{resourceType.Name} is not a resource model.");
 
 			return entityAttribute.EntityType;
 		}
