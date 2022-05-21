@@ -16,7 +16,7 @@ is compiled into
 
 ![alt text](https://github.com/mzuniga58/Tense.Rql/blob/main/Images/RqlNode1.png "RqlNode")
 
-Each node begins with an operation. In this case, the operation is **EQ**, representing equality. The **EQ** operation takes two paramters, and it will check whether parameter 1 is equal to parameter 2. The first parmater is another RqlNode. This node has the operation **PROPERTY**, and it takes one paramter. The **PROPERTY** operation means that its single parameter is the name of a member in a model. The parameter for this operation is an object value - a string in this case - that holds the value "BookId".
+Each node begins with an operation. In this case, the operation is **EQ**, representing equality. The **EQ** operation takes two paramters, and it will check whether parameter 1 is equal to parameter 2. The first parmater is another **RqlNode**. This node has the operation **PROPERTY**, and it takes one paramter. The **PROPERTY** operation means that its single parameter is the name of a member in a model. The parameter for this operation is an object value - a string in this case - that holds the value "BookId".
 
 The second parameter of the parent node is an object value -- an int in this case -- holding the value 1.
 
