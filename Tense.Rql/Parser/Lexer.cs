@@ -17,7 +17,7 @@ namespace Tense.Rql
 
 			if (token! != null)
 				return token;
-
+			
 			throw new RqlFormatException("Invalid Rql Syntax");
 		}
 
@@ -69,6 +69,9 @@ namespace Tense.Rql
 			_input = new MemoryStreamReader(input);
 			_state = LexicalState.INITIAL_STATE;
 			_tokenStream.Clear();
+
+			if ( _input == null )
+				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
 
 			while (!_input.EndOfStream)
 			{
@@ -318,88 +321,124 @@ namespace Tense.Rql
 						ProcessTimeSpan5();
 						break;
 
+					case LexicalState.YMD1:
+						ProcessYMD1();
+						break;
+
+					case LexicalState.YMD2:
+						ProcessYMD2();
+						break;
+
+					case LexicalState.YMD3:
+						ProcessYMD3();
+						break;
+
+					case LexicalState.MDY1:
+						ProcessMDY1();
+						break;
+						
+					case LexicalState.MDY2:
+						ProcessMDY2();
+						break;
+
+					case LexicalState.MDY3:
+						ProcessMDY3();
+						break;
+
+					case LexicalState.MDY4:
+						ProcessMDY4();
+						break;
+
+					case LexicalState.MDY5:
+						ProcessMDY5();
+						break;
+
+					case LexicalState.MDY6:
+						ProcessMDY6();
+						break;
+
+					case LexicalState.MDY7:
+						ProcessMDY7();
+						break;
+
+					case LexicalState.MDY8:
+						ProcessMDY8();
+						break;
+
+					case LexicalState.MDY9:
+						ProcessMDY9();
+						break;
+
+					case LexicalState.MDY10:
+						ProcessMDY10();
+						break;
+
+					case LexicalState.MDY11:
+						ProcessMDY11();
+						break;
+
 					case LexicalState.DATETIME1:
 						ProcessDateTime1();
 						break;
 
-					case LexicalState.DATETIME2:
-						ProcessDateTime2();
+					case LexicalState.UTC1:
+						ProcessUTC1();
 						break;
 
-					case LexicalState.DATETIME3:
-						ProcessDateTime3();
+					case LexicalState.UTC2:
+						ProcessUTC2();
 						break;
 
-					case LexicalState.DATETIME4:
-						ProcessDateTime4();
+					case LexicalState.UTC3:
+						ProcessUTC3();
 						break;
 
-					case LexicalState.DATETIME5:
-						ProcessDateTime5();
+					case LexicalState.UTC4:
+						ProcessUTC4();
 						break;
 
-					case LexicalState.DATETIME6:
-						ProcessDateTime6();
+					case LexicalState.UTC5:
+						ProcessUTC5();
 						break;
 
-					case LexicalState.DATETIME7:
-						ProcessDateTime7();
+					case LexicalState.UTC6:
+						ProcessUTC6();
 						break;
 
-					case LexicalState.DATETIME8:
-						ProcessDateTime8();
+					case LexicalState.UTC7:
+						ProcessUTC7();
 						break;
 
-					case LexicalState.DATETIME9:
-						ProcessDateTime9();
+					case LexicalState.UTC8:
+						ProcessUTC8();
 						break;
 
-					case LexicalState.DATETIME10:
-						ProcessDateTime10();
+					case LexicalState.UTC9:
+						ProcessUTC9();
 						break;
 
-					case LexicalState.DATETIME11:
-						ProcessDateTime11();
+					case LexicalState.UTC10:
+						ProcessUTC10();
 						break;
 
-					case LexicalState.DATETIME12:
-						ProcessDateTime12();
+					case LexicalState.UTC11:
+						ProcessUTC11();
 						break;
 
-					case LexicalState.DATETIME13:
-						ProcessDateTime13();
+					case LexicalState.UTC12:
+						ProcessUTC12();
 						break;
 
-					case LexicalState.DATETIME14:
-						ProcessDateTime14();
+					case LexicalState.UTC13:
+						ProcessUTC13();
 						break;
 
-					case LexicalState.DATETIME15:
-						ProcessDateTime15();
+					case LexicalState.UTC14:
+						ProcessUTC14();
 						break;
 
-					case LexicalState.DATETIME16:
-						ProcessDateTime16();
-						break;
-
-					case LexicalState.DATETIME17:
-						ProcessDateTime17();
-						break;
-
-					case LexicalState.DATETIME18:
-						ProcessDateTime18();
-						break;
-
-					case LexicalState.DATETIME19:
-						ProcessDateTime19();
-						break;
-
-					case LexicalState.DATETIME20:
-						ProcessDateTime20();
-						break;
-
-					case LexicalState.DATETIME21:
-						ProcessDateTime21();
+					case LexicalState.UTC15:
+						ProcessUTC15();
 						break;
 
 					case LexicalState.HEXVAL:
@@ -456,14 +495,6 @@ namespace Tense.Rql
 
 					case LexicalState.URI2:
 						ProcessUri2();
-						break;
-
-					case LexicalState.FREEFORMDATE1:
-						ProcessFreeFormDate1();
-						break;
-
-					case LexicalState.FREEFORMDATE2:
-						ProcessFreeFormDate2();
 						break;
 
 					default:
@@ -1657,644 +1688,911 @@ namespace Tense.Rql
 			}
 		}
 
-		private void ProcessFreeFormDate1()
-		{
-			if (_input != null)
-			{
-				//	3/1
-				if (_input.Peek() >= '0' && _input.Peek() <= '9')
-				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.FREEFORMDATE1;
-
-					if (_input.EndOfStream)
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-				}
-				else if (_input.Peek() == '/' || _input.Peek() == '-')
-				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.FREEFORMDATE2;
-
-					if (_input.EndOfStream)
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-				}
-				else
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else
-			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
-			}
-		}
-
-		private void ProcessFreeFormDate2()
-		{
-			if (_input != null)
-			{
-				//	3/1/2020
-				if (_input.Peek() >= '0' && _input.Peek() <= '9')
-				{
-					yytext.Append(_input.Read());
-
-					if (_input.EndOfStream)
-					{
-						_state = LexicalState.INITIAL_STATE;
-						try
-						{
-							_tokenStream.Push(new Token(Symbol.DATETIME, DateTime.Parse(yytext.ToString())));
-							yytext.Clear();
-						}
-						catch (Exception)
-						{
-							throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-						}
-					}
-				}
-				else
-				{
-					_state = LexicalState.INITIAL_STATE;
-					try
-					{
-						_tokenStream.Push(new Token(Symbol.DATETIME, DateTime.Parse(yytext.ToString())));
-						yytext.Clear();
-					}
-					catch (Exception)
-					{
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-					}
-				}
-			}
-			else
-			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
-			}
-		}
-
 		private void ProcessDateTime1()
 		{
-			if (_input != null)
-			{
-				if (yytext.Length == 5)
-				{
-					//	2020-
-
-					if (_input.Peek() >= '0' && _input.Peek() <= '1')
-					{
-						yytext.Append(_input.Read());
-						_state = LexicalState.DATETIME2;
-
-						if (_input.EndOfStream)
-							throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-					}
-					else
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-				}
-				else
-				{
-					// 3/
-					if (_input.Peek() >= '0' && _input.Peek() <= '9')
-					{
-						yytext.Append(_input.Read());
-						_state = LexicalState.FREEFORMDATE1;
-
-						if (_input.EndOfStream)
-							throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-					}
-					else
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-				}
-			}
-			else
-			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
-			}
-		}
-
-		private void ProcessDateTime2()
-		{
-			if (_input != null)
-			{
-				//	2020-1
-
-				if (_input != null && _input.Peek() >= '0' && _input.Peek() <= '9')
-				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.DATETIME3;
-
-					if (_input.EndOfStream)
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-				}
-				else
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else
-			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
-			}
-		}
-
-		private void ProcessDateTime3()
-		{
-			if (_input != null)
-			{
-				//	2020-05
-
-				if (_input.Peek() == '-' || _input.Peek() == '/')
-				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.DATETIME4;
-
-					if (_input.EndOfStream)
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-				}
-				else
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else
-			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
-			}
-		}
-
-		private void ProcessDateTime4()
-		{
-			if (_input != null)
-			{
-				//	2020-05-
-
-				if (_input.Peek() >= '0' && _input.Peek() <= '3')
-				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.DATETIME5;
-
-					if (_input.EndOfStream)
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-				}
-				else
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else
-			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
-			}
-		}
-
-		private void ProcessDateTime5()
-		{
-			if (_input != null)
-			{
-				//	2020-05-2
-
-				if (_input.Peek() >= '0' && _input.Peek() <= '9')
-				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.DATETIME6;
-
-					if (_input.EndOfStream)
-					{
-						try
-						{
-							_tokenStream.Push(new Token(Symbol.DATETIME, DateTime.Parse(yytext.ToString())));
-							yytext.Clear();
-						}
-						catch (Exception)
-						{
-							throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-						}
-					}
-				}
-				else
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else
-			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
-			}
-		}
-
-		private void ProcessDateTime6()
-		{
-			//	2020-05-21
-
-			if (_input != null && (_input.Peek() == 't' || _input.Peek() == 'T'))
+			if (yytext.Length < 4 && _input.Peek() >= '0' && _input.Peek() <= '9')
 			{
 				yytext.Append(_input.Read());
-				_state = LexicalState.DATETIME7;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (yytext.Length <= 2 && (_input.Peek() >= '-' || _input.Peek() <= '/'))
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.MDY1;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if ((yytext.Length > 2  && yytext.Length <=4) && (_input.Peek() >= '-' || _input.Peek() <= '/'))
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.YMD1;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+		private void ProcessUTC1()
+		{
+			if (yytext.Length < 4 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (yytext.Length <= 2 && (_input.Peek() >= '-' || _input.Peek() <= '/'))
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC2;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if ((yytext.Length > 2 && yytext.Length <= 4) && (_input.Peek() >= '-' || _input.Peek() <= '/'))
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC13;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+		private void ProcessUTC2()
+		{
+			// m/  mm/
+			// m-  mm-
+			if (_input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC3;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+		private void ProcessUTC3()
+		{
+			//	mm/0 - mm/9
+			//	mm-0 - mm-9
+
+			if ((yytext[^1] == '0' || yytext[^1] == '1' || yytext[^1] == '2') &&
+				(_input.Peek() >= '0' && _input.Peek() <= '9'))
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC4;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+
+			else if (yytext[^1] == '3' &&
+					  (_input.Peek() >= '0' && _input.Peek() <= '1'))
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC4;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (_input.Peek() == '-' || _input.Peek() == '/')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC5;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+		private void ProcessUTC4()
+		{
+			//	mm/dd
+			//	mm-dd
+
+			if (_input.Peek() == '-' || _input.Peek() == '/')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC5;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+		private void ProcessUTC5()
+		{
+			//	mm-dd-
+			//	mm/dd/
+
+			var index1 = yytext.ToString().LastIndexOf('-');
+			var index2 = yytext.ToString().LastIndexOf('/');
+			var index = index1 > index2 ? index1 : index2;
+
+			if (yytext.Length - index - 1 < 4 &&
+				 _input.Peek() >= '0' &&
+				 _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
 
 				if (_input.EndOfStream)
 				{
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+					var datetime = DateTime.Parse(yytext.ToString());
+					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
+					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					yytext.Clear();
+				}
+			}
+			else if (_input.Peek() == ' ')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC6;
+
+				if (_input.EndOfStream)
+				{
+					var datetime = DateTime.Parse(yytext.ToString());
+					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
+					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					yytext.Clear();
 				}
 			}
 			else
 				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 		}
 
-		private void ProcessDateTime7()
+		private void ProcessUTC6()
 		{
-			if (_input != null)
+			//	mm/dd/yyyy<sp>
+			var index = yytext.ToString().LastIndexOf(' ');
+
+			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
 			{
-				//	2020-05-21T
+				yytext.Append(_input.Read());
 
-				if (_input.Peek() >= '0' || _input.Peek() <= '9')
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (_input.Peek() == ':')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC7;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+		private void ProcessUTC7()
+		{
+			//	mm/dd/yyyy hh:
+
+			var index = yytext.ToString().LastIndexOf(':');
+
+			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (_input.Peek() == ':')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC8;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+		private void ProcessUTC8()
+		{
+			//	mm/dd/yyyy hh:mm:
+
+			var index = yytext.ToString().LastIndexOf(':');
+
+			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
 				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.DATETIME8;
-
-					if (_input.EndOfStream)
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+					var datetime = DateTime.Parse(yytext.ToString());
+					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
+					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					yytext.Clear();
 				}
-				else
+			}
+			else if (_input.Peek() == '.')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC9;
+
+				if (_input.EndOfStream)
 					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 			}
 			else
 			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
+				var datetime = DateTime.Parse(yytext.ToString());
+				var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
+				_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
 			}
 		}
 
-		private void ProcessDateTime8()
+		private void ProcessUTC9()
 		{
-			if (_input != null)
+			//	mm/dd/yyyy hh:mm:ss.
+
+			var index = yytext.ToString().LastIndexOf('.');
+
+			if (yytext.Length - index - 1 < 6 && _input.Peek() >= '0' && _input.Peek() <= '9')
 			{
-				//	2020-05-21T0
+				yytext.Append(_input.Read());
 
-				if (_input.Peek() >= '0' || _input.Peek() <= '9')
+				if (_input.EndOfStream)
 				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.DATETIME9;
-
-					if (_input.EndOfStream)
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+					var datetime = DateTime.Parse(yytext.ToString());
+					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
+					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					yytext.Clear();
 				}
-				else
+			}
+			else if (_input.Peek() == '-' || _input.Peek() == '+')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC10;
+			}
+			else
+			{
+				var datetime = DateTime.Parse(yytext.ToString());
+				var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
+				_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
+			}
+		}
+
+		private void ProcessUTC10()
+		{
+			//	mm/dd/yyyy hh:mm:ss.ffffff+
+			//	mm/dd/yyyy hh:mm:ss.ffffff-
+
+			var index1 = yytext.ToString().LastIndexOf('-');
+			var index2 = yytext.ToString().LastIndexOf('+');
+			var index = index1 > index2 ? index1 : index2;
+
+			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (yytext.Length - index - 1 >= 1 && _input.Peek() >= ':')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC11;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (yytext.Length - index - 1 == 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC12;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+		private void ProcessUTC11()
+		{
+			//	mm/dd/yyyy hh:mm:ss.ffffff+00:
+			//	mm/dd/yyyy hh:mm:ss.ffffff-00:
+
+			var index = yytext.ToString().LastIndexOf(':');
+
+			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+				{
+					var datetime = DateTimeOffset.Parse(yytext.ToString());
+					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
+					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					yytext.Clear();
+				}
+			}
+			else if (yytext.Length - index - 1 >= 1 && yytext.Length - index - 1 <= 2 && (_input.Peek() < '0' || _input.Peek() > '9'))
+			{
+				var datetime = DateTimeOffset.Parse(yytext.ToString());
+				var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
+				_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+		private void ProcessUTC12()
+		{
+			//	mm/dd/yyyy hh:mm:ss.ffffff+000
+			//	mm/dd/yyyy hh:mm:ss.ffffff-000
+
+			var index1 = yytext.ToString().LastIndexOf('-');
+			var index2 = yytext.ToString().LastIndexOf('+');
+			var index = index1 > index2 ? index1 : index2;
+
+			if (yytext.Length - index - 1 < 4 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+				{
+					var datetime = DateTimeOffset.Parse(yytext.ToString());
+					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
+					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					yytext.Clear();
+				}
+			}
+			else if (yytext.Length - index - 1 == 4)
+			{
+				var datetime = DateTimeOffset.Parse(yytext.ToString());
+				var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
+				_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+		private void ProcessUTC13()
+		{
+			//	yyyy/
+			//	yyyy-
+
+			var index1 = yytext.ToString().LastIndexOf('-');
+			var index2 = yytext.ToString().LastIndexOf('+');
+			var index = index1 > index2 ? index1 : index2;
+
+			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (yytext.Length - index - 1 >= 1 && (_input.Peek() == '/' || _input.Peek() == '-'))
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC14;
+
+				if (_input.EndOfStream)
 					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 			}
 			else
 			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 			}
 		}
 
-		private void ProcessDateTime9()
+		private void ProcessUTC14()
 		{
-			if (_input != null)
+			//	yyyy-mm-
+			//	yyyy/mm/
+
+			var index1 = yytext.ToString().LastIndexOf('-');
+			var index2 = yytext.ToString().LastIndexOf('/');
+			var index = index1 > index2 ? index1 : index2;
+
+			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
 			{
-				//	2020-05-21T00
+				yytext.Append(_input.Read());
 
-				if (_input.Peek() == ':')
+				if (_input.EndOfStream)
 				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.DATETIME10;
-
-					if (_input.EndOfStream)
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+					var datetime = DateTimeOffset.Parse(yytext.ToString());
+					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
+					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					yytext.Clear();
 				}
-				else
+			}
+			else if (yytext.Length - index - 1 >= 1 && (_input.Peek() == 'T' || _input.Peek() == 't'))
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC15;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (yytext.Length - index - 1 >= 1)
+			{
+				var datetime = DateTimeOffset.Parse(yytext.ToString());
+				var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
+				_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+		private void ProcessUTC15()
+		{
+			//	yyyy-mm-ddT
+			var index1 = yytext.ToString().LastIndexOf('t');
+			var index2 = yytext.ToString().LastIndexOf('T');
+			var index = index1 > index2 ? index1 : index2;
+
+			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (yytext.Length - index - 1 >= 1 && _input.Peek() >= ':')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC7;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+
+		private void ProcessMDY1()
+		{
+			// m/  mm/
+			// m-  mm-
+			if (_input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.MDY2;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+		private void ProcessMDY2()
+		{
+			//	mm/0 - mm/9
+			//	mm-0 - mm-9
+
+			if ((yytext[^1] == '0' || yytext[^1] == '1' || yytext[^1] == '2') &&
+				(_input.Peek() >= '0' && _input.Peek() <= '9'))
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.MDY3;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+
+			else if ( yytext[^1] == '3' &&
+				      (_input.Peek() >= '0' && _input.Peek() <= '1'))
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.MDY3;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (_input.Peek() == '-' || _input.Peek() == '/')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.MDY4;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+		private void ProcessMDY3()
+		{
+			//	mm/dd
+			//	mm-dd
+
+			if (_input.Peek() == '-' || _input.Peek() == '/')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.MDY4;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+		private void ProcessMDY4()
+		{
+			//	mm-dd-
+			//	mm/dd/
+
+			var index1 = yytext.ToString().LastIndexOf('-');
+			var index2 = yytext.ToString().LastIndexOf('/');
+			var index = index1 > index2 ? index1 : index2;
+
+			if (yytext.Length - index - 1 < 4 &&
+				 _input.Peek() >= '0' &&
+				 _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+				{
+					var datetime = DateTime.Parse(yytext.ToString());
+					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
+					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					yytext.Clear();
+				}
+			}
+			else if (_input.Peek() == ' ')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.MDY5;
+
+				if (_input.EndOfStream)
+				{
+					var datetime = DateTime.Parse(yytext.ToString());
+					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
+					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					yytext.Clear();
+				}
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+		private void ProcessMDY5()
+		{
+			//	mm/dd/yyyy<sp>
+			var index = yytext.ToString().LastIndexOf(' ');
+
+			if ( yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9' )
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if ( _input.Peek() == ':' )
+            {
+				yytext.Append(_input.Read());
+				_state = LexicalState.MDY6;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+		private void ProcessMDY6()
+		{
+			//	mm/dd/yyyy hh:
+
+			var index = yytext.ToString().LastIndexOf(':');
+
+			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (_input.Peek() == ':')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.MDY7;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+		private void ProcessMDY7()
+		{
+			//	mm/dd/yyyy hh:mm:
+
+			var index = yytext.ToString().LastIndexOf(':');
+
+			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+				{
+					var datetime = DateTime.Parse(yytext.ToString());
+					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
+					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					yytext.Clear();
+				}
+			}
+			else if (_input.Peek() == '.')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.MDY8;
+
+				if (_input.EndOfStream)
 					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 			}
 			else
 			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
+				var datetime = DateTime.Parse(yytext.ToString());
+				var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
+				_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
 			}
 		}
 
-		private void ProcessDateTime10()
+		private void ProcessMDY8()
 		{
-			if (_input != null)
+			//	mm/dd/yyyy hh:mm:ss.
+
+			var index = yytext.ToString().LastIndexOf('.');
+
+			if (yytext.Length - index - 1 < 6 && _input.Peek() >= '0' && _input.Peek() <= '9')
 			{
-				//	2020-05-21T00:
+				yytext.Append(_input.Read());
 
-				if (_input.Peek() >= '0' || _input.Peek() <= '9')
+				if (_input.EndOfStream)
 				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.DATETIME11;
-
-					if (_input.EndOfStream)
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+					var datetime = DateTime.Parse(yytext.ToString());
+					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
+					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					yytext.Clear();
 				}
-				else
+			}
+			else if ( _input.Peek() == '-' || _input.Peek() == '+' )
+            {
+				yytext.Append(_input.Read());
+				_state = LexicalState.MDY9;
+			}
+			else
+			{
+				var datetime = DateTime.Parse(yytext.ToString());
+				var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
+				_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
+			}
+		}
+
+		private void ProcessMDY9()
+		{
+			//	mm/dd/yyyy hh:mm:ss.ffffff+
+			//	mm/dd/yyyy hh:mm:ss.ffffff-
+
+			var index1 = yytext.ToString().LastIndexOf('-');
+			var index2 = yytext.ToString().LastIndexOf('+');
+			var index = index1 > index2 ? index1 : index2;
+
+			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (yytext.Length - index - 1 >= 1 && _input.Peek() >= ':')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.MDY10;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (yytext.Length - index - 1 == 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.MDY11;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+		private void ProcessMDY10()
+		{
+			//	mm/dd/yyyy hh:mm:ss.ffffff+00:
+			//	mm/dd/yyyy hh:mm:ss.ffffff-00:
+
+			var index = yytext.ToString().LastIndexOf(':');
+
+			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+				{
+					var datetime = DateTimeOffset.Parse(yytext.ToString());
+					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
+					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					yytext.Clear();
+				}
+			}
+			else if ( yytext.Length-index-1 >= 1 && yytext.Length-index-1 <= 2 && (_input.Peek() < '0' || _input.Peek() > '9'))
+            {
+				var datetime = DateTimeOffset.Parse(yytext.ToString());
+				var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
+				_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+		private void ProcessMDY11()
+		{
+			//	mm/dd/yyyy hh:mm:ss.ffffff+000
+			//	mm/dd/yyyy hh:mm:ss.ffffff-000
+
+			var index1 = yytext.ToString().LastIndexOf('-');
+			var index2 = yytext.ToString().LastIndexOf('+');
+			var index = index1 > index2 ? index1 : index2;
+
+			if (yytext.Length - index - 1 < 4 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+				{
+					var datetime = DateTimeOffset.Parse(yytext.ToString());
+					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
+					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					yytext.Clear();
+				}
+			}
+			else if (yytext.Length - index - 1 == 4)
+			{
+				var datetime = DateTimeOffset.Parse(yytext.ToString());
+				var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
+				_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+		private void ProcessYMD1()
+		{
+			//	yyyy/
+			//	yyyy-
+
+			var index1 = yytext.ToString().LastIndexOf('-');
+			var index2 = yytext.ToString().LastIndexOf('+');
+			var index = index1 > index2 ? index1 : index2;
+
+			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (yytext.Length - index - 1 >= 1 && (_input.Peek() == '/' || _input.Peek() == '-'))
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.YMD2;
+
+				if (_input.EndOfStream)
 					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 			}
 			else
 			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 			}
 		}
 
-		private void ProcessDateTime11()
+		private void ProcessYMD2()
 		{
-			if (_input != null)
+			//	yyyy-mm-
+			//	yyyy/mm/
+
+			var index1 = yytext.ToString().LastIndexOf('-');
+			var index2 = yytext.ToString().LastIndexOf('/');
+			var index = index1 > index2 ? index1 : index2;
+
+			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
 			{
-				//	2020-05-21T00:0
+				yytext.Append(_input.Read());
 
-				if (_input.Peek() >= '0' || _input.Peek() <= '9')
+				if (_input.EndOfStream)
 				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.DATETIME12;
-
-					if (_input.EndOfStream)
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+					var datetime = DateTimeOffset.Parse(yytext.ToString());
+					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
+					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					yytext.Clear();
 				}
-				else
+			}
+			else if (yytext.Length - index - 1 >= 1 && (_input.Peek() == 'T' || _input.Peek() == 't'))
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.YMD3;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (yytext.Length - index - 1 >= 1)
+			{
+				var datetime = DateTimeOffset.Parse(yytext.ToString());
+				var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
+				_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+		private void ProcessYMD3()
+		{
+			//	yyyy-mm-ddT
+			var index1 = yytext.ToString().LastIndexOf('t');
+			var index2 = yytext.ToString().LastIndexOf('T');
+			var index = index1 > index2 ? index1 : index2;
+
+			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (yytext.Length - index - 1 >= 1 && _input.Peek() >= ':' )
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.MDY6;
+
+				if (_input.EndOfStream)
 					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 			}
 			else
-			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
-			}
-		}
-
-		private void ProcessDateTime12()
-		{
-			if (_input != null)
-			{
-				//	2020-05-21T00:00
-
-				if (_input.Peek() == ':')
-				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.DATETIME13;
-
-					if (_input.EndOfStream)
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-				}
-				else
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else
-			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
-			}
-		}
-
-		private void ProcessDateTime13()
-		{
-			if (_input != null)
-			{
-				//	2020-05-21T00:00:
-
-				if (_input.Peek() >= '0' || _input.Peek() <= '9')
-				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.DATETIME14;
-
-					if (_input.EndOfStream)
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-				}
-				else
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else
-			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
-			}
-		}
-
-		private void ProcessDateTime14()
-		{
-			if (_input != null)
-			{
-				//	2020-05-21T00:00:0
-
-				if (_input.Peek() >= '0' || _input.Peek() <= '9')
-				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.DATETIME15;
-
-					if (_input.EndOfStream)
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-				}
-				else
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else
-			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
-			}
-		}
-
-		private void ProcessDateTime15()
-		{
-			if (_input != null)
-			{
-				//	2020-05-21T00:00:00
-
-				if (_input.Peek() == '.')
-				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.DATETIME16;
-
-					if (_input.EndOfStream)
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-				}
-				else if (_input.Peek() == '+' || _input.Peek() == '-')
-				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.DATETIME17;
-
-					if (_input.EndOfStream)
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-				}
-				else if (_input.Peek() == 'z' || _input.Peek() == 'Z')
-				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.INITIAL_STATE;
-
-					try
-					{
-						_tokenStream.Push(new Token(Symbol.DATETIME, DateTime.Parse(yytext.ToString())));
-						yytext.Clear();
-					}
-					catch (Exception)
-					{
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-					}
-				}
-				else
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else
-			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
-			}
-		}
-
-		private void ProcessDateTime16()
-		{
-			if (_input != null)
-			{
-				//	2020-05-21T00:00:00.
-
-				if (_input.Peek() >= '0' && _input.Peek() <= '9')
-				{
-					yytext.Append(_input.Read());
-
-					if (_input.EndOfStream)
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-				}
-				else if (_input.Peek() == '+' || _input.Peek() == '-')
-				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.DATETIME17;
-
-					if (_input.EndOfStream)
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-				}
-				else if (_input.Peek() == 'z' || _input.Peek() == 'Z')
-				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.INITIAL_STATE;
-
-					try
-					{
-						_tokenStream.Push(new Token(Symbol.DATETIME, DateTime.Parse(yytext.ToString())));
-						yytext.Clear();
-					}
-					catch (Exception)
-					{
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-					}
-				}
-				else
-				{
-					_state = LexicalState.INITIAL_STATE;
-					try
-					{
-						_tokenStream.Push(new Token(Symbol.DATETIME, DateTime.Parse(yytext.ToString())));
-						yytext.Clear();
-					}
-					catch (Exception)
-					{
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-					}
-				}
-			}
-			else
-			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
-			}
-		}
-
-		private void ProcessDateTime17()
-		{
-			if (_input != null)
-			{
-				//	2020-05-21T00:00:00.000000+
-
-				if (_input.Peek() >= '0' && _input.Peek() <= '9')
-				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.DATETIME18;
-
-					if (_input.EndOfStream)
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-				}
-				else
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else
-			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
-			}
-		}
-
-		private void ProcessDateTime18()
-		{
-			if (_input != null)
-			{
-				//	2020-05-21T00:00:00.000000+0
-
-				if (_input.Peek() >= '0' && _input.Peek() <= '9')
-				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.DATETIME19;
-
-					if (_input.EndOfStream)
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-				}
-				else
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else
-			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
-			}
-		}
-
-		private void ProcessDateTime19()
-		{
-			if (_input != null)
-			{
-				//	2020-05-21T00:00:00.000000+00
-
-				if (_input != null && _input.Peek() == ':')
-				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.DATETIME20;
-
-					if (_input.EndOfStream)
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-				}
-				else
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else
-			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
-			}
-		}
-
-		private void ProcessDateTime20()
-		{
-			if (_input != null)
-			{
-				//	2020-05-21T00:00:00.000000+00:
-
-				if (_input != null && _input.Peek() >= '0' && _input.Peek() <= '9')
-				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.DATETIME21;
-
-					if (_input.EndOfStream)
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-				}
-				else
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else
-			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
-			}
-		}
-
-		private void ProcessDateTime21()
-		{
-			if (_input != null)
-			{
-				//	2020-05-21T00:00:00.000000+00:0
-
-				if (_input.Peek() >= '0' && _input.Peek() <= '9')
-				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.INITIAL_STATE;
-					try
-					{
-						_tokenStream.Push(new Token(Symbol.DATETIME, DateTime.Parse(yytext.ToString())));
-						yytext.Clear();
-					}
-					catch (Exception)
-					{
-						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-					}
-				}
-				else
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else
-			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
-			}
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 		}
 
 		private void ProcessTimeSpan1()
@@ -3643,242 +3941,219 @@ namespace Tense.Rql
 
 		private void ProcessDateOrTimeOrNumericOrGuid()
 		{
-			if (_input != null)
+			//	all numeric numbers at this point
+			yytext.Append(Convert.ToString(_input.Read()));
+
+			//	Is it a hexidecimal number format?
+			if (yytext.Length == 1 && yytext[0] == '0' && (_input.Peek() == 'x' || _input.Peek() == 'X'))
 			{
-				//	all numeric numbers at this point
 				yytext.Append(Convert.ToString(_input.Read()));
+				_state = LexicalState.HEXVAL;
+				yytext.Clear();
+			}
+
+			//	Is it a timespan format?
+			else if ((yytext.Length == 1 || yytext.Length == 2) && _input.Peek() == ':')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.TIMESPAN1;
+			}
+
+			//	Is it a datetime of the form mdy?
+			else if ((yytext.Length == 1 || yytext.Length == 2) && (_input.Peek() == '-' || _input.Peek() == '/'))
+			{
+				if (Convert.ToInt32(yytext.ToString()) > 0 && Convert.ToInt32(yytext.ToString()) <= 12)
+				{
+					yytext.Append(_input.Read());
+					_state = LexicalState.MDY1;
+				}
+				else
+					throw new RqlFormatException("Datetime format is invalid.");
+			}
+			//	Is it a datetime of the form ymd?
+			else if (yytext.Length == 4 && (_input.Peek() == '-' || _input.Peek() == '/'))
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.YMD1;
+			}
+			//	Is it a double format?
+			else if (_input.Peek() == 'd' || _input.Peek() == 'D')
+			{
+				//	nnnnd or nnnnD
+				var c = _input.Read();
 
 				if (_input.EndOfStream)
 				{
 					_state = LexicalState.INITIAL_STATE;
-					_tokenStream.Push(new Token(Symbol.INTEGER, Convert.ToInt32(yytext.ToString())));
+					_tokenStream.Push(new Token(Symbol.DOUBLE, Convert.ToDouble(yytext.ToString())));
 					yytext.Clear();
 				}
-				else if (yytext.Length == 1 && yytext[0] == '0' && (_input.Peek() == 'x' || _input.Peek() == 'X'))
+				else if ((_input.Peek() >= 'a' && _input.Peek() <= 'f') || (_input.Peek() >= 'A' && _input.Peek() <= 'F') || (_input.Peek() >= '0' && _input.Peek() <= '9'))
 				{
-					yytext.Append(Convert.ToString(_input.Read()));
-					_state = LexicalState.HEXVAL;
-					yytext.Clear();
+					yytext.Append(c);
+					_state = LexicalState.GUID1;
 				}
-				else if (_input.Peek() == 'd' || _input.Peek() == 'D')
+				else
 				{
-					//	nnnnd or nnnnD
-					var c = _input.Read();
-
-					if (_input.EndOfStream)
-					{
-						_state = LexicalState.INITIAL_STATE;
-						_tokenStream.Push(new Token(Symbol.DOUBLE, Convert.ToDouble(yytext.ToString())));
-						yytext.Clear();
-					}
-					else if ((_input.Peek() >= 'a' && _input.Peek() <= 'f') || (_input.Peek() >= 'A' && _input.Peek() <= 'F') || (_input.Peek() >= '0' && _input.Peek() <= '9'))
-					{
-						yytext.Append(c);
-						_state = LexicalState.GUID1;
-					}
-					else
-					{
-						_state = LexicalState.INITIAL_STATE;
-						_tokenStream.Push(new Token(Symbol.DOUBLE, Convert.ToDouble(yytext.ToString())));
-						yytext.Clear();
-					}
-				}
-				else if (_input.Peek() == 'f' || _input.Peek() == 'F')
-				{
-					//	nnnnd or nnnnD
-					var c = _input.Read();
-
-					if (_input.EndOfStream)
-					{
-						_state = LexicalState.INITIAL_STATE;
-						_tokenStream.Push(new Token(Symbol.SINGLE, Convert.ToSingle(yytext.ToString())));
-						yytext.Clear();
-					}
-					else if ((_input.Peek() >= 'a' && _input.Peek() <= 'f') || (_input.Peek() >= 'A' && _input.Peek() <= 'F') || (_input.Peek() >= '0' && _input.Peek() <= '9'))
-					{
-						yytext.Append(c);
-						_state = LexicalState.GUID1;
-					}
-					else
-					{
-						_state = LexicalState.INITIAL_STATE;
-						_tokenStream.Push(new Token(Symbol.SINGLE, Convert.ToSingle(yytext.ToString())));
-						yytext.Clear();
-					}
-				}
-				else if (_input.Peek() == 'u' || _input.Peek() == 'U')
-				{
-					_input.Read();
-
-					if (_input.EndOfStream)
-					{
-						_state = LexicalState.INITIAL_STATE;
-						_tokenStream.Push(new Token(Symbol.UINTEGER, Convert.ToUInt32(yytext.ToString())));
-						yytext.Clear();
-					}
-					else if (_input.Peek() == 'l' || _input.Peek() == 'L')
-					{
-						_input.Read();
-						_state = LexicalState.INITIAL_STATE;
-						_tokenStream.Push(new Token(Symbol.ULONG, Convert.ToUInt64(yytext.ToString())));
-						yytext.Clear();
-					}
-					else
-					{
-						_state = LexicalState.INITIAL_STATE;
-						_tokenStream.Push(new Token(Symbol.UINTEGER, Convert.ToUInt32(yytext.ToString())));
-						yytext.Clear();
-					}
-				}
-				else if (_input.Peek() == 'm' || _input.Peek() == 'M')
-				{
-					_input.Read();
 					_state = LexicalState.INITIAL_STATE;
-					_tokenStream.Push(new Token(Symbol.DECIMAL, Convert.ToDecimal(yytext.ToString())));
+					_tokenStream.Push(new Token(Symbol.DOUBLE, Convert.ToDouble(yytext.ToString())));
+					yytext.Clear();
+				}
+			}
+
+			//	Is it a float format?
+			else if (_input.Peek() == 'f' || _input.Peek() == 'F')
+			{
+				//	nnnnd or nnnnD
+				var c = _input.Read();
+
+				if (_input.EndOfStream)
+				{
+					_state = LexicalState.INITIAL_STATE;
+					_tokenStream.Push(new Token(Symbol.SINGLE, Convert.ToSingle(yytext.ToString())));
+					yytext.Clear();
+				}
+				else if ((_input.Peek() >= 'a' && _input.Peek() <= 'f') || (_input.Peek() >= 'A' && _input.Peek() <= 'F') || (_input.Peek() >= '0' && _input.Peek() <= '9'))
+				{
+					yytext.Append(c);
+					_state = LexicalState.GUID1;
+				}
+				else
+				{
+					_state = LexicalState.INITIAL_STATE;
+					_tokenStream.Push(new Token(Symbol.SINGLE, Convert.ToSingle(yytext.ToString())));
+					yytext.Clear();
+				}
+			}
+
+			//	Is it an unsigned integer format?
+			else if (_input.Peek() == 'u' || _input.Peek() == 'U')
+			{
+				_input.Read();
+
+				if (_input.EndOfStream)
+				{
+					_state = LexicalState.INITIAL_STATE;
+					_tokenStream.Push(new Token(Symbol.UINTEGER, Convert.ToUInt32(yytext.ToString())));
 					yytext.Clear();
 				}
 				else if (_input.Peek() == 'l' || _input.Peek() == 'L')
 				{
 					_input.Read();
+					_state = LexicalState.INITIAL_STATE;
+					_tokenStream.Push(new Token(Symbol.ULONG, Convert.ToUInt64(yytext.ToString())));
+					yytext.Clear();
+				}
+				else
+				{
+					_state = LexicalState.INITIAL_STATE;
+					_tokenStream.Push(new Token(Symbol.UINTEGER, Convert.ToUInt32(yytext.ToString())));
+					yytext.Clear();
+				}
+			}
 
-					if (_input.EndOfStream)
-					{
-						_state = LexicalState.INITIAL_STATE;
-						_tokenStream.Push(new Token(Symbol.LONG, Convert.ToInt64(yytext.ToString())));
-						yytext.Clear();
-					}
-					else if (_input.Peek() == 'u' || _input.Peek() == 'U')
-					{
-						_input.Read();
-						_state = LexicalState.INITIAL_STATE;
-						_tokenStream.Push(new Token(Symbol.ULONG, Convert.ToUInt64(yytext.ToString())));
-						yytext.Clear();
-					}
-					else
-					{
-						_state = LexicalState.INITIAL_STATE;
-						_tokenStream.Push(new Token(Symbol.LONG, Convert.ToInt64(yytext.ToString())));
-						yytext.Clear();
-					}
-				}
-				else if (yytext.Length == 2 && _input.Peek() == ':')
-				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.TIMESPAN1;
-				}
-				else if (yytext.Length <= 4 && (_input.Peek() == '-' || _input.Peek() == '/'))
-				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.DATETIME1;
-				}
-				else if (yytext.Length == 8 && _input.Peek() == '-')
-				{
-					_state = LexicalState.GUID1;
-				}
-				else if ((_input.Peek() >= 'a' && _input.Peek() <= 'f') || (_input.Peek() >= 'A' && _input.Peek() <= 'F'))
-				{
-					_state = LexicalState.GUID1;
-				}
-				else if (_input.Peek() == '.')
-				{
-					yytext.Append(_input.Read());
-					_state = LexicalState.DECIMALPORTION;
+			//	Is it a decimal format?
+			else if (_input.Peek() == 'm' || _input.Peek() == 'M')
+			{
+				_input.Read();
+				_state = LexicalState.INITIAL_STATE;
+				_tokenStream.Push(new Token(Symbol.DECIMAL, Convert.ToDecimal(yytext.ToString())));
+				yytext.Clear();
+			}
 
-					if (_input.EndOfStream)
-					{
-						try
-						{
-							_state = LexicalState.INITIAL_STATE;
-							_tokenStream.Push(new Token(Symbol.DOUBLE, Convert.ToDouble(yytext.ToString())));
-							yytext.Clear();
-						}
-						catch (Exception)
-						{
-							throw new RqlFormatException($"Unable to cast {yytext} as double. Aborting scan.");
-						}
-					}
+			//	Is it a long format?
+			else if (_input.Peek() == 'l' || _input.Peek() == 'L')
+			{
+				_input.Read();
+
+				if (_input.EndOfStream)
+				{
+					_state = LexicalState.INITIAL_STATE;
+					_tokenStream.Push(new Token(Symbol.LONG, Convert.ToInt64(yytext.ToString())));
+					yytext.Clear();
 				}
-				else if (_input.Peek() < '0' || _input.Peek() > '9')
+				else if (_input.Peek() == 'u' || _input.Peek() == 'U')
+				{
+					_input.Read();
+					_state = LexicalState.INITIAL_STATE;
+					_tokenStream.Push(new Token(Symbol.ULONG, Convert.ToUInt64(yytext.ToString())));
+					yytext.Clear();
+				}
+				else
+				{
+					_state = LexicalState.INITIAL_STATE;
+					_tokenStream.Push(new Token(Symbol.LONG, Convert.ToInt64(yytext.ToString())));
+					yytext.Clear();
+				}
+			}
+
+			//	Is it a GUID format?
+			else if ( (yytext.Length == 8 && _input.Peek() == '-') ||
+				      (_input.Peek() >= 'a' && _input.Peek() <= 'f') ||
+					  (_input.Peek() >= 'A' && _input.Peek() <= 'F'))
+			{
+				_state = LexicalState.GUID1;
+			}
+
+			//	Is it a decimal number (double, float or decimal)
+			else if (_input.Peek() == '.')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.DECIMALPORTION;
+
+				if (_input.EndOfStream)
 				{
 					try
 					{
 						_state = LexicalState.INITIAL_STATE;
-						_tokenStream.Push(new Token(Symbol.INTEGER, Convert.ToInt32(yytext.ToString())));
+						_tokenStream.Push(new Token(Symbol.DOUBLE, Convert.ToDouble(yytext.ToString())));
 						yytext.Clear();
 					}
 					catch (Exception)
 					{
-						throw new RqlFormatException($"Unable to cast {yytext} as int. Aborting scan.");
+						throw new RqlFormatException($"Unable to cast {yytext} as double. Aborting scan.");
 					}
 				}
 			}
-			else
+
+			//	Is this the end of the numeric format?
+			else if (_input.Peek() < '0' || _input.Peek() > '9')
 			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
+				try
+				{
+					_state = LexicalState.INITIAL_STATE;
+					_tokenStream.Push(new Token(Symbol.INTEGER, Convert.ToInt32(yytext.ToString())));
+					yytext.Clear();
+				}
+				catch (Exception)
+				{
+					throw new RqlFormatException($"Unable to cast {yytext} as int. Aborting scan.");
+				}
 			}
 		}
 
 		private void ProcessGuidOrString1()
 		{
-			if (_input != null)
+			if (yytext.Length < 8)
 			{
-				if (yytext.Length < 8)
-				{
-					if ((_input.Peek() >= '0' && _input.Peek() <= '9') ||
-						(_input.Peek() >= 'a' && _input.Peek() <= 'f') ||
-						(_input.Peek() >= 'A' && _input.Peek() <= 'F'))
-					{
-						yytext.Append(_input.Read());
-
-						if (_input.EndOfStream)
-						{
-							_tokenStream.Push(new Token(Symbol.PROPERTY, yytext.ToString()));
-							_state = LexicalState.INITIAL_STATE;
-							yytext.Clear();
-						}
-					}
-					else if (_input.Peek() == '_' ||
-							(_input.Peek() >= 'g' && _input.Peek() <= 'z') ||
-							(_input.Peek() >= 'G' && _input.Peek() <= 'Z'))
-					{
-						_state = LexicalState.TEXTSTREAM;
-					}
-					else if (IsStringSpecialChar())
-					{
-						_state = LexicalState.STRING2;
-					}
-					else
-					{
-						_tokenStream.Push(new Token(Symbol.PROPERTY, yytext.ToString()));
-						yytext.Clear();
-						_state = LexicalState.INITIAL_STATE;
-					}
-				}
-				else if (_input.Peek() == '-')
+				if ((_input.Peek() >= '0' && _input.Peek() <= '9') ||
+					(_input.Peek() >= 'a' && _input.Peek() <= 'f') ||
+					(_input.Peek() >= 'A' && _input.Peek() <= 'F'))
 				{
 					yytext.Append(_input.Read());
-					_state = LexicalState.GUIDORSTRING2;
 
 					if (_input.EndOfStream)
 					{
 						_tokenStream.Push(new Token(Symbol.PROPERTY, yytext.ToString()));
-						yytext.Clear();
 						_state = LexicalState.INITIAL_STATE;
+						yytext.Clear();
 					}
 				}
-				else if ((_input.Peek() >= '0' && _input.Peek() <= '9') ||
-					 (_input.Peek() >= 'a' && _input.Peek() <= 'z') ||
-					 (_input.Peek() >= 'A' && _input.Peek() <= 'Z') || _input.Peek() == '_')
+				else if (_input.Peek() == '_' ||
+						(_input.Peek() >= 'g' && _input.Peek() <= 'z') ||
+						(_input.Peek() >= 'G' && _input.Peek() <= 'Z'))
 				{
-					yytext.Append(_input.Read());
 					_state = LexicalState.TEXTSTREAM;
-
-					if (_input.EndOfStream)
-					{
-						_tokenStream.Push(new Token(Symbol.PROPERTY, yytext.ToString()));
-						yytext.Clear();
-						_state = LexicalState.INITIAL_STATE;
-					}
 				}
 				else if (IsStringSpecialChar())
 				{
@@ -3891,55 +4166,56 @@ namespace Tense.Rql
 					_state = LexicalState.INITIAL_STATE;
 				}
 			}
+			else if (_input.Peek() == '-')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.GUIDORSTRING2;
+
+				if (_input.EndOfStream)
+				{
+					_tokenStream.Push(new Token(Symbol.PROPERTY, yytext.ToString()));
+					yytext.Clear();
+					_state = LexicalState.INITIAL_STATE;
+				}
+			}
+			else if ((_input.Peek() >= '0' && _input.Peek() <= '9') ||
+				     (_input.Peek() >= 'a' && _input.Peek() <= 'z') ||
+				     (_input.Peek() >= 'A' && _input.Peek() <= 'Z') || _input.Peek() == '_')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.TEXTSTREAM;
+
+				if (_input.EndOfStream)
+				{
+					_tokenStream.Push(new Token(Symbol.PROPERTY, yytext.ToString()));
+					yytext.Clear();
+					_state = LexicalState.INITIAL_STATE;
+				}
+			}
+			else if (IsStringSpecialChar())
+			{
+				_state = LexicalState.STRING2;
+			}
 			else
 			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
+				_tokenStream.Push(new Token(Symbol.PROPERTY, yytext.ToString()));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
 			}
 		}
 
 		private void ProcessGuidOrString2()
 		{
-			if (_input != null)
+			//	12345678-0123
+			//	4a0bb476-8ab5-4265-a698-6f999b09867b
+
+			if (yytext.Length < 13)
 			{
-				//	12345678-0123
-				//	4a0bb476-8ab5-4265-a698-6f999b09867b
-
-				if (yytext.Length < 13)
-				{
-					if ((_input.Peek() >= '0' && _input.Peek() <= '9') ||
-						(_input.Peek() >= 'a' && _input.Peek() <= 'f') ||
-						(_input.Peek() >= 'A' && _input.Peek() <= 'F'))
-					{
-						yytext.Append(_input.Read());
-
-						if (_input.EndOfStream)
-						{
-							_tokenStream.Push(new Token(Symbol.STRING, yytext.ToString()));
-							yytext.Clear();
-							_state = LexicalState.INITIAL_STATE;
-						}
-					}
-					else if (_input.Peek() == '_' ||
-							(_input.Peek() >= 'g' && _input.Peek() <= 'z') ||
-							(_input.Peek() >= 'G' && _input.Peek() <= 'Z'))
-					{
-						_state = LexicalState.TEXTSTREAM;
-					}
-					else if (IsStringSpecialChar())
-					{
-						_state = LexicalState.STRING2;
-					}
-					else
-					{
-						_tokenStream.Push(new Token(Symbol.STRING, yytext.ToString()));
-						yytext.Clear();
-						_state = LexicalState.INITIAL_STATE;
-					}
-				}
-				else if (_input.Peek() == '-')
+				if ((_input.Peek() >= '0' && _input.Peek() <= '9') ||
+					(_input.Peek() >= 'a' && _input.Peek() <= 'f') ||
+					(_input.Peek() >= 'A' && _input.Peek() <= 'F'))
 				{
 					yytext.Append(_input.Read());
-					_state = LexicalState.GUIDORSTRING3;
 
 					if (_input.EndOfStream)
 					{
@@ -3948,9 +4224,9 @@ namespace Tense.Rql
 						_state = LexicalState.INITIAL_STATE;
 					}
 				}
-				else if ((_input.Peek() >= '0' && _input.Peek() <= '9') ||
-					 (_input.Peek() >= 'a' && _input.Peek() <= 'z') ||
-					 (_input.Peek() >= 'A' && _input.Peek() <= 'Z') || _input.Peek() == '_')
+				else if (_input.Peek() == '_' ||
+						(_input.Peek() >= 'g' && _input.Peek() <= 'z') ||
+						(_input.Peek() >= 'G' && _input.Peek() <= 'Z'))
 				{
 					_state = LexicalState.TEXTSTREAM;
 				}
@@ -3965,59 +4241,52 @@ namespace Tense.Rql
 					_state = LexicalState.INITIAL_STATE;
 				}
 			}
+			else if (_input.Peek() == '-')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.GUIDORSTRING3;
+
+				if (_input.EndOfStream)
+				{
+					_tokenStream.Push(new Token(Symbol.STRING, yytext.ToString()));
+					yytext.Clear();
+					_state = LexicalState.INITIAL_STATE;
+				}
+			}
+			else if ((_input.Peek() >= '0' && _input.Peek() <= '9') ||
+				 (_input.Peek() >= 'a' && _input.Peek() <= 'z') ||
+				 (_input.Peek() >= 'A' && _input.Peek() <= 'Z') || _input.Peek() == '_')
+			{
+				_state = LexicalState.TEXTSTREAM;
+			}
+			else if (IsStringSpecialChar())
+			{
+				_state = LexicalState.STRING2;
+			}
 			else
 			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
+				_tokenStream.Push(new Token(Symbol.STRING, yytext.ToString()));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
 			}
 		}
 
 		private void ProcessGuidOrString3()
 		{
-			if (_input != null)
-			{
-				//	12345678-0123-5678
-				//	4a0bb476-8ab5-4265-a698-6f999b09867b
+			//	12345678-0123-5678
+			//	4a0bb476-8ab5-4265-a698-6f999b09867b
 
-				if (yytext.Length < 18)
-				{
-					if ((_input.Peek() >= '0' && _input.Peek() <= '9') ||
-						(_input.Peek() >= 'a' && _input.Peek() <= 'f') ||
-						(_input.Peek() >= 'A' && _input.Peek() <= 'F'))
-					{
-						yytext.Append(_input.Read());
-					}
-					else if (_input.Peek() == '_' ||
-							(_input.Peek() >= 'g' && _input.Peek() <= 'z') ||
-							(_input.Peek() >= 'G' && _input.Peek() <= 'Z'))
-					{
-						_state = LexicalState.TEXTSTREAM;
-					}
-					else if (IsStringSpecialChar())
-					{
-						_state = LexicalState.STRING2;
-					}
-					else
-					{
-						_tokenStream.Push(new Token(Symbol.STRING, yytext.ToString()));
-						yytext.Clear();
-						_state = LexicalState.INITIAL_STATE;
-					}
-				}
-				else if (_input.Peek() == '-')
+			if (yytext.Length < 18)
+			{
+				if ((_input.Peek() >= '0' && _input.Peek() <= '9') ||
+					(_input.Peek() >= 'a' && _input.Peek() <= 'f') ||
+					(_input.Peek() >= 'A' && _input.Peek() <= 'F'))
 				{
 					yytext.Append(_input.Read());
-					_state = LexicalState.GUIDORSTRING4;
-
-					if (_input.EndOfStream)
-					{
-						_tokenStream.Push(new Token(Symbol.STRING, yytext.ToString()));
-						yytext.Clear();
-						_state = LexicalState.INITIAL_STATE;
-					}
 				}
-				else if ((_input.Peek() >= '0' && _input.Peek() <= '9') ||
-					 (_input.Peek() >= 'a' && _input.Peek() <= 'z') ||
-					 (_input.Peek() >= 'A' && _input.Peek() <= 'Z') || _input.Peek() == '_')
+				else if (_input.Peek() == '_' ||
+						(_input.Peek() >= 'g' && _input.Peek() <= 'z') ||
+						(_input.Peek() >= 'G' && _input.Peek() <= 'Z'))
 				{
 					_state = LexicalState.TEXTSTREAM;
 				}
@@ -4032,59 +4301,52 @@ namespace Tense.Rql
 					_state = LexicalState.INITIAL_STATE;
 				}
 			}
+			else if (_input.Peek() == '-')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.GUIDORSTRING4;
+
+				if (_input.EndOfStream)
+				{
+					_tokenStream.Push(new Token(Symbol.STRING, yytext.ToString()));
+					yytext.Clear();
+					_state = LexicalState.INITIAL_STATE;
+				}
+			}
+			else if ((_input.Peek() >= '0' && _input.Peek() <= '9') ||
+				 (_input.Peek() >= 'a' && _input.Peek() <= 'z') ||
+				 (_input.Peek() >= 'A' && _input.Peek() <= 'Z') || _input.Peek() == '_')
+			{
+				_state = LexicalState.TEXTSTREAM;
+			}
+			else if (IsStringSpecialChar())
+			{
+				_state = LexicalState.STRING2;
+			}
 			else
 			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
+				_tokenStream.Push(new Token(Symbol.STRING, yytext.ToString()));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
 			}
 		}
 
 		private void ProcessGuidOrString4()
 		{
-			if (_input != null)
-			{
-				//	12345678-0123-5678-0123
-				//	4a0bb476-8ab5-4265-a698-6f999b09867b
+			//	12345678-0123-5678-0123
+			//	4a0bb476-8ab5-4265-a698-6f999b09867b
 
-				if (yytext.Length < 23)
-				{
-					if ((_input.Peek() >= '0' && _input.Peek() <= '9') ||
-						(_input.Peek() >= 'a' && _input.Peek() <= 'f') ||
-						(_input.Peek() >= 'A' && _input.Peek() <= 'F'))
-					{
-						yytext.Append(_input.Read());
-					}
-					else if (_input.Peek() == '_' ||
-							(_input.Peek() >= 'g' && _input.Peek() <= 'z') ||
-							(_input.Peek() >= 'G' && _input.Peek() <= 'Z'))
-					{
-						_state = LexicalState.TEXTSTREAM;
-					}
-					else if (IsStringSpecialChar())
-					{
-						_state = LexicalState.STRING2;
-					}
-					else
-					{
-						_tokenStream.Push(new Token(Symbol.STRING, yytext.ToString()));
-						yytext.Clear();
-						_state = LexicalState.INITIAL_STATE;
-					}
-				}
-				else if (_input.Peek() == '-')
+			if (yytext.Length < 23)
+			{
+				if ((_input.Peek() >= '0' && _input.Peek() <= '9') ||
+					(_input.Peek() >= 'a' && _input.Peek() <= 'f') ||
+					(_input.Peek() >= 'A' && _input.Peek() <= 'F'))
 				{
 					yytext.Append(_input.Read());
-					_state = LexicalState.GUIDORSTRING5;
-
-					if (_input.EndOfStream)
-					{
-						_tokenStream.Push(new Token(Symbol.STRING, yytext.ToString()));
-						yytext.Clear();
-						_state = LexicalState.INITIAL_STATE;
-					}
 				}
-				else if ((_input.Peek() >= '0' && _input.Peek() <= '9') ||
-					 (_input.Peek() >= 'a' && _input.Peek() <= 'z') ||
-					 (_input.Peek() >= 'A' && _input.Peek() <= 'Z') || _input.Peek() == '_')
+				else if (_input.Peek() == '_' ||
+						(_input.Peek() >= 'g' && _input.Peek() <= 'z') ||
+						(_input.Peek() >= 'G' && _input.Peek() <= 'Z'))
 				{
 					_state = LexicalState.TEXTSTREAM;
 				}
@@ -4099,65 +4361,66 @@ namespace Tense.Rql
 					_state = LexicalState.INITIAL_STATE;
 				}
 			}
+			else if (_input.Peek() == '-')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.GUIDORSTRING5;
+
+				if (_input.EndOfStream)
+				{
+					_tokenStream.Push(new Token(Symbol.STRING, yytext.ToString()));
+					yytext.Clear();
+					_state = LexicalState.INITIAL_STATE;
+				}
+			}
+			else if ((_input.Peek() >= '0' && _input.Peek() <= '9') ||
+				 (_input.Peek() >= 'a' && _input.Peek() <= 'z') ||
+				 (_input.Peek() >= 'A' && _input.Peek() <= 'Z') || _input.Peek() == '_')
+			{
+				_state = LexicalState.TEXTSTREAM;
+			}
+			else if (IsStringSpecialChar())
+			{
+				_state = LexicalState.STRING2;
+			}
 			else
 			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
+				_tokenStream.Push(new Token(Symbol.STRING, yytext.ToString()));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
 			}
 		}
 
 		private void ProcessGuidOrString5()
 		{
-			if (_input != null)
+			//	12345678-0123-5678-0123-567890123456
+			//	4a0bb476-8ab5-4265-a698-6f999b09867b
+
+			if (yytext.Length < 36)
 			{
-				//	12345678-0123-5678-0123-567890123456
-				//	4a0bb476-8ab5-4265-a698-6f999b09867b
-
-				if (yytext.Length < 36)
+				if ((_input.Peek() >= '0' && _input.Peek() <= '9') ||
+					(_input.Peek() >= 'a' && _input.Peek() <= 'f') ||
+					(_input.Peek() >= 'A' && _input.Peek() <= 'F'))
 				{
-					if ((_input.Peek() >= '0' && _input.Peek() <= '9') ||
-						(_input.Peek() >= 'a' && _input.Peek() <= 'f') ||
-						(_input.Peek() >= 'A' && _input.Peek() <= 'F'))
-					{
-						yytext.Append(_input.Read());
+					yytext.Append(_input.Read());
 
-						if (_input.EndOfStream)
+					if (_input.EndOfStream)
+					{
+						try
 						{
-							try
-							{
-								_state = LexicalState.INITIAL_STATE;
-								_tokenStream.Push(new Token(Symbol.UNIQUEIDENTIFIER, Guid.Parse(yytext.ToString())));
-								yytext.Clear();
-							}
-							catch (Exception error)
-							{
-								throw new RqlFormatException($"{error.Message} Aborting scan.");
-							}
+							_state = LexicalState.INITIAL_STATE;
+							_tokenStream.Push(new Token(Symbol.UNIQUEIDENTIFIER, Guid.Parse(yytext.ToString())));
+							yytext.Clear();
+						}
+						catch (Exception error)
+						{
+							throw new RqlFormatException($"{error.Message} Aborting scan.");
 						}
 					}
-					else if (_input.Peek() == '_' ||
-							(_input.Peek() >= 'g' && _input.Peek() <= 'z') ||
-							(_input.Peek() >= 'G' && _input.Peek() <= 'Z'))
-					{
-						_state = LexicalState.TEXTSTREAM;
-					}
-					else if (IsStringSpecialChar())
-					{
-						_state = LexicalState.STRING2;
-					}
-					else
-					{
-						_tokenStream.Push(new Token(Symbol.STRING, yytext.ToString()));
-						yytext.Clear();
-						_state = LexicalState.INITIAL_STATE;
-					}
 				}
-				else if (_input.Peek() == '-')
-				{
-					_state = LexicalState.TEXTSTREAM;
-				}
-				else if ((_input.Peek() >= '0' && _input.Peek() <= '9') ||
-					 (_input.Peek() >= 'a' && _input.Peek() <= 'z') ||
-					 (_input.Peek() >= 'A' && _input.Peek() <= 'Z') || _input.Peek() == '_')
+				else if (_input.Peek() == '_' ||
+						(_input.Peek() >= 'g' && _input.Peek() <= 'z') ||
+						(_input.Peek() >= 'G' && _input.Peek() <= 'Z'))
 				{
 					_state = LexicalState.TEXTSTREAM;
 				}
@@ -4167,14 +4430,30 @@ namespace Tense.Rql
 				}
 				else
 				{
-					_state = LexicalState.INITIAL_STATE;
-					_tokenStream.Push(new Token(Symbol.UNIQUEIDENTIFIER, Guid.Parse(yytext.ToString())));
+					_tokenStream.Push(new Token(Symbol.STRING, yytext.ToString()));
 					yytext.Clear();
+					_state = LexicalState.INITIAL_STATE;
 				}
+			}
+			else if (_input.Peek() == '-')
+			{
+				_state = LexicalState.TEXTSTREAM;
+			}
+			else if ((_input.Peek() >= '0' && _input.Peek() <= '9') ||
+				 (_input.Peek() >= 'a' && _input.Peek() <= 'z') ||
+				 (_input.Peek() >= 'A' && _input.Peek() <= 'Z') || _input.Peek() == '_')
+			{
+				_state = LexicalState.TEXTSTREAM;
+			}
+			else if (IsStringSpecialChar())
+			{
+				_state = LexicalState.STRING2;
 			}
 			else
 			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
+				_state = LexicalState.INITIAL_STATE;
+				_tokenStream.Push(new Token(Symbol.UNIQUEIDENTIFIER, Guid.Parse(yytext.ToString())));
+				yytext.Clear();
 			}
 		}
 
@@ -5458,532 +5737,329 @@ namespace Tense.Rql
 
 		private void ProcessTextStream()
 		{
-			if (_input != null)
+			if ((_input.Peek() >= 'a' && _input.Peek() <= 'z') || (_input.Peek() >= 'A' && _input.Peek() <= 'Z') || (_input.Peek() >= '0' && _input.Peek() <= '9') || _input.Peek() == '_')
 			{
-				if ((_input.Peek() >= 'a' && _input.Peek() <= 'z') || (_input.Peek() >= 'A' && _input.Peek() <= 'Z') || (_input.Peek() >= '0' && _input.Peek() <= '9') || _input.Peek() == '_')
-				{
-					yytext.Append(Convert.ToString(_input.Read()));
+				yytext.Append(Convert.ToString(_input.Read()));
 
-					if (_input.EndOfStream)
-						ParseReservedWords();
-				}
-				else if (IsStringSpecialChar())
+				if (_input.EndOfStream)
+					ParseReservedWords();
+			}
+			else if (IsStringSpecialChar())
+			{
+				_state = LexicalState.STRING2;
+			}
+			else if (_input.Peek() == '\\')
+			{
+				_state = LexicalState.STRING2;
+			}
+			else if (_input.Peek() == ':')
+			{
+				if (string.Equals(yytext.ToString(), "int8", StringComparison.OrdinalIgnoreCase))
 				{
-					_state = LexicalState.STRING2;
+					_input.Read();
+					_state = LexicalState.TINY;
+					yytext.Clear();
 				}
-				else if (_input.Peek() == '\\')
+				else if (string.Equals(yytext.ToString(), "uint8", StringComparison.OrdinalIgnoreCase))
 				{
-					_state = LexicalState.STRING2;
+					_input.Read();
+					_state = LexicalState.UTINY;
+					yytext.Clear();
 				}
-				else if (_input.Peek() == ':')
+				else if (string.Equals(yytext.ToString(), "int16", StringComparison.OrdinalIgnoreCase))
 				{
-					if (string.Equals(yytext.ToString(), "int8", StringComparison.OrdinalIgnoreCase))
-					{
-						_input.Read();
-						_state = LexicalState.TINY;
-						yytext.Clear();
-					}
-					else if (string.Equals(yytext.ToString(), "uint8", StringComparison.OrdinalIgnoreCase))
-					{
-						_input.Read();
-						_state = LexicalState.UTINY;
-						yytext.Clear();
-					}
-					else if (string.Equals(yytext.ToString(), "int16", StringComparison.OrdinalIgnoreCase))
-					{
-						_input.Read();
-						_state = LexicalState.SHORT;
-						yytext.Clear();
-					}
-					else if (string.Equals(yytext.ToString(), "uint16", StringComparison.OrdinalIgnoreCase))
-					{
-						_input.Read();
-						_state = LexicalState.USHORT;
-						yytext.Clear();
-					}
-					else if (string.Equals(yytext.ToString(), "int32", StringComparison.OrdinalIgnoreCase))
-					{
-						_input.Read();
-						_state = LexicalState.INT;
-						yytext.Clear();
-					}
-					else if (string.Equals(yytext.ToString(), "uint32", StringComparison.OrdinalIgnoreCase))
-					{
-						_input.Read();
-						_state = LexicalState.UINT;
-						yytext.Clear();
-					}
-					else if (string.Equals(yytext.ToString(), "int64", StringComparison.OrdinalIgnoreCase))
-					{
-						_input.Read();
-						_state = LexicalState.LONG;
-						yytext.Clear();
-					}
-					else if (string.Equals(yytext.ToString(), "uint64", StringComparison.OrdinalIgnoreCase))
-					{
-						_input.Read();
-						_state = LexicalState.ULONG;
-						yytext.Clear();
-					}
-					else if (string.Equals(yytext.ToString(), "double", StringComparison.OrdinalIgnoreCase))
-					{
-						_input.Read();
-						_state = LexicalState.DOUBLE1;
-						yytext.Clear();
-					}
-					else if (string.Equals(yytext.ToString(), "float", StringComparison.OrdinalIgnoreCase))
-					{
-						_input.Read();
-						_state = LexicalState.SINGLE1;
-						yytext.Clear();
-					}
-					else if (string.Equals(yytext.ToString(), "decimal", StringComparison.OrdinalIgnoreCase))
-					{
-						_input.Read();
-						_state = LexicalState.DECIMAL1;
-						yytext.Clear();
-					}
-					else if (string.Equals(yytext.ToString(), "boolean", StringComparison.OrdinalIgnoreCase))
-					{
-						_input.Read();
-						_state = LexicalState.BOOL1;
-						yytext.Clear();
-					}
-					else if (string.Equals(yytext.ToString(), "bool", StringComparison.OrdinalIgnoreCase))
-					{
-						_input.Read();
-						_state = LexicalState.BOOL1;
-						yytext.Clear();
-					}
-					else if (string.Equals(yytext.ToString(), "bin", StringComparison.OrdinalIgnoreCase))
-					{
-						_input.Read();
-						_state = LexicalState.BINARY1;
-						yytext.Clear();
-					}
-					else if (string.Equals(yytext.ToString(), "binary", StringComparison.OrdinalIgnoreCase))
-					{
-						_input.Read();
-						_state = LexicalState.BINARY1;
-						yytext.Clear();
-					}
-					else if (string.Equals(yytext.ToString(), "char", StringComparison.OrdinalIgnoreCase))
-					{
-						_input.Read();
-						_state = LexicalState.CHARA;
-						yytext.Clear();
-					}
-					else if (string.Equals(yytext.ToString(), "bstr", StringComparison.OrdinalIgnoreCase))
-					{
-						currentBStr = new Bstr();
-						_input.Read();
-						_state = LexicalState.BSTR1;
-						yytext.Clear();
-					}
-					else if (string.Equals(yytext.ToString(), "guid", StringComparison.OrdinalIgnoreCase))
-					{
-						_input.Read();
-						_state = LexicalState.GUID1;
-						yytext.Clear();
-					}
-					else if (string.Equals(yytext.ToString(), "datetime", StringComparison.OrdinalIgnoreCase))
-					{
-						_input.Read();
-						_state = LexicalState.DATETIME1;
-						yytext.Clear();
-					}
-					else if (string.Equals(yytext.ToString(), "timespan", StringComparison.OrdinalIgnoreCase))
-					{
-						_input.Read();
-						_state = LexicalState.TIMESPAN1;
-						yytext.Clear();
-					}
-					else if (string.Equals(yytext.ToString(), "string", StringComparison.OrdinalIgnoreCase))
-					{
-						_input.Read();
-						_state = LexicalState.STRING1;
-						yytext.Clear();
-					}
-					else if (string.Equals(yytext.ToString(), "str", StringComparison.OrdinalIgnoreCase))
-					{
-						_input.Read();
-						_state = LexicalState.STRING1;
-						yytext.Clear();
-					}
-					else if (string.Equals(yytext.ToString(), "uri", StringComparison.OrdinalIgnoreCase))
-					{
-						_input.Read();
+					_input.Read();
+					_state = LexicalState.SHORT;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "uint16", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.USHORT;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "int32", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.INT;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "uint32", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.UINT;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "int64", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.LONG;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "uint64", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.ULONG;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "double", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.DOUBLE1;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "float", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.SINGLE1;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "decimal", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.DECIMAL1;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "boolean", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.BOOL1;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "bool", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.BOOL1;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "bin", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.BINARY1;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "binary", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.BINARY1;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "char", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.CHARA;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "bstr", StringComparison.OrdinalIgnoreCase))
+				{
+					currentBStr = new Bstr();
+					_input.Read();
+					_state = LexicalState.BSTR1;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "guid", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.GUID1;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "datetime", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.DATETIME1;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "utc", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.UTC1;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "timespan", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.TIMESPAN1;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "string", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.STRING1;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "str", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.STRING1;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "uri", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
 
-						if (_input.Peek() == '"')
-						{
-							_input.Read();
-							_state = LexicalState.QURI1;
-						}
-						else
-							_state = LexicalState.URI1;
-
-						yytext.Clear();
+					if (_input.Peek() == '"')
+					{
+						_input.Read();
+						_state = LexicalState.QURI1;
 					}
 					else
-					{
-						yytext.Append(Convert.ToString(_input.Read()));
-						throw new Exception($"Unrecognized token starting at {yytext}. Aborting scan.");
-					}
-				}
-				else if (_input.Peek() == ' ')
-				{
-					yytext.Append(Convert.ToString(_input.Read()));
+						_state = LexicalState.URI1;
 
-					if (_input.EndOfStream)
-						ParseReservedWords();
+					yytext.Clear();
 				}
 				else
 				{
-					ParseReservedWords();
+					yytext.Append(Convert.ToString(_input.Read()));
+					throw new Exception($"Unrecognized token starting at {yytext}. Aborting scan.");
 				}
+			}
+			else if (_input.Peek() == ' ')
+			{
+				yytext.Append(Convert.ToString(_input.Read()));
+
+				if (_input.EndOfStream)
+					ParseReservedWords();
 			}
 			else
 			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
+				ParseReservedWords();
 			}
 		}
 
 		private void ProcessInitialState()
 		{
-			if (_input != null)
+			if (_input.Peek() == ' ' || _input.Peek() == '\t' || _input.Peek() == '\r' || _input.Peek() == '\b' || _input.Peek() == '\n')
 			{
-				if (_input.Peek() == ' ' || _input.Peek() == '\t' || _input.Peek() == '\r' || _input.Peek() == '\b' || _input.Peek() == '\n')
+				_input.Read();		//	Skip Whitespace
+			}
+			else if (IsStringSpecialChar())
+			{
+				_state = LexicalState.STRING2;
+			}
+			else if (_input.Peek() == '\\')
+			{
+				_state = LexicalState.STRING2;
+			}
+			else if (_input.Peek() == '/')
+			{
+				_tokenStream.Push(new Token(Symbol.FORWARDSLASH, Convert.ToString(_input.Read())));
+				yytext.Clear();
+			}
+			else if (_input.Peek() == '\'')
+			{
+				_input.Read();
+
+				if (_input.EndOfStream)
 				{
-					_input.Read();
-					//	Skip whitespace
+					yytext.Append(Convert.ToString("'"));
+					throw new Exception($"Unrecognized token {yytext}. Scan aborted.");
 				}
-				else if (IsStringSpecialChar())
+
+				_state = LexicalState.CHAR1;
+			}
+			else if (_input.Peek() == '"')
+			{
+				_input.Read();
+				yytext.Clear();
+
+				if ((_input.Peek() == 'h' || _input.Peek() == 'H') &&
+					 (_input.LookForward(1) != null && (_input.LookForward(1) == 't' || _input.LookForward(1) == 'T')) &&
+					 (_input.LookForward(2) != null && (_input.LookForward(2) == 't' || _input.LookForward(2) == 'T')) &&
+					 (_input.LookForward(3) != null && (_input.LookForward(3) == 'p' || _input.LookForward(3) == 'P')) &&
+					 (_input.LookForward(4) != null && _input.LookForward(4) == ':'))
 				{
-					_state = LexicalState.STRING2;
+					_state = LexicalState.QURI1;
 				}
-				else if (_input.Peek() == '\\')
+				else if ((_input.Peek() == 'h' || _input.Peek() == 'H') &&
+					 (_input.LookForward(1) != null && (_input.LookForward(1) == 't' || _input.LookForward(1) == 'T')) &&
+					 (_input.LookForward(2) != null && (_input.LookForward(2) == 't' || _input.LookForward(2) == 'T')) &&
+					 (_input.LookForward(3) != null && (_input.LookForward(3) == 'p' || _input.LookForward(3) == 'P')) &&
+					 (_input.LookForward(4) != null && (_input.LookForward(4) == 's' || _input.LookForward(4) == 'S')) &&
+					 (_input.LookForward(5) != null && _input.LookForward(5) == ':'))
 				{
-					_state = LexicalState.STRING2;
+					_state = LexicalState.QURI1;
 				}
 				else if (_input.Peek() == '/')
 				{
-					_tokenStream.Push(new Token(Symbol.FORWARDSLASH, Convert.ToString(_input.Read())));
-					yytext.Clear();
+					_state = LexicalState.QURI1;
 				}
-				else if (_input.Peek() == '\'')
+				else
 				{
-					_input.Read();
+					_state = LexicalState.QSTRING1;
+				}
+			}
+			else if (_input.Peek() == '(')
+			{
+				_tokenStream.Push(new Token(Symbol.LPAREN, Convert.ToString(_input.Read())));
+				yytext.Clear();
+			}
+			else if (_input.Peek() == ')')
+			{
+				_tokenStream.Push(new Token(Symbol.RPAREN, Convert.ToString(_input.Read())));
+				yytext.Clear();
+			}
+			else if (_input.Peek() == ',')
+			{
+				_tokenStream.Push(new Token(Symbol.COMMA, Convert.ToString(_input.Read())));
+				yytext.Clear();
+			}
+			else if (_input.Peek() == '&')
+			{
+				_tokenStream.Push(new Token(Symbol.AND, Convert.ToString(_input.Read())));
+				yytext.Clear();
+			}
+			else if (_input.Peek() == '|')
+			{
+				_tokenStream.Push(new Token(Symbol.OR, Convert.ToString(_input.Read())));
+				yytext.Clear();
+			}
+			else if (_input.Peek() == '>')
+			{
+				yytext.Append(Convert.ToString(_input.Read()));
 
-					if (_input.EndOfStream)
-					{
-						yytext.Append(Convert.ToString("'"));
-						throw new Exception($"Unrecognized token {yytext}. Scan aborted.");
-					}
-
-					_state = LexicalState.CHAR1;
-				}
-				else if (_input.Peek() == '"')
-				{
-					_input.Read();
-					yytext.Clear();
-
-					if ((_input.Peek() == 'h' || _input.Peek() == 'H') &&
-						 (_input.LookForward(1) != null && (_input.LookForward(1) == 't' || _input.LookForward(1) == 'T')) &&
-						 (_input.LookForward(2) != null && (_input.LookForward(2) == 't' || _input.LookForward(2) == 'T')) &&
-						 (_input.LookForward(3) != null && (_input.LookForward(3) == 'p' || _input.LookForward(3) == 'P')) &&
-						 (_input.LookForward(4) != null && _input.LookForward(4) == ':'))
-					{
-						_state = LexicalState.QURI1;
-					}
-					else if ((_input.Peek() == 'h' || _input.Peek() == 'H') &&
-						 (_input.LookForward(1) != null && (_input.LookForward(1) == 't' || _input.LookForward(1) == 'T')) &&
-						 (_input.LookForward(2) != null && (_input.LookForward(2) == 't' || _input.LookForward(2) == 'T')) &&
-						 (_input.LookForward(3) != null && (_input.LookForward(3) == 'p' || _input.LookForward(3) == 'P')) &&
-						 (_input.LookForward(4) != null && (_input.LookForward(4) == 's' || _input.LookForward(4) == 'S')) &&
-						 (_input.LookForward(5) != null && _input.LookForward(5) == ':'))
-					{
-						_state = LexicalState.QURI1;
-					}
-					else if (_input.Peek() == '/')
-					{
-						_state = LexicalState.QURI1;
-					}
-					else
-					{
-						_state = LexicalState.QSTRING1;
-					}
-				}
-				else if (_input.Peek() == '(')
-				{
-					_tokenStream.Push(new Token(Symbol.LPAREN, Convert.ToString(_input.Read())));
-					yytext.Clear();
-				}
-				else if (_input.Peek() == ')')
-				{
-					_tokenStream.Push(new Token(Symbol.RPAREN, Convert.ToString(_input.Read())));
-					yytext.Clear();
-				}
-				else if (_input.Peek() == ',')
-				{
-					_tokenStream.Push(new Token(Symbol.COMMA, Convert.ToString(_input.Read())));
-					yytext.Clear();
-				}
-				else if (_input.Peek() == '&')
-				{
-					_tokenStream.Push(new Token(Symbol.AND, Convert.ToString(_input.Read())));
-					yytext.Clear();
-				}
-				else if (_input.Peek() == '|')
-				{
-					_tokenStream.Push(new Token(Symbol.OR, Convert.ToString(_input.Read())));
-					yytext.Clear();
-				}
-				else if (_input.Peek() == '>')
+				if (!_input.EndOfStream && _input.Peek() == '=')
 				{
 					yytext.Append(Convert.ToString(_input.Read()));
-
-					if (!_input.EndOfStream && _input.Peek() == '=')
-					{
-						yytext.Append(Convert.ToString(_input.Read()));
-						_tokenStream.Push(new Token(Symbol.GE, yytext.ToString()));
-						yytext.Clear();
-					}
-					else
-					{
-						_tokenStream.Push(new Token(Symbol.GT, yytext.ToString()));
-						yytext.Clear();
-					}
+					_tokenStream.Push(new Token(Symbol.GE, yytext.ToString()));
+					yytext.Clear();
 				}
-				else if (_input.Peek() == '<')
+				else
+				{
+					_tokenStream.Push(new Token(Symbol.GT, yytext.ToString()));
+					yytext.Clear();
+				}
+			}
+			else if (_input.Peek() == '<')
+			{
+				yytext.Append(Convert.ToString(_input.Read()));
+
+				if (!_input.EndOfStream && _input.Peek() == '=')
 				{
 					yytext.Append(Convert.ToString(_input.Read()));
-
-					if (!_input.EndOfStream && _input.Peek() == '=')
-					{
-						yytext.Append(Convert.ToString(_input.Read()));
-						_tokenStream.Push(new Token(Symbol.LE, yytext.ToString()));
-						yytext.Clear();
-					}
-					else if (!_input.EndOfStream && _input.Peek() == '>')
-					{
-						yytext.Append(Convert.ToString(_input.Read()));
-						_tokenStream.Push(new Token(Symbol.NE, yytext.ToString()));
-						yytext.Clear();
-					}
-					else
-					{
-						_tokenStream.Push(new Token(Symbol.LT, yytext.ToString()));
-						yytext.Clear();
-					}
+					_tokenStream.Push(new Token(Symbol.LE, yytext.ToString()));
+					yytext.Clear();
 				}
-				else if (_input.Peek() == '!')
+				else if (!_input.EndOfStream && _input.Peek() == '>')
 				{
 					yytext.Append(Convert.ToString(_input.Read()));
-
-					if (!_input.EndOfStream && _input.Peek() == '=')
-					{
-						yytext.Append(Convert.ToString(_input.Read()));
-						_tokenStream.Push(new Token(Symbol.NE, yytext.ToString()));
-						yytext.Clear();
-					}
-					else
-					{
-						yytext.Append(Convert.ToString(_input.Read()));
-						throw new Exception($"Unrecognized token {yytext}. Scan aborted.");
-					}
+					_tokenStream.Push(new Token(Symbol.NE, yytext.ToString()));
+					yytext.Clear();
 				}
-				else if (_input.Peek() == '=')
+				else
 				{
-					yytext.Append(_input.Read());
-					var position = _input.Position;
-
-					if (_input.Peek() == 'N' || _input.Peek() == 'n')
-					{
-						yytext.Append(_input.Read());
-
-						if (_input.Peek() == 'E' || _input.Peek() == 'e')
-						{
-							yytext.Append(_input.Read());
-
-							if (_input.Peek() == '=')
-							{
-								yytext.Append(_input.Read());
-								_tokenStream.Push(new Token(Symbol.NE, yytext.ToString()));
-								yytext.Clear();
-							}
-							else
-							{
-								_input.Position = position;
-								_tokenStream.Push(new Token(Symbol.EQ, "="));
-								yytext.Clear();
-							}
-						}
-						else
-						{
-							_input.Position = position;
-							_tokenStream.Push(new Token(Symbol.EQ, "="));
-							yytext.Clear();
-						}
-					}
-					else if (_input.Peek() == 'L' || _input.Peek() == 'l')
-					{
-						yytext.Append(_input.Read());
-
-						if (_input.Peek() == 'E' || _input.Peek() == 'e')
-						{
-							yytext.Append(_input.Read());
-
-							if (_input.Peek() == '=')
-							{
-								yytext.Append(_input.Read());
-								_tokenStream.Push(new Token(Symbol.LE, yytext.ToString()));
-								yytext.Clear();
-							}
-							else
-							{
-								_input.Position = position;
-								_tokenStream.Push(new Token(Symbol.EQ, "="));
-								yytext.Clear();
-							}
-						}
-						else if (_input.Peek() == 'T' || _input.Peek() == 't')
-						{
-							yytext.Append(_input.Read());
-
-							if (_input.Peek() == '=')
-							{
-								yytext.Append(_input.Read());
-								_tokenStream.Push(new Token(Symbol.LT, yytext.ToString()));
-								yytext.Clear();
-							}
-							else
-							{
-								_input.Position = position;
-								_tokenStream.Push(new Token(Symbol.EQ, "="));
-								yytext.Clear();
-							}
-						}
-						else
-						{
-							_input.Position = position;
-							_tokenStream.Push(new Token(Symbol.EQ, "="));
-							yytext.Clear();
-						}
-					}
-					else if (_input.Peek() == 'G' || _input.Peek() == 'g')
-					{
-						yytext.Append(_input.Read());
-
-						if (_input.Peek() == 'E' || _input.Peek() == 'e')
-						{
-							yytext.Append(_input.Read());
-
-							if (_input.Peek() == '=')
-							{
-								yytext.Append(_input.Read());
-								_tokenStream.Push(new Token(Symbol.GE, yytext.ToString()));
-								yytext.Clear();
-							}
-							else
-							{
-								_input.Position = position;
-								_tokenStream.Push(new Token(Symbol.EQ, "="));
-								yytext.Clear();
-							}
-						}
-						else if (_input.Peek() == 'T' || _input.Peek() == 't')
-						{
-							yytext.Append(_input.Read());
-
-							if (_input.Peek() == '=')
-							{
-								yytext.Append(_input.Read());
-								_tokenStream.Push(new Token(Symbol.GT, yytext.ToString()));
-								yytext.Clear();
-							}
-							else
-							{
-								_input.Position = position;
-								_tokenStream.Push(new Token(Symbol.EQ, "="));
-								yytext.Clear();
-							}
-						}
-						else
-						{
-							_input.Position = position;
-							_tokenStream.Push(new Token(Symbol.EQ, "="));
-							yytext.Clear();
-						}
-					}
-					else if (_input.Peek() == 'E' || _input.Peek() == 'e')
-					{
-						yytext.Append(_input.Read());
-
-						if (_input.Peek() == 'Q' || _input.Peek() == 'q')
-						{
-							yytext.Append(_input.Read());
-
-							if (_input.Peek() == '=')
-							{
-								yytext.Append(_input.Read());
-								_tokenStream.Push(new Token(Symbol.EQ, yytext.ToString()));
-								yytext.Clear();
-							}
-							else
-							{
-								_input.Position = position;
-								_tokenStream.Push(new Token(Symbol.EQ, "="));
-								yytext.Clear();
-							}
-						}
-						else
-						{
-							_input.Position = position;
-							_tokenStream.Push(new Token(Symbol.EQ, "="));
-							yytext.Clear();
-						}
-					}
-					else
-					{
-						_tokenStream.Push(new Token(Symbol.EQ, yytext.ToString()));
-						yytext.Clear();
-					}
+					_tokenStream.Push(new Token(Symbol.LT, yytext.ToString()));
+					yytext.Clear();
 				}
-				else if (_input.Peek() == '-' || _input.Peek() == '+' || _input.Peek() == '.')
+			}
+			else if (_input.Peek() == '!')
+			{
+				yytext.Append(Convert.ToString(_input.Read()));
+
+				if (!_input.EndOfStream && _input.Peek() == '=')
 				{
-					_state = LexicalState.NUMERIC1;
-				}
-				else if (_input.Peek() >= '0' && _input.Peek() <= '9')
-				{
-					_state = LexicalState.DATEORTIMEORNUMERICORGUID;
-				}
-				else if ((_input.Peek() >= 'a' && _input.Peek() <= 'f') || (_input.Peek() >= 'A' && _input.Peek() <= 'F'))
-				{
-					_state = LexicalState.GUIDORSTRING1;
-				}
-				else if ((_input.Peek() >= 'g' && _input.Peek() <= 'z') || (_input.Peek() >= 'G' && _input.Peek() <= 'Z') || _input.Peek() == '_')
-				{
-					if ((_input.Peek() == 'h' || _input.Peek() == 'H') &&
-						 (_input.LookForward(1) != null && (_input.LookForward(1) == 't' || _input.LookForward(1) == 'T')) &&
-						 (_input.LookForward(2) != null && (_input.LookForward(2) == 't' || _input.LookForward(2) == 'T')) &&
-						 (_input.LookForward(3) != null && (_input.LookForward(3) == 'p' || _input.LookForward(3) == 'P')) &&
-						 (_input.LookForward(4) != null && _input.LookForward(4) == ':'))
-					{
-						_state = LexicalState.URI1;
-					}
-					else if ((_input.Peek() == 'h' || _input.Peek() == 'H') &&
-						 (_input.LookForward(1) != null && (_input.LookForward(1) == 't' || _input.LookForward(1) == 'T')) &&
-						 (_input.LookForward(2) != null && (_input.LookForward(2) == 't' || _input.LookForward(2) == 'T')) &&
-						 (_input.LookForward(3) != null && (_input.LookForward(3) == 'p' || _input.LookForward(3) == 'P')) &&
-						 (_input.LookForward(4) != null && (_input.LookForward(4) == 's' || _input.LookForward(4) == 'S')) &&
-						 (_input.LookForward(5) != null && _input.LookForward(5) == ':'))
-					{
-						_state = LexicalState.URI1;
-					}
-					else
-					{
-						_state = LexicalState.TEXTSTREAM;
-					}
+					yytext.Append(Convert.ToString(_input.Read()));
+					_tokenStream.Push(new Token(Symbol.NE, yytext.ToString()));
+					yytext.Clear();
 				}
 				else
 				{
@@ -5991,9 +6067,203 @@ namespace Tense.Rql
 					throw new Exception($"Unrecognized token {yytext}. Scan aborted.");
 				}
 			}
+			else if (_input.Peek() == '=')
+			{
+				yytext.Append(_input.Read());
+				var position = _input.Position;
+
+				if (_input.Peek() == 'N' || _input.Peek() == 'n')
+				{
+					yytext.Append(_input.Read());
+
+					if (_input.Peek() == 'E' || _input.Peek() == 'e')
+					{
+						yytext.Append(_input.Read());
+
+						if (_input.Peek() == '=')
+						{
+							yytext.Append(_input.Read());
+							_tokenStream.Push(new Token(Symbol.NE, yytext.ToString()));
+							yytext.Clear();
+						}
+						else
+						{
+							_input.Position = position;
+							_tokenStream.Push(new Token(Symbol.EQ, "="));
+							yytext.Clear();
+						}
+					}
+					else
+					{
+						_input.Position = position;
+						_tokenStream.Push(new Token(Symbol.EQ, "="));
+						yytext.Clear();
+					}
+				}
+				else if (_input.Peek() == 'L' || _input.Peek() == 'l')
+				{
+					yytext.Append(_input.Read());
+
+					if (_input.Peek() == 'E' || _input.Peek() == 'e')
+					{
+						yytext.Append(_input.Read());
+
+						if (_input.Peek() == '=')
+						{
+							yytext.Append(_input.Read());
+							_tokenStream.Push(new Token(Symbol.LE, yytext.ToString()));
+							yytext.Clear();
+						}
+						else
+						{
+							_input.Position = position;
+							_tokenStream.Push(new Token(Symbol.EQ, "="));
+							yytext.Clear();
+						}
+					}
+					else if (_input.Peek() == 'T' || _input.Peek() == 't')
+					{
+						yytext.Append(_input.Read());
+
+						if (_input.Peek() == '=')
+						{
+							yytext.Append(_input.Read());
+							_tokenStream.Push(new Token(Symbol.LT, yytext.ToString()));
+							yytext.Clear();
+						}
+						else
+						{
+							_input.Position = position;
+							_tokenStream.Push(new Token(Symbol.EQ, "="));
+							yytext.Clear();
+						}
+					}
+					else
+					{
+						_input.Position = position;
+						_tokenStream.Push(new Token(Symbol.EQ, "="));
+						yytext.Clear();
+					}
+				}
+				else if (_input.Peek() == 'G' || _input.Peek() == 'g')
+				{
+					yytext.Append(_input.Read());
+
+					if (_input.Peek() == 'E' || _input.Peek() == 'e')
+					{
+						yytext.Append(_input.Read());
+
+						if (_input.Peek() == '=')
+						{
+							yytext.Append(_input.Read());
+							_tokenStream.Push(new Token(Symbol.GE, yytext.ToString()));
+							yytext.Clear();
+						}
+						else
+						{
+							_input.Position = position;
+							_tokenStream.Push(new Token(Symbol.EQ, "="));
+							yytext.Clear();
+						}
+					}
+					else if (_input.Peek() == 'T' || _input.Peek() == 't')
+					{
+						yytext.Append(_input.Read());
+
+						if (_input.Peek() == '=')
+						{
+							yytext.Append(_input.Read());
+							_tokenStream.Push(new Token(Symbol.GT, yytext.ToString()));
+							yytext.Clear();
+						}
+						else
+						{
+							_input.Position = position;
+							_tokenStream.Push(new Token(Symbol.EQ, "="));
+							yytext.Clear();
+						}
+					}
+					else
+					{
+						_input.Position = position;
+						_tokenStream.Push(new Token(Symbol.EQ, "="));
+						yytext.Clear();
+					}
+				}
+				else if (_input.Peek() == 'E' || _input.Peek() == 'e')
+				{
+					yytext.Append(_input.Read());
+
+					if (_input.Peek() == 'Q' || _input.Peek() == 'q')
+					{
+						yytext.Append(_input.Read());
+
+						if (_input.Peek() == '=')
+						{
+							yytext.Append(_input.Read());
+							_tokenStream.Push(new Token(Symbol.EQ, yytext.ToString()));
+							yytext.Clear();
+						}
+						else
+						{
+							_input.Position = position;
+							_tokenStream.Push(new Token(Symbol.EQ, "="));
+							yytext.Clear();
+						}
+					}
+					else
+					{
+						_input.Position = position;
+						_tokenStream.Push(new Token(Symbol.EQ, "="));
+						yytext.Clear();
+					}
+				}
+				else
+				{
+					_tokenStream.Push(new Token(Symbol.EQ, yytext.ToString()));
+					yytext.Clear();
+				}
+			}
+			else if (_input.Peek() == '-' || _input.Peek() == '+' || _input.Peek() == '.')
+			{
+				_state = LexicalState.NUMERIC1;
+			}
+			else if (_input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				_state = LexicalState.DATEORTIMEORNUMERICORGUID;
+			}
+			else if ((_input.Peek() >= 'a' && _input.Peek() <= 'f') || (_input.Peek() >= 'A' && _input.Peek() <= 'F'))
+			{
+				_state = LexicalState.GUIDORSTRING1;
+			}
+			else if ((_input.Peek() >= 'g' && _input.Peek() <= 'z') || (_input.Peek() >= 'G' && _input.Peek() <= 'Z') || _input.Peek() == '_')
+			{
+				if ((_input.Peek() == 'h' || _input.Peek() == 'H') &&
+					 (_input.LookForward(1) != null && (_input.LookForward(1) == 't' || _input.LookForward(1) == 'T')) &&
+					 (_input.LookForward(2) != null && (_input.LookForward(2) == 't' || _input.LookForward(2) == 'T')) &&
+					 (_input.LookForward(3) != null && (_input.LookForward(3) == 'p' || _input.LookForward(3) == 'P')) &&
+					 (_input.LookForward(4) != null && _input.LookForward(4) == ':'))
+				{
+					_state = LexicalState.URI1;
+				}
+				else if ((_input.Peek() == 'h' || _input.Peek() == 'H') &&
+					 (_input.LookForward(1) != null && (_input.LookForward(1) == 't' || _input.LookForward(1) == 'T')) &&
+					 (_input.LookForward(2) != null && (_input.LookForward(2) == 't' || _input.LookForward(2) == 'T')) &&
+					 (_input.LookForward(3) != null && (_input.LookForward(3) == 'p' || _input.LookForward(3) == 'P')) &&
+					 (_input.LookForward(4) != null && (_input.LookForward(4) == 's' || _input.LookForward(4) == 'S')) &&
+					 (_input.LookForward(5) != null && _input.LookForward(5) == ':'))
+				{
+					_state = LexicalState.URI1;
+				}
+				else
+				{
+					_state = LexicalState.TEXTSTREAM;
+				}
+			}
 			else
 			{
-				throw new RqlFormatException($"Unexpected end of stream. Aborting scan.");
+				yytext.Append(Convert.ToString(_input.Read()));
+				throw new Exception($"Unrecognized token {yytext}. Scan aborted.");
 			}
 		}
 
