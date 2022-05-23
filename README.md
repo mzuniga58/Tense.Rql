@@ -28,7 +28,7 @@ BookId = 1
 
 Which can then be placed inside of a WHERE clause.
 
-<h3>RqlNode.Parse<h3>
+<h3>RqlNode.Parse</h3>
 
 <i>RqlNode</i> <b>RqlNode</b>.Parse(<i>statement</i>)
 
