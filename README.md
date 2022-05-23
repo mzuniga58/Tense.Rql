@@ -49,8 +49,10 @@ An <b>RqlNode</b> that represents the RQL statement. The function alwasys return
     <tr>
         <th>Date</th>
         <th>Description</th>
+        <th>Version</th>
     </tr>
     <tr>
         <td>05/23/2022</td>
         <td>Fixed DateTime parsing bugs.</td>
+        <td>0.0.8-alpha</td>
 </table>
