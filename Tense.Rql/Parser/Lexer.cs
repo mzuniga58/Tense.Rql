@@ -369,14 +369,6 @@ namespace Tense.Rql
 						ProcessMDY9();
 						break;
 
-					case LexicalState.MDY10:
-						ProcessMDY10();
-						break;
-
-					case LexicalState.MDY11:
-						ProcessMDY11();
-						break;
-
 					case LexicalState.DATETIME1:
 						ProcessDateTime1();
 						break;
@@ -427,18 +419,6 @@ namespace Tense.Rql
 
 					case LexicalState.UTC12:
 						ProcessUTC12();
-						break;
-
-					case LexicalState.UTC13:
-						ProcessUTC13();
-						break;
-
-					case LexicalState.UTC14:
-						ProcessUTC14();
-						break;
-
-					case LexicalState.UTC15:
-						ProcessUTC15();
 						break;
 
 					case LexicalState.HEXVAL:
@@ -1737,7 +1717,7 @@ namespace Tense.Rql
 			else if ((yytext.Length > 2 && yytext.Length <= 4) && (_input.Peek() >= '-' || _input.Peek() <= '/'))
 			{
 				yytext.Append(_input.Read());
-				_state = LexicalState.UTC13;
+				_state = LexicalState.UTC10;
 
 				if (_input.EndOfStream)
 					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
@@ -1749,8 +1729,21 @@ namespace Tense.Rql
 		private void ProcessUTC2()
 		{
 			// m/  mm/
-			// m-  mm-
-			if (_input.Peek() >= '0' && _input.Peek() <= '9')
+			// m-  mm			
+			var index1 = yytext.ToString().LastIndexOf('-');
+			var index2 = yytext.ToString().LastIndexOf('/');
+			var index = index1 > index2 ? index1 : index2;
+
+			if (yytext.Length - index - 1 < 2 &&
+				 _input.Peek() >= '0' &&
+				 _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if ( yytext.Length - index - 1 >= 1 && (_input.Peek() == '-' || _input.Peek() == '/'))
 			{
 				yytext.Append(_input.Read());
 				_state = LexicalState.UTC3;
@@ -1764,135 +1757,144 @@ namespace Tense.Rql
 
 		private void ProcessUTC3()
 		{
-			//	mm/0 - mm/9
-			//	mm-0 - mm-9
-
-			if ((yytext[^1] == '0' || yytext[^1] == '1' || yytext[^1] == '2') &&
-				(_input.Peek() >= '0' && _input.Peek() <= '9'))
-			{
-				yytext.Append(_input.Read());
-				_state = LexicalState.UTC4;
-
-				if (_input.EndOfStream)
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-
-			else if (yytext[^1] == '3' &&
-					  (_input.Peek() >= '0' && _input.Peek() <= '1'))
-			{
-				yytext.Append(_input.Read());
-				_state = LexicalState.UTC4;
-
-				if (_input.EndOfStream)
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else if (_input.Peek() == '-' || _input.Peek() == '/')
-			{
-				yytext.Append(_input.Read());
-				_state = LexicalState.UTC5;
-
-				if (_input.EndOfStream)
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else
-				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-		}
-
-		private void ProcessUTC4()
-		{
-			//	mm/dd
-			//	mm-dd
-
-			if (_input.Peek() == '-' || _input.Peek() == '/')
-			{
-				yytext.Append(_input.Read());
-				_state = LexicalState.UTC5;
-
-				if (_input.EndOfStream)
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else
-				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-		}
-
-		private void ProcessUTC5()
-		{
-			//	mm-dd-
-			//	mm/dd/
-
+			//	mm/0 - mm/dd/
+			//	mm-0 - mm-dd/
 			var index1 = yytext.ToString().LastIndexOf('-');
 			var index2 = yytext.ToString().LastIndexOf('/');
 			var index = index1 > index2 ? index1 : index2;
 
-			if (yytext.Length - index - 1 < 4 &&
-				 _input.Peek() >= '0' &&
-				 _input.Peek() <= '9')
+			if (yytext.Length - index - 1 < 4 && _input.Peek() >= '0' && _input.Peek() <= '9')
 			{
 				yytext.Append(_input.Read());
 
 				if (_input.EndOfStream)
 				{
-					var datetime = DateTime.Parse(yytext.ToString());
-					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
-					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext} 00:00:00+0000").UtcDateTime));
 					yytext.Clear();
 				}
 			}
-			else if (_input.Peek() == ' ')
+			else if ((yytext.Length - index - 1 >= 1 && yytext.Length - index - 1 <= 4) && (_input.Peek() == 'z' || _input.Peek() == 'Z'))
 			{
 				yytext.Append(_input.Read());
-				_state = LexicalState.UTC6;
+				_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
+			}
+			else if (yytext.Length - index - 1 > 1 && (_input.Peek() == 'g' || _input.Peek() == 'G'))
+			{
+				yytext.Append(_input.Read());
 
 				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+
+				if (_input.Peek() == 'm' || _input.Peek() == 'M')
 				{
-					var datetime = DateTime.Parse(yytext.ToString());
-					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
-					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
-					yytext.Clear();
+					yytext.Append(_input.Read());
+
+					if (_input.EndOfStream)
+						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+
+					if (_input.Peek() == 't' || _input.Peek() == 'T')
+					{
+						yytext.Append(_input.Read());
+						_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
+						yytext.Clear();
+						_state = LexicalState.INITIAL_STATE;
+					}
+					else
+						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 				}
+				else
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+
+			}
+			else if ((yytext.Length - index - 1 >= 1 && yytext.Length - index - 1 <= 4) && _input.Peek() == ' ')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC4;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if ((yytext.Length - index - 1 >= 1 && yytext.Length - index - 1 <= 4) && (_input.Peek() == '+' || _input.Peek() == '+'))
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC8;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if ((yytext.Length - index - 1 >= 1 && yytext.Length - index - 1 <= 4))
+			{
+				_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext} 00:00:00+0000").UtcDateTime));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
 			}
 			else
 				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+
 		}
 
-		private void ProcessUTC6()
+		private void ProcessUTC4()
 		{
 			//	mm/dd/yyyy<sp>
+			//	mm-dd-yyyy<sp>
 			var index = yytext.ToString().LastIndexOf(' ');
+			if ( _input.Peek() == ' ' || _input.Peek() == '\t')
+            {
+				_input.Read();	//	Skip whitespace
+            }
+			else if (yytext.Length - index - 1 == 0 && (_input.Peek() == 'g' || _input.Peek() == 'G'))
+            {
+				yytext.Append(_input.Read());
 
-			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+
+				if (_input.Peek() == 'm' || _input.Peek() == 'M')
+				{
+					yytext.Append(_input.Read());
+
+					if (_input.EndOfStream)
+						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+
+					if (_input.Peek() == 't' || _input.Peek() == 'T')
+					{
+						yytext.Append(_input.Read());
+						_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
+						yytext.Clear();
+						_state = LexicalState.INITIAL_STATE;
+					}
+					else
+						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+				}
+				else
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+
+			}
+			else if (yytext.Length - index - 1 == 0 && (_input.Peek() == 'z' || _input.Peek() == 'Z'))
+            {
+				yytext.Append(_input.Read());
+				_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
+			}
+			else if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
 			{
 				yytext.Append(_input.Read());
 
 				if (_input.EndOfStream)
 					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 			}
-			else if (_input.Peek() == ':')
+			else if (yytext.Length - index - 1 >= 1 && _input.Peek() == ':')
 			{
 				yytext.Append(_input.Read());
-				_state = LexicalState.UTC7;
+				_state = LexicalState.UTC5;
 
 				if (_input.EndOfStream)
 					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 			}
-			else
-				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-		}
-
-		private void ProcessUTC7()
-		{
-			//	mm/dd/yyyy hh:
-
-			var index = yytext.ToString().LastIndexOf(':');
-
-			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
-			{
-				yytext.Append(_input.Read());
-
-				if (_input.EndOfStream)
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else if (_input.Peek() == ':')
+			else if (yytext.Length - index - 1 >= 1 && (_input.Peek() == '-' || _input.Peek() == '+' ))
 			{
 				yytext.Append(_input.Read());
 				_state = LexicalState.UTC8;
@@ -1904,9 +1906,10 @@ namespace Tense.Rql
 				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 		}
 
-		private void ProcessUTC8()
+		private void ProcessUTC5()
 		{
-			//	mm/dd/yyyy hh:mm:
+			//	mm-dd-yyyy hh:
+			//	mm/dd/yyyy hh:
 
 			var index = yytext.ToString().LastIndexOf(':');
 
@@ -1915,14 +1918,187 @@ namespace Tense.Rql
 				yytext.Append(_input.Read());
 
 				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (yytext.Length - index - 1 >- 1 && _input.Peek() >= ':' )
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC6;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else
+				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+		}
+
+		private void ProcessUTC6()
+		{
+			//	mm/dd/yyyy hh:mm:
+			var index = yytext.ToString().LastIndexOf(':');
+
+			if (_input.Peek() == ' ' || _input.Peek() == '\t')
+            {
+				_input.Read();		//	Skip Whitespace
+            }
+			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
 				{
-					var datetime = DateTime.Parse(yytext.ToString());
-					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
-					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}+0000").UtcDateTime));
 					yytext.Clear();
 				}
 			}
-			else if (_input.Peek() == '.')
+			else if (yytext.Length - index - 1 > 1 && _input.Peek() == '.')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC7;
+
+				if (_input.EndOfStream)
+				{
+					_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}+0000").UtcDateTime));
+					yytext.Clear();
+				}
+			}
+			else if (yytext.Length - index - 1 > 1 && (_input.Peek() == '+' || _input.Peek() == '-'))
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC8;
+
+				if (_input.EndOfStream)
+				{
+					_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}0000").UtcDateTime));
+					yytext.Clear();
+				}
+			}
+			else if (yytext.Length - index - 1 > 1 && (_input.Peek() == 'z' || _input.Peek() == 'Z'))
+			{
+				yytext.Append(_input.Read());
+				_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
+			}
+			else if (yytext.Length - index - 1 > 1 && (_input.Peek() == 'g' || _input.Peek() == 'G'))
+			{
+				yytext.Append(_input.Read());
+				if ( _input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+
+				else if (_input.Peek() == 'm' || _input.Peek() == 'M')
+				{
+					yytext.Append(_input.Read());
+					if (_input.EndOfStream)
+						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+
+					else if (_input.Peek() == 't' || _input.Peek() == 'T')
+					{
+						yytext.Append(_input.Read());
+						_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
+						yytext.Clear();
+						_state = LexicalState.INITIAL_STATE;
+					}
+					else
+						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+				}
+				else
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else
+			{
+				_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}+0000").UtcDateTime));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
+			}
+		}
+
+		private void ProcessUTC7()
+		{
+			//	mm/dd/yyyy hh:mm:ss.
+
+			var index = yytext.ToString().LastIndexOf('.');
+
+			if ( _input.Peek() == ' ' || _input.Peek() == '\t')
+            {
+				_input.Read();	//	Skip whitespace
+            }
+			else if (yytext.Length - index - 1 < 6 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+				{
+					_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}+0000").UtcDateTime));
+					yytext.Clear();
+				}
+			}
+			else if (yytext.Length - index - 1 >= 1 && (_input.Peek() == '-' || _input.Peek() == '+'))
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC8;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (yytext.Length - index - 1 >= 1 && (_input.Peek() == 'z' || _input.Peek() == 'Z'))
+			{
+				yytext.Append(_input.Read());
+				_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse(yytext.ToString()).UtcDateTime));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
+			}
+			else if (yytext.Length - index - 1 >= 1 && 
+				    (_input.Peek() == 'g' || _input.Peek() == 'G') &&
+					!yytext.ToString().Contains('T') &&
+					!yytext.ToString().Contains('t'))
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+				else if (_input.Peek() == 'm' || _input.Peek() == 'M')
+				{
+					yytext.Append(_input.Read());
+
+					if (_input.EndOfStream)
+						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+					else if (_input.Peek() == 't' || _input.Peek() == 'T')
+					{
+						yytext.Append(_input.Read());
+						_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse(yytext.ToString()).UtcDateTime));
+						yytext.Clear();
+						_state = LexicalState.INITIAL_STATE;
+					}
+				}
+			}
+			else
+			{
+				_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}+0000").UtcDateTime));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
+			}
+		}
+
+		private void ProcessUTC8()
+		{
+			//	mm/dd/yyyy hh:mm:ss.ssssss+
+
+			var index1 = yytext.ToString().LastIndexOf('+');
+			var index2 = yytext.ToString().LastIndexOf('-');
+			var index = index1 > index2 ? index1 : index2;
+
+			if (yytext.Length - index - 1 < 4 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+				
+				if (_input.EndOfStream)
+				{
+					_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse(yytext.ToString()).UtcDateTime));
+					yytext.Clear();
+				}
+			}
+			else if (yytext.Length - index - 1 >= 1 && _input.Peek() == ':' )
 			{
 				yytext.Append(_input.Read());
 				_state = LexicalState.UTC9;
@@ -1932,9 +2108,7 @@ namespace Tense.Rql
 			}
 			else
 			{
-				var datetime = DateTime.Parse(yytext.ToString());
-				var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
-				_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+				_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse(yytext.ToString()).UtcDateTime));
 				yytext.Clear();
 				_state = LexicalState.INITIAL_STATE;
 			}
@@ -1942,77 +2116,7 @@ namespace Tense.Rql
 
 		private void ProcessUTC9()
 		{
-			//	mm/dd/yyyy hh:mm:ss.
-
-			var index = yytext.ToString().LastIndexOf('.');
-
-			if (yytext.Length - index - 1 < 6 && _input.Peek() >= '0' && _input.Peek() <= '9')
-			{
-				yytext.Append(_input.Read());
-
-				if (_input.EndOfStream)
-				{
-					var datetime = DateTime.Parse(yytext.ToString());
-					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
-					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
-					yytext.Clear();
-				}
-			}
-			else if (_input.Peek() == '-' || _input.Peek() == '+')
-			{
-				yytext.Append(_input.Read());
-				_state = LexicalState.UTC10;
-			}
-			else
-			{
-				var datetime = DateTime.Parse(yytext.ToString());
-				var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
-				_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
-				yytext.Clear();
-				_state = LexicalState.INITIAL_STATE;
-			}
-		}
-
-		private void ProcessUTC10()
-		{
-			//	mm/dd/yyyy hh:mm:ss.ffffff+
-			//	mm/dd/yyyy hh:mm:ss.ffffff-
-
-			var index1 = yytext.ToString().LastIndexOf('-');
-			var index2 = yytext.ToString().LastIndexOf('+');
-			var index = index1 > index2 ? index1 : index2;
-
-			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
-			{
-				yytext.Append(_input.Read());
-
-				if (_input.EndOfStream)
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else if (yytext.Length - index - 1 >= 1 && _input.Peek() >= ':')
-			{
-				yytext.Append(_input.Read());
-				_state = LexicalState.UTC11;
-
-				if (_input.EndOfStream)
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else if (yytext.Length - index - 1 == 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
-			{
-				yytext.Append(_input.Read());
-				_state = LexicalState.UTC12;
-
-				if (_input.EndOfStream)
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else
-				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-		}
-
-		private void ProcessUTC11()
-		{
 			//	mm/dd/yyyy hh:mm:ss.ffffff+00:
-			//	mm/dd/yyyy hh:mm:ss.ffffff-00:
 
 			var index = yytext.ToString().LastIndexOf(':');
 
@@ -2022,64 +2126,25 @@ namespace Tense.Rql
 
 				if (_input.EndOfStream)
 				{
-					var datetime = DateTimeOffset.Parse(yytext.ToString());
-					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
-					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse(yytext.ToString()).UtcDateTime));
 					yytext.Clear();
 				}
 			}
-			else if (yytext.Length - index - 1 >= 1 && yytext.Length - index - 1 <= 2 && (_input.Peek() < '0' || _input.Peek() > '9'))
+			else
 			{
-				var datetime = DateTimeOffset.Parse(yytext.ToString());
-				var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
-				_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+				_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse(yytext.ToString()).UtcDateTime));
 				yytext.Clear();
 				_state = LexicalState.INITIAL_STATE;
 			}
-			else
-				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 		}
 
-		private void ProcessUTC12()
-		{
-			//	mm/dd/yyyy hh:mm:ss.ffffff+000
-			//	mm/dd/yyyy hh:mm:ss.ffffff-000
-
-			var index1 = yytext.ToString().LastIndexOf('-');
-			var index2 = yytext.ToString().LastIndexOf('+');
-			var index = index1 > index2 ? index1 : index2;
-
-			if (yytext.Length - index - 1 < 4 && _input.Peek() >= '0' && _input.Peek() <= '9')
-			{
-				yytext.Append(_input.Read());
-
-				if (_input.EndOfStream)
-				{
-					var datetime = DateTimeOffset.Parse(yytext.ToString());
-					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
-					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
-					yytext.Clear();
-				}
-			}
-			else if (yytext.Length - index - 1 == 4)
-			{
-				var datetime = DateTimeOffset.Parse(yytext.ToString());
-				var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
-				_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
-				yytext.Clear();
-				_state = LexicalState.INITIAL_STATE;
-			}
-			else
-				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-		}
-
-		private void ProcessUTC13()
+		private void ProcessUTC10()
 		{
 			//	yyyy/
 			//	yyyy-
 
 			var index1 = yytext.ToString().LastIndexOf('-');
-			var index2 = yytext.ToString().LastIndexOf('+');
+			var index2 = yytext.ToString().LastIndexOf('/');
 			var index = index1 > index2 ? index1 : index2;
 
 			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
@@ -2092,7 +2157,7 @@ namespace Tense.Rql
 			else if (yytext.Length - index - 1 >= 1 && (_input.Peek() == '/' || _input.Peek() == '-'))
 			{
 				yytext.Append(_input.Read());
-				_state = LexicalState.UTC14;
+				_state = LexicalState.UTC11;
 
 				if (_input.EndOfStream)
 					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
@@ -2103,7 +2168,7 @@ namespace Tense.Rql
 			}
 		}
 
-		private void ProcessUTC14()
+		private void ProcessUTC11()
 		{
 			//	yyyy-mm-
 			//	yyyy/mm/
@@ -2112,31 +2177,71 @@ namespace Tense.Rql
 			var index2 = yytext.ToString().LastIndexOf('/');
 			var index = index1 > index2 ? index1 : index2;
 
-			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			if ( _input.Peek() == ' ' || _input.Peek() == '\t')
+            {
+				_input.Read();	//	Skip whitespace
+            }
+			else if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
 			{
 				yytext.Append(_input.Read());
 
 				if (_input.EndOfStream)
 				{
-					var datetime = DateTimeOffset.Parse(yytext.ToString());
-					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
-					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext} 00:00:00+0000").UtcDateTime));
 					yytext.Clear();
 				}
 			}
 			else if (yytext.Length - index - 1 >= 1 && (_input.Peek() == 'T' || _input.Peek() == 't'))
 			{
 				yytext.Append(_input.Read());
-				_state = LexicalState.UTC15;
+				_state = LexicalState.UTC12;
 
 				if (_input.EndOfStream)
 					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 			}
+			else if (yytext.Length - index - 1 >= 1 && (_input.Peek() == 'z' || _input.Peek() == 'Z'))
+			{
+				yytext.Append(_input.Read());
+				_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
+			}
+			else if (yytext.Length - index - 1 >= 1 && (_input.Peek() == '+' || _input.Peek() == '-'))
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.UTC8;
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (yytext.Length - index - 1 >= 1 && (_input.Peek() == 'g' || _input.Peek() == 'G'))
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+				else if (_input.Peek() == 'm' || _input.Peek() == 'M')
+				{
+					yytext.Append(_input.Read());
+
+					if (_input.EndOfStream)
+						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+					else if (_input.Peek() == 't' || _input.Peek() == 'T')
+					{
+						yytext.Append(_input.Read());
+						_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
+						yytext.Clear();
+						_state = LexicalState.INITIAL_STATE;
+					}
+					else
+						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+				}
+				else
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
 			else if (yytext.Length - index - 1 >= 1)
 			{
-				var datetime = DateTimeOffset.Parse(yytext.ToString());
-				var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Utc);
-				_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+				_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext} 00:00:00+0000").UtcDateTime));
 				yytext.Clear();
 				_state = LexicalState.INITIAL_STATE;
 			}
@@ -2144,7 +2249,7 @@ namespace Tense.Rql
 				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 		}
 
-		private void ProcessUTC15()
+		private void ProcessUTC12()
 		{
 			//	yyyy-mm-ddT
 			var index1 = yytext.ToString().LastIndexOf('t');
@@ -2156,12 +2261,15 @@ namespace Tense.Rql
 				yytext.Append(_input.Read());
 
 				if (_input.EndOfStream)
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+				{
+					_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
+					yytext.Clear();
+				}
 			}
 			else if (yytext.Length - index - 1 >= 1 && _input.Peek() >= ':')
 			{
 				yytext.Append(_input.Read());
-				_state = LexicalState.UTC7;
+				_state = LexicalState.UTC5;
 
 				if (_input.EndOfStream)
 					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
@@ -2169,67 +2277,145 @@ namespace Tense.Rql
 			else
 				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 		}
+
 
 
 		private void ProcessMDY1()
 		{
 			// m/  mm/
 			// m-  mm-
-			if (_input.Peek() >= '0' && _input.Peek() <= '9')
+			var index1 = yytext.ToString().LastIndexOf('-');
+			var index2 = yytext.ToString().LastIndexOf('/');
+			var index = index1 > index2 ? index1 : index2;
+
+			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
 			{
 				yytext.Append(_input.Read());
-				_state = LexicalState.MDY2;
 
 				if (_input.EndOfStream)
 					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 			}
+			else if ( yytext.Length - index - 1 >= 1 && (_input.Peek() == '-' || _input.Peek() == '/' ))
+            {
+				yytext.Append(_input.Read());
+				_state = LexicalState.MDY2;
+            }
 			else
 				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 		}
 
 		private void ProcessMDY2()
 		{
-			//	mm/0 - mm/9
-			//	mm-0 - mm-9
+			//	mm/0 - mm/dd/
+			//	mm-0 - mm-dd-
 
-			if ((yytext[^1] == '0' || yytext[^1] == '1' || yytext[^1] == '2') &&
-				(_input.Peek() >= '0' && _input.Peek() <= '9'))
+			var index1 = yytext.ToString().LastIndexOf('-');
+			var index2 = yytext.ToString().LastIndexOf('/');
+			var index = index1 > index2 ? index1 : index2;
+
+			if (yytext.Length - index - 1 < 4 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+				{
+					var sign = TimeZoneInfo.Local.BaseUtcOffset.Hours < 0 ? "" : "+";
+					_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext} 00:00:00{sign}{TimeZoneInfo.Local.BaseUtcOffset.Hours:00}:{TimeZoneInfo.Local.BaseUtcOffset.Minutes:00}").UtcDateTime));
+					yytext.Clear();
+				}
+			}
+			else if (yytext.Length - index - 1 >= 3 && (_input.Peek() == 'z' || _input.Peek() == 'Z'))
+			{
+				yytext.Append(_input.Read());
+				_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
+			}
+			else if (yytext.Length - index - 1 >= 3 && (_input.Peek() == 'g' || _input.Peek() == 'G'))
+			{
+				yytext.Append(_input.Read());
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+				else if (yytext.Length - index - 1 >= 3 && (_input.Peek() == 'm' || _input.Peek() == 'M'))
+				{
+					yytext.Append(_input.Read());
+					if (_input.EndOfStream)
+						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+					else if (yytext.Length - index - 1 >= 3 && (_input.Peek() == 't' || _input.Peek() == 'T'))
+					{
+						yytext.Append(_input.Read());
+						_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
+						yytext.Clear();
+						_state = LexicalState.INITIAL_STATE;
+					}
+					else
+						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+				}
+				else
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (yytext.Length - index - 1 >= 3 && _input.Peek() == ' ')
 			{
 				yytext.Append(_input.Read());
 				_state = LexicalState.MDY3;
-
-				if (_input.EndOfStream)
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-
-			else if ( yytext[^1] == '3' &&
-				      (_input.Peek() >= '0' && _input.Peek() <= '1'))
-			{
-				yytext.Append(_input.Read());
-				_state = LexicalState.MDY3;
-
-				if (_input.EndOfStream)
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else if (_input.Peek() == '-' || _input.Peek() == '/')
-			{
-				yytext.Append(_input.Read());
-				_state = LexicalState.MDY4;
-
-				if (_input.EndOfStream)
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 			}
 			else
-				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			{
+				var sign = TimeZoneInfo.Local.BaseUtcOffset.Hours < 0 ? "" : "+";
+				_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext} 00:00:00{sign}{TimeZoneInfo.Local.BaseUtcOffset.Hours:00}:{TimeZoneInfo.Local.BaseUtcOffset.Minutes:00}").UtcDateTime));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
+			}
 		}
 
 		private void ProcessMDY3()
 		{
-			//	mm/dd
-			//	mm-dd
+			//	mm/dd/yyyy<sp>
+			var index = yytext.ToString().LastIndexOf(' ');
 
-			if (_input.Peek() == '-' || _input.Peek() == '/')
+			if (_input.Peek() == ' ' || _input.Peek() == '\t')
+            {
+				_input.Read();	//	Skip whitespace
+			}
+			else if (yytext.Length - index - 1 == 0 && (_input.Peek() == 'z' || _input.Peek() == 'Z'))
 			{
+				yytext.Append(_input.Read());
+				_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
+			}
+			else if (yytext.Length - index - 1 == 0 && (_input.Peek() == 'g' || _input.Peek() == 'G'))
+			{
+				yytext.Append(_input.Read());
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+				else if (_input.Peek() == 'm' || _input.Peek() == 'M')
+				{
+					yytext.Append(_input.Read());
+					if (_input.EndOfStream)
+						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+					else if (_input.Peek() == 't' || _input.Peek() == 'T')
+					{
+						yytext.Append(_input.Read());
+						_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
+						yytext.Clear();
+						_state = LexicalState.INITIAL_STATE;
+					}
+					else
+						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+				}
+				else
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if ( _input.Peek() == ':' )
+            {
 				yytext.Append(_input.Read());
 				_state = LexicalState.MDY4;
 
@@ -2242,70 +2428,6 @@ namespace Tense.Rql
 
 		private void ProcessMDY4()
 		{
-			//	mm-dd-
-			//	mm/dd/
-
-			var index1 = yytext.ToString().LastIndexOf('-');
-			var index2 = yytext.ToString().LastIndexOf('/');
-			var index = index1 > index2 ? index1 : index2;
-
-			if (yytext.Length - index - 1 < 4 &&
-				 _input.Peek() >= '0' &&
-				 _input.Peek() <= '9')
-			{
-				yytext.Append(_input.Read());
-
-				if (_input.EndOfStream)
-				{
-					var datetime = DateTime.Parse(yytext.ToString());
-					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
-					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
-					yytext.Clear();
-				}
-			}
-			else if (_input.Peek() == ' ')
-			{
-				yytext.Append(_input.Read());
-				_state = LexicalState.MDY5;
-
-				if (_input.EndOfStream)
-				{
-					var datetime = DateTime.Parse(yytext.ToString());
-					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
-					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
-					yytext.Clear();
-				}
-			}
-			else
-				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-		}
-
-		private void ProcessMDY5()
-		{
-			//	mm/dd/yyyy<sp>
-			var index = yytext.ToString().LastIndexOf(' ');
-
-			if ( yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9' )
-			{
-				yytext.Append(_input.Read());
-
-				if (_input.EndOfStream)
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else if ( _input.Peek() == ':' )
-            {
-				yytext.Append(_input.Read());
-				_state = LexicalState.MDY6;
-
-				if (_input.EndOfStream)
-					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-			}
-			else
-				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
-		}
-
-		private void ProcessMDY6()
-		{
 			//	mm/dd/yyyy hh:
 
 			var index = yytext.ToString().LastIndexOf(':');
@@ -2317,10 +2439,10 @@ namespace Tense.Rql
 				if (_input.EndOfStream)
 					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 			}
-			else if (_input.Peek() == ':')
+			else if (yytext.Length - index - 1 >= 1 && _input.Peek() == ':')
 			{
 				yytext.Append(_input.Read());
-				_state = LexicalState.MDY7;
+				_state = LexicalState.MDY5;
 
 				if (_input.EndOfStream)
 					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
@@ -2329,76 +2451,142 @@ namespace Tense.Rql
 				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 		}
 
-		private void ProcessMDY7()
+		private void ProcessMDY5()
 		{
 			//	mm/dd/yyyy hh:mm:
-
 			var index = yytext.ToString().LastIndexOf(':');
 
-			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			if ( _input.Peek() == ' ' || _input.Peek() == '\t')
+            {
+				_input.Read();		// Skip whitespace
+            }
+			else if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
 			{
 				yytext.Append(_input.Read());
 
 				if (_input.EndOfStream)
 				{
-					var datetime = DateTime.Parse(yytext.ToString());
-					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
-					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					var sign = TimeZoneInfo.Local.BaseUtcOffset.Hours < 0 ? "" : "+";
+					var dateString = $"{yytext}{sign}{TimeZoneInfo.Local.BaseUtcOffset.Hours:00}:{TimeZoneInfo.Local.BaseUtcOffset.Minutes:00}";
+					_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse(dateString).UtcDateTime));
 					yytext.Clear();
 				}
 			}
-			else if (_input.Peek() == '.')
+			else if (yytext.Length - index - 1 >= 1 && (_input.Peek() == 'z' || _input.Peek() == 'Z'))
 			{
 				yytext.Append(_input.Read());
-				_state = LexicalState.MDY8;
+				_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
+			}
+			else if (yytext.Length - index - 1 >= 1 && (_input.Peek() == 'g' || _input.Peek() == 'G'))
+			{
+				yytext.Append(_input.Read());
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+				else if (yytext.Length - index - 1 >= 1 && (_input.Peek() == 'm' || _input.Peek() == 'M'))
+				{
+					yytext.Append(_input.Read());
+					if (_input.EndOfStream)
+						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+					else if (yytext.Length - index - 1 >= 1 && (_input.Peek() == 't' || _input.Peek() == 'T'))
+					{
+						yytext.Append(_input.Read());
+						_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
+						yytext.Clear();
+						_state = LexicalState.INITIAL_STATE;
+					}
+					else
+						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+				}
+				else
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (yytext.Length - index - 1 >= 1 && _input.Peek() == '.')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.MDY6;
 
 				if (_input.EndOfStream)
 					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 			}
 			else
 			{
-				var datetime = DateTime.Parse(yytext.ToString());
-				var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
-				_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+				var sign = TimeZoneInfo.Local.BaseUtcOffset.Hours < 0 ? "" : "+";
+				_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}{sign}{TimeZoneInfo.Local.BaseUtcOffset.Hours:00}:{TimeZoneInfo.Local.BaseUtcOffset.Minutes:00}").UtcDateTime));
 				yytext.Clear();
 				_state = LexicalState.INITIAL_STATE;
 			}
 		}
 
-		private void ProcessMDY8()
+		private void ProcessMDY6()
 		{
 			//	mm/dd/yyyy hh:mm:ss.
 
 			var index = yytext.ToString().LastIndexOf('.');
 
-			if (yytext.Length - index - 1 < 6 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			if (_input.Peek() == ' ' || _input.Peek() == '\t')
+			{
+				_input.Read();      //	Skip whitespace
+			}
+			else if (yytext.Length - index - 1 < 6 && _input.Peek() >= '0' && _input.Peek() <= '9')
 			{
 				yytext.Append(_input.Read());
 
 				if (_input.EndOfStream)
 				{
-					var datetime = DateTime.Parse(yytext.ToString());
-					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
-					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					var sign = TimeZoneInfo.Local.BaseUtcOffset.Hours < 0 ? "" : "+";
+					_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}{sign}{TimeZoneInfo.Local.BaseUtcOffset.Hours:00}:{TimeZoneInfo.Local.BaseUtcOffset.Minutes:00}").UtcDateTime));
 					yytext.Clear();
 				}
 			}
-			else if ( _input.Peek() == '-' || _input.Peek() == '+' )
-            {
+			else if (yytext.Length - index - 1 > 1 && (_input.Peek() == 'z' || _input.Peek() == 'Z'))
+			{
 				yytext.Append(_input.Read());
-				_state = LexicalState.MDY9;
+				_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
+			}
+			else if (yytext.Length - index - 1 > 1 && (_input.Peek() == 'g' || _input.Peek() == 'G'))
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+				else if (_input.Peek() == 'm' || _input.Peek() == 'M')
+				{
+					yytext.Append(_input.Read());
+
+					if (_input.EndOfStream)
+						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+					else if (_input.Peek() == 't' || _input.Peek() == 'T')
+					{
+						yytext.Append(_input.Read());
+						_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
+						yytext.Clear();
+						_state = LexicalState.INITIAL_STATE;
+					}
+					else
+						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+				}
+				else
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+			}
+			else if (_input.Peek() == '-' || _input.Peek() == '+')
+			{
+				yytext.Append(_input.Read());
+				_state = LexicalState.MDY7;
 			}
 			else
 			{
-				var datetime = DateTime.Parse(yytext.ToString());
-				var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
-				_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+				var sign = TimeZoneInfo.Local.BaseUtcOffset.Hours < 0 ? "" : "+";
+				_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}{sign}{TimeZoneInfo.Local.BaseUtcOffset.Hours:00}:{TimeZoneInfo.Local.BaseUtcOffset.Minutes:00}").UtcDateTime));
 				yytext.Clear();
 				_state = LexicalState.INITIAL_STATE;
 			}
 		}
 
-		private void ProcessMDY9()
+		private void ProcessMDY7()
 		{
 			//	mm/dd/yyyy hh:mm:ss.ffffff+
 			//	mm/dd/yyyy hh:mm:ss.ffffff-
@@ -2417,7 +2605,7 @@ namespace Tense.Rql
 			else if (yytext.Length - index - 1 >= 1 && _input.Peek() >= ':')
 			{
 				yytext.Append(_input.Read());
-				_state = LexicalState.MDY10;
+				_state = LexicalState.MDY8;
 
 				if (_input.EndOfStream)
 					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
@@ -2425,7 +2613,7 @@ namespace Tense.Rql
 			else if (yytext.Length - index - 1 == 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
 			{
 				yytext.Append(_input.Read());
-				_state = LexicalState.MDY11;
+				_state = LexicalState.MDY9;
 
 				if (_input.EndOfStream)
 					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
@@ -2434,7 +2622,7 @@ namespace Tense.Rql
 				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 		}
 
-		private void ProcessMDY10()
+		private void ProcessMDY8()
 		{
 			//	mm/dd/yyyy hh:mm:ss.ffffff+00:
 			//	mm/dd/yyyy hh:mm:ss.ffffff-00:
@@ -2447,17 +2635,13 @@ namespace Tense.Rql
 
 				if (_input.EndOfStream)
 				{
-					var datetime = DateTimeOffset.Parse(yytext.ToString());
-					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
-					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
 					yytext.Clear();
 				}
 			}
 			else if ( yytext.Length-index-1 >= 1 && yytext.Length-index-1 <= 2 && (_input.Peek() < '0' || _input.Peek() > '9'))
             {
-				var datetime = DateTimeOffset.Parse(yytext.ToString());
-				var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
-				_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+				_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
 				yytext.Clear();
 				_state = LexicalState.INITIAL_STATE;
 			}
@@ -2465,7 +2649,7 @@ namespace Tense.Rql
 				throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 		}
 
-		private void ProcessMDY11()
+		private void ProcessMDY9()
 		{
 			//	mm/dd/yyyy hh:mm:ss.ffffff+000
 			//	mm/dd/yyyy hh:mm:ss.ffffff-000
@@ -2480,17 +2664,13 @@ namespace Tense.Rql
 
 				if (_input.EndOfStream)
 				{
-					var datetime = DateTimeOffset.Parse(yytext.ToString());
-					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
-					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
 					yytext.Clear();
 				}
 			}
 			else if (yytext.Length - index - 1 == 4)
 			{
-				var datetime = DateTimeOffset.Parse(yytext.ToString());
-				var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
-				_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+				_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
 				yytext.Clear();
 				_state = LexicalState.INITIAL_STATE;
 			}
@@ -2504,7 +2684,7 @@ namespace Tense.Rql
 			//	yyyy-
 
 			var index1 = yytext.ToString().LastIndexOf('-');
-			var index2 = yytext.ToString().LastIndexOf('+');
+			var index2 = yytext.ToString().LastIndexOf('/');
 			var index = index1 > index2 ? index1 : index2;
 
 			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
@@ -2537,17 +2717,50 @@ namespace Tense.Rql
 			var index2 = yytext.ToString().LastIndexOf('/');
 			var index = index1 > index2 ? index1 : index2;
 
-			if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
+			if (_input.Peek() == ' ' || _input.Peek() == '\t')
+			{
+				_input.Read();      //	Skip Whitespace	
+			}
+			else if (yytext.Length - index - 1 < 2 && _input.Peek() >= '0' && _input.Peek() <= '9')
 			{
 				yytext.Append(_input.Read());
 
 				if (_input.EndOfStream)
 				{
-					var datetime = DateTimeOffset.Parse(yytext.ToString());
-					var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
-					_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+					var sign = TimeZoneInfo.Local.BaseUtcOffset.Hours < 0 ? "" : "+";
+					_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}T00:00:00{sign}{TimeZoneInfo.Local.BaseUtcOffset.Hours:00}:{TimeZoneInfo.Local.BaseUtcOffset.Minutes:00}").UtcDateTime));
 					yytext.Clear();
 				}
+			}
+			else if (yytext.Length - index - 1 >= 1 && (_input.Peek() == 'z' || _input.Peek() == 'Z'))
+			{
+				yytext.Append(_input.Read());
+				_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
+				yytext.Clear();
+				_state = LexicalState.INITIAL_STATE;
+			}
+			else if (yytext.Length - index - 1 >= 1 && (_input.Peek() == 'g' || _input.Peek() == 'G'))
+			{
+				yytext.Append(_input.Read());
+
+				if (_input.EndOfStream)
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+				else if (_input.Peek() == 'm' || _input.Peek() == 'M')
+				{
+					yytext.Append(_input.Read());
+
+					if (_input.EndOfStream)
+						throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
+					else if (_input.Peek() == 't' || _input.Peek() == 'T')
+					{
+						yytext.Append(_input.Read());
+						_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}").UtcDateTime));
+						yytext.Clear();
+						_state = LexicalState.INITIAL_STATE;
+					}
+				}
+				else
+					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
 			}
 			else if (yytext.Length - index - 1 >= 1 && (_input.Peek() == 'T' || _input.Peek() == 't'))
 			{
@@ -2559,9 +2772,8 @@ namespace Tense.Rql
 			}
 			else if (yytext.Length - index - 1 >= 1)
 			{
-				var datetime = DateTimeOffset.Parse(yytext.ToString());
-				var datetime2 = new DateTime(datetime.Ticks, DateTimeKind.Local);
-				_tokenStream.Push(new Token(Symbol.DATETIME, datetime2));
+				var sign = TimeZoneInfo.Local.BaseUtcOffset.Hours < 0 ? "" : "+";
+				_tokenStream.Push(new Token(Symbol.DATETIME, DateTimeOffset.Parse($"{yytext}T00:00:00{sign}{TimeZoneInfo.Local.BaseUtcOffset.Hours:00}:{TimeZoneInfo.Local.BaseUtcOffset.Minutes:00}").UtcDateTime));
 				yytext.Clear();
 				_state = LexicalState.INITIAL_STATE;
 			}
@@ -2586,7 +2798,7 @@ namespace Tense.Rql
 			else if (yytext.Length - index - 1 >= 1 && _input.Peek() >= ':' )
 			{
 				yytext.Append(_input.Read());
-				_state = LexicalState.MDY6;
+				_state = LexicalState.MDY4;
 
 				if (_input.EndOfStream)
 					throw new RqlFormatException($"Invalid Datetime format {yytext}. Aborting scan.");
@@ -3971,7 +4183,7 @@ namespace Tense.Rql
 					throw new RqlFormatException("Datetime format is invalid.");
 			}
 			//	Is it a datetime of the form ymd?
-			else if (yytext.Length == 4 && (_input.Peek() == '-' || _input.Peek() == '/'))
+			else if (yytext.Length > 2 && (_input.Peek() == '-' || _input.Peek() == '/'))
 			{
 				yytext.Append(_input.Read());
 				_state = LexicalState.YMD1;
