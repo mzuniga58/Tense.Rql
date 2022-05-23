@@ -1,11 +1,11 @@
-# Tense.Rql #
+<h1>Tense.Rql</h1>
 A library that supports RQL for REST Services. The *Tense.Rql* works in conjunction with the *Tense* package. 
 
 The Resource Query Language (RQL) is a query language designed for use in URIs with object style data structures. The language provides powerful filtering capabilities to your endpoints. In addition, the RQL language can be used to support multi-update / multi-delete operations on resources.
 
 The RQL language is used to describe the SQL Statement that will be used to perform the operation. In accordance with that goal, the *Tense.Rql* package contains the following features:
 
-## RqlNode ##
+<h2>RqlNode<h2>
 The **RqlNode** class is a structured representation of an RQL Statement. It has various functions to compile, inspect and manipulate the statement. An **RqlNode** is a hierarchical representation of the RQL statement. It consists of an Operation, and a set of parameters. Each parameter may be another RqlNode, or it may be an object value.
 
 For example, the RQL Statement
@@ -28,7 +28,7 @@ BookId = 1
 
 Which can then be placed inside of a WHERE clause.
 
-### RqlNode.Parse ###
+<h3>RqlNode.Parse<h3>
 
 *RqlNode* **RqlNode**.Parse(*statement*)
 
@@ -44,3 +44,13 @@ An **RqlNode** that represents the RQL statement. The function alwasys returns a
 
 - **RqlFormatException** - An exception that details a Syntax error in the RQL Statement.
 
+<h2>Change History</h2>
+<table>
+    <tr>
+        <th>Date</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>05/23/2022</td>
+        <td>Fixed DateTime parsing bugs.</td>
+</table>
