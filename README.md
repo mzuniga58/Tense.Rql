@@ -5,8 +5,8 @@ The Resource Query Language (RQL) is a query language designed for use in URIs w
 
 The RQL language is used to describe the SQL Statement that will be used to perform the operation. In accordance with that goal, the *Tense.Rql* package contains the following features:
 
-<h2>RqlNode<h2>
-The **RqlNode** class is a structured representation of an RQL Statement. It has various functions to compile, inspect and manipulate the statement. An **RqlNode** is a hierarchical representation of the RQL statement. It consists of an Operation, and a set of parameters. Each parameter may be another RqlNode, or it may be an object value.
+<h2>RqlNode</h2>
+The <b>RqlNode</b> class is a structured representation of an RQL Statement. It has various functions to compile, inspect and manipulate the statement. An <b>RqlNode</b> is a hierarchical representation of the RQL statement. It consists of an Operation, and a set of parameters. Each parameter may be another RqlNode, or it may be an object value.
 
 For example, the RQL Statement
 
@@ -16,7 +16,7 @@ is compiled into
 
 ![alt text](https://github.com/mzuniga58/Tense.Rql/blob/main/Images/RqlNode1.png "RqlNode")
 
-Each node begins with an operation. In this case, the operation is **EQ**, representing equality. The **EQ** operation takes two paramters, and it will check whether parameter 1 is equal to parameter 2. The first parmater is another **RqlNode**. This node has the operation **PROPERTY**, and it takes one paramter. The **PROPERTY** operation means that its single parameter is the name of a member in a model. The parameter for this operation is an object value - a string in this case - that holds the value "BookId".
+Each node begins with an operation. In this case, the operation is <b>EQ</b>, representing equality. The <b>EQ</b> operation takes two paramters, and it will check whether parameter 1 is equal to parameter 2. The first parmater is another <b>RqlNode</b>. This node has the operation <b>PROPERTY</b>, and it takes one paramter. The <b>PROPERTY</b> operation means that its single parameter is the name of a member in a model. The parameter for this operation is an object value - a string in this case - that holds the value "BookId".
 
 The second parameter of the parent node is an object value -- an int in this case -- holding the value 1.
 
@@ -30,19 +30,19 @@ Which can then be placed inside of a WHERE clause.
 
 <h3>RqlNode.Parse<h3>
 
-*RqlNode* **RqlNode**.Parse(*statement*)
+<i>RqlNode</i> <b>RqlNode</b>.Parse(<i>statement</i>)
 
-- *statement* - the RQL Statement to be compiled
+- <i>statement</i> - the RQL Statement to be compiled
 
-The **RqlNode**.Parse function is used to parse, or compile an RQL Statement into an **RqlNode** representation.
+The <b>RqlNode</b>.Parse function is used to parse, or compile an RQL Statement into an <b>RqlNode</b> representation.
 
-**Returns**
+<b>Returns</b>
 
-An **RqlNode** that represents the RQL statement. The function alwasys returns an **RqlNode**. If the statement to be compiled is blank or whitespace, the function will return an **RqlNode** with an Operation of NOOP, and no parameters.
+An <b>RqlNode</b> that represents the RQL statement. The function alwasys returns an <b>RqlNode</b>. If the statement to be compiled is blank or whitespace, the function will return an <b>RqlNode</b> with an Operation of NOOP, and no parameters.
 
-**Exceptions**
+<b>Exceptions</b>
 
-- **RqlFormatException** - An exception that details a Syntax error in the RQL Statement.
+- <b>RqlFormatException</b> - An exception that details a Syntax error in the RQL Statement.
 
 <h2>Change History</h2>
 <table>
