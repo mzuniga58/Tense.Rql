@@ -4156,8 +4156,15 @@ namespace Tense.Rql
 			//	all numeric numbers at this point
 			yytext.Append(Convert.ToString(_input.Read()));
 
+			if ( _input.EndOfStream )
+			{
+				_state = LexicalState.INITIAL_STATE;
+				_tokenStream.Push(new Token(Symbol.INTEGER, Convert.ToInt32(yytext.ToString())));
+				yytext.Clear();
+			}
+
 			//	Is it a hexidecimal number format?
-			if (yytext.Length == 1 && yytext[0] == '0' && (_input.Peek() == 'x' || _input.Peek() == 'X'))
+			else if (yytext.Length == 1 && yytext[0] == '0' && (_input.Peek() == 'x' || _input.Peek() == 'X'))
 			{
 				yytext.Append(Convert.ToString(_input.Read()));
 				_state = LexicalState.HEXVAL;
@@ -5902,12 +5909,16 @@ namespace Tense.Rql
 
 		private void ProcessTiny()
 		{
-			if (_input != null)
+			if (_input.Peek() == ' ' || _input.Peek() == '\t' )
+            {
+				_input.Read();	//	Skip whitespace
+            }
+			else if (_input != null)
 			{
 				if ((_input.Peek() >= '0' && _input.Peek() <= '9') || _input.Peek() == '-' || _input.Peek() == '+')
 				{
 					var c = _input.Read();
-
+						
 					if (_input.EndOfStream && (c == '+' || c == '-'))
 					{
 						yytext.Append(Convert.ToString(c));
@@ -5966,7 +5977,19 @@ namespace Tense.Rql
 			}
 			else if (_input.Peek() == ':')
 			{
-				if (string.Equals(yytext.ToString(), "int8", StringComparison.OrdinalIgnoreCase))
+				if (string.Equals(yytext.ToString(), "byte", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.UTINY;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "sbyte", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.TINY;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "int8", StringComparison.OrdinalIgnoreCase))
 				{
 					_input.Read();
 					_state = LexicalState.TINY;
@@ -5978,10 +6001,22 @@ namespace Tense.Rql
 					_state = LexicalState.UTINY;
 					yytext.Clear();
 				}
+				else if (string.Equals(yytext.ToString(), "short", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.SHORT;
+					yytext.Clear();
+				}
 				else if (string.Equals(yytext.ToString(), "int16", StringComparison.OrdinalIgnoreCase))
 				{
 					_input.Read();
 					_state = LexicalState.SHORT;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "ushort", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.USHORT;
 					yytext.Clear();
 				}
 				else if (string.Equals(yytext.ToString(), "uint16", StringComparison.OrdinalIgnoreCase))
@@ -5996,7 +6031,31 @@ namespace Tense.Rql
 					_state = LexicalState.INT;
 					yytext.Clear();
 				}
+				else if (string.Equals(yytext.ToString(), "int", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.INT;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "integer", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.INT;
+					yytext.Clear();
+				}
 				else if (string.Equals(yytext.ToString(), "uint32", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.UINT;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "uint", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.UINT;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "uinteger", StringComparison.OrdinalIgnoreCase))
 				{
 					_input.Read();
 					_state = LexicalState.UINT;
@@ -6008,7 +6067,19 @@ namespace Tense.Rql
 					_state = LexicalState.LONG;
 					yytext.Clear();
 				}
+				else if (string.Equals(yytext.ToString(), "long", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.LONG;
+					yytext.Clear();
+				}
 				else if (string.Equals(yytext.ToString(), "uint64", StringComparison.OrdinalIgnoreCase))
+				{
+					_input.Read();
+					_state = LexicalState.ULONG;
+					yytext.Clear();
+				}
+				else if (string.Equals(yytext.ToString(), "ulong", StringComparison.OrdinalIgnoreCase))
 				{
 					_input.Read();
 					_state = LexicalState.ULONG;
