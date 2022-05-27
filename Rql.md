@@ -97,7 +97,7 @@ Total=int64:7000000000</code></pre>
 <li><b>bstr</b> - written as bstr:&lt;encoding&gt;:value i.e., bstr:utf8:value - a base-64 encoded string</li>
 <li><b>char</b> - a character value</li>
 </ul>
-<li><b>Miscellaneous operators</li>
+<li>Miscellaneous operators</li>
 <ul>
 <li><b>guid</b> - a GUID (Globally Unique Identifier) value</li>
 <li><b>uri</b> - a URI value
