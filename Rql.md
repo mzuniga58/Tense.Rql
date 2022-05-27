@@ -25,7 +25,7 @@ gt(Age,18)</code></pre>
 <pre><code>Age=18
 FirstName=Joe
 Cost=2.15</code></pre>
-<p>In the first case, the value 18 is encoded as a signed interger (int) value, the value "Joe" is encoded as a string, and the value 2.15 is encoded as a double. However, at the timei of SQL generation, the value is cast to the value of the column. So, for example, if Cost is a column defined in a database, and the data type of Cost is money, then the double value 2.15 will be cast as decimal(18,2) to match the column it references when the SQL Statement is generated. Likewise, a value that represents a date (such as "1/1/1960 14:32:25") would be encoded as a UTC Date. If the column to which it references is a DataTimeOffset, then the appropriate conversion will be done at the time of the SQL Statement generation.<p>
+<p>In the first case, the value 18 is encoded as a signed interger (int) value, the value "Joe" is encoded as a string, and the value 2.15 is encoded as a double. However, at the time of SQL generation, the value is cast to the value of the column. So, for example, if <b>Cost</b> is a column defined in a database, and the data type of <b>Cost</b> is <i>money</i>, then the double value 2.15 will be cast as decimal(18,2) to match the column it references when the SQL Statement is generated. Likewise, a value that represents a date (such as "1/1/1960 14:32:25") would be encoded as a UTC Date. If the column to which it references is a DataTimeOffset, then the appropriate conversion will be done at the time of the SQL Statement generation.<p>
 <p>Sometimes, for certain queries, the default values are not suffient. What if, for example, you wanted to write this statement:<p>
 <pre><code>Total=7000000000
 </code></pre>
