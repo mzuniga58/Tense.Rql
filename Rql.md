@@ -12,7 +12,7 @@
 <li><b>&gt;=</b> - can also be written as <b>=ge</b></li>
 <li><b>!=</b> - can also be written as <b>=ne</b></li>
 </ul>
-<p>Each of these operations can also be written in the paranthesized nested form of <op>(<arg>,<arg>). For example, if we wanted to create a filter that returns all the records in a dataset where Age is greater than 18, we could write:</p>
+<p>Each of these operations can also be written in the paranthesized nested form of &lt;op&gt;(&lt;arg&gt;,&lt;arg&gt;). For example, if we wanted to create a filter that returns all the records in a dataset where Age is greater than 18, we could write:</p>
 <pre><code>Age&gt;18
 Age=gt=18
 gt(Age,18)</code></pre>
