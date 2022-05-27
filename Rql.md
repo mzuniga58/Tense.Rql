@@ -21,6 +21,7 @@ gt(Age,18)</code></pre>
 &lt;property&gt;&lt;alphaoperator&gt;=&lt;value&gt;
 &lt;operator&gt;(&lt;property&gt;,&lt;value&gt;)
 </code></pre>
+<h2>Encoding Values</h2>
 <p>The &lt;value&gt; argument is evaluated as in integer, double or string for most values, and translated to specialty values for specialty formats, such as Dates, Timespans or Unique Identitifers. For example, consider the following RQL statements:<p>
 <pre><code>Age=18
 FirstName=Joe
