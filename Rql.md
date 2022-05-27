@@ -42,7 +42,7 @@ Total=int64:7000000000</code></pre>
 <li><b>0xnnnn</b> - 16-bit unsigned integer (the hexidecimal format)</li>
 <li><b>0xnnnnnnnn</b> - 32-bit unsigned integer (the hexidecimal format)</li>
 <li><b>0xnnnnnnnnnnnnnnnn</b> - 64-bit unsigned integer (the hexidecimal format)</li>
-<li><b>nnnu</b> - 32 - -bit unsigned integer</li>
+<li><b>nnnu</b> - 32-bit unsigned integer</li>
 <li><b>nnnL or nnnl</b> - 64-bit signed integer</li>
 <li><b>nnnUL or nnnul</b> - 64-bit unsigned integer</li>
 <li><b>nnn.nn</b> - double value</li>
