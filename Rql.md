@@ -108,3 +108,24 @@ Total=int64:7000000000</code></pre>
 <pre><code>Name=Tom &amp; Jerry's=Good Ice Creame
 </code></pre>
 <p>This statement can be interpreted in either of two ways. Either we are searching for the name "Tom &amp; Gerrys=Good Ice Creame", or we are searching for the name "Tom" and a column called "Jerry's" which should be equal to "Good Ice Creame". When the RQL parser sees the &amp; character, it interprets it as the end of the previous clause and the beginning of a new clause joined by the AND operation. Therefore, a statement like Name=Tom &amp; Jerry's would throw an RQL Format Exception, because it would interpret Jerry's as the beginning of the next clause, and that clause is incomplete. The same issue can happen with Uris. To avoid situations like this, you an enclose the the value in double quotes: Name="Tom &amp; Jerry's". This statement will compile corretly, because it will interpret "Tom &amp; Jerry's" as a single string.</p>
+<h2>Logical Operators</h2>
+<p>Now that we have the basics of relational operators, and understand how we can encode values, let's take a look at the logical operations. There are two, and they are fairly self-explanatory:</p>
+<ul>
+<li>AND</li>
+<li>OR</li>
+</ul>
+<p>You can encode the <b>AND</b> and <b>OR</b> operations using the &amp; and | symbols respectively. For example, suppose we have a table with a member called <b>Status</b>. Suppose further that the <b>Status</b> member can take on any of three values: A - active, I - inactve and P - in process. Suppose further that there is a <b>Category</b> member. Now suppose I want the records in category 1 that are acive. The following RQL statement will give us those results:</p>
+<pre><code>Category=1&Status=A
+</code></pre>
+<p>We can write the same statement using alphasymbols, or in normalized form:</p>
+<pre><code>Category=eq-1&Status=eq=A
+and(eq(Category,1),eq(Status,A))</code></pre>
+<p>We can also combine logical operators using paranthesis. Suppose we want the records in category 1 that are active, combined with the records in category 2 that are in process:</p>
+<pre><code>(Category=1&Status=A)|(Category=2&Status=P)
+or(and(eq(Category,1),eq(Status,A)),and(eq(Category,2),eq(Status,P)))</code></pre>
+<p>The normalized form is a bit difficult to read, but it does the same as the statement above it. It's easier to read if we break it down in a hierarchial form:</p>
+<pre><code>
+or(                                       ),(                                       )
+     and(                              )      and (                               )
+          eq(Category,1), eq(Status,A)               eq(Category,2), eq(Status,P)
+</code></pre>
