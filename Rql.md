@@ -152,6 +152,7 @@ or(                                        ,                                    
 <pre><code>limit(&lt;start&gt;,&lt;pagesize&gt;)
 </code></pre>
 <p>The start value is a one based index value. For example, suppose I called /customers?limit(1,10). This statement would return the first 10 customers in the list. The call /customers?limit(11,10) would return the next 10 customers, starting with the 11th customer. Unless otherwise specified, the returned set will be ordered by the primary key(s) of the table in question.</p>
+<p>Also note that the pagesize value does NOT override the batch-size specified in your service. You can call /customers?limit(1,1000), but if your batch-size value is 100, you're still only going to get the first 100 records.</p>
 <h2>The Sort operator</h2>
 <p>You can specifiy the order of a collection using the <b>SORT</b> operator. The syntax is:</p>
 <pre><code>sort(+/-member,+/-member,...+/-member)</code></pre>
