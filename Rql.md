@@ -1,7 +1,7 @@
 <h1>Resource Query Language Reference</h1>
 <p>The Resource Query Language (RQL) is a query language designed for use in URIs with object style data structures. <b>Tense.Rql</b> includes the RQL specification and provides a C# implementation of query parsing and model translations. Supporting packages, such as <b>Tense.Rql.SqlServer</b> provide SQL Statement generators that can translate an RQL query into its corresponding SQL Statement. RQL can be thought as basically a set of nestable named operators which each have a set of arguments. RQL is designed to have an extremely simple, but extensible grammar that can be written in a URL friendly query string.</p>
 <h2>General Syntax</h2>
-<p>The RQL grammar is based around standard URI delimiters, and the standard rules for encoding strings with URL encoding (%xx) are observed. RQL is also a superset of the Feed Item Query Language (FIQL, pronounced "fickle"). It supports parenthesized nested operations (also called the normalized form), as well as alpha relational operations (i.e., =lt is the same as &lt;).<p>
+<p>The RQL grammar is based around standard URI delimiters, and the standard rules for encoding strings with URL encoding (%xx) are observed. RQL is also a superset of the Feed Item Query Language (FIQL, pronounced "fickle"). It supports parenthesized nested operations (also called the normalized form), as well as alpha relational operations (i.e., =lt is the same as &lt;). All operator names are case insensitive, i.e., =eq is the same as =EQ.<p>
 <h3>Relational Operations</h3>
 <p>The relational operations include the standard set:</p>
 <ul>
