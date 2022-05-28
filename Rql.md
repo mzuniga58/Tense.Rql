@@ -125,7 +125,29 @@ and(eq(Category,1),eq(Status,A))</code></pre>
 or(and(eq(Category,1),eq(Status,A)),and(eq(Category,2),eq(Status,P)))</code></pre>
 <p>The normalized form is a bit difficult to read, but it does the same as the statement above it. It's easier to read if we break it down in a hierarchial form:</p>
 <pre><code>
-or(                                       ),(                                       )
-     and(                              )      and (                               )
-          eq(Category,1), eq(Status,A)               eq(Category,2), eq(Status,P)
+or(                                        ,                                          )
+     and(                ,              )     and (                 ,               )
+          eq(Category,1)   eq(Status,A)              eq(Category,2)    eq(Status,P)
+</code></pre>
+<h2>The Aggregation Operators</h2>
+<p>Along with the relational and logical operators, RQl also supports aggregation. Think of this as the GROUP BY clause in SQL. The aggregation operator are:<p>
+<ul>
+<li><b>MAX</b> - delivers the maximum value of a member in a set</li>
+<li><b>MIN</b> - delivers teh minimum value of a member in a set</li>
+<li><b>MEAN</b> - delivers the mean, or average, value of a member in a set</li>
+<li><b>COUNT</b> - delivers the total number of members in a set</li>
+<li><b>SUM</b> - delivers the sum of the members in a set</li>
+</ul>
+<p>Used by themselves, these operators will return one record with the specified value. If these operators are used, they can only be used with other aggregation operators. Again, think of the GROUP BY clause in SQL. For example, suppose we have a list of customers purchases, and suppose that the customer purchaes record has the members PurchaseDate, ProductId, Age (the age of the customer in years), Quantity, Cost, List, and Discount. Now, suppose we wanted to get the average cost of all purchases.</p>
+<pre><code>mean(Cost)
+</code></pre>
+<p>This query will return one record with one value, the average cost of all purchases. If we wanted the aveerage cost and the average list price:</p>
+<pre><code>mean(Cost)&mean(List)
+</code><pre>
+<p>But, now suppose we wanted those values broken down by age. To do that we need to introduce another operator, the <b>AGGREGATE</b> operator. The aggregate operator takes a list of properties, and a list of aggregate operations. The properties are included in the GROuP By clause of the SQL statement, and the aggregate operations are the values in the SELECT clause.</p>
+<pre></code>aggregate(Age,mean(Cost),Mean(List))</code></pre>
+<p>This query will return one record for each Age value, and that record will contain two values, the average cost and averge list price for that age.</p>
+<h2>Paging Operator</h2>
+<p>A collection of items is returned in a <b>PageSet</b> class, and is limited to batch-size defined in your service. For example, suppose we have table of customers, and we are fortunate enough to have 100,000 customers. The endpoint to retrive the list of customers is /customer. You can call this endpoint, with no filters, and it will return the entire list. But it won't do it all in one shot. Instead of returning 100,000 records, it will only return the first 100 records (assuming your batch-size is 100). To get the remaining records, you have to specify a start and page size. In RQl, we use the <b>LIMIT</b> operator.</p>
+<pre><code>limit(&lt;start&gt;,&lt;pagesize&gt;)
 </code></pre>
