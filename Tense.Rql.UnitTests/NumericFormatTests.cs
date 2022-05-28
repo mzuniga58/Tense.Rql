@@ -21,23 +21,23 @@ namespace Tense.Rql.UnitTests
                 Assert.IsNotNull(node);
                 Assert.IsTrue(node.Operation == RqlOperation.EQ);
                 Assert.IsTrue(node.Count == 2);
-                Assert.IsInstanceOfType(node.NonNullValue<RqlNode>(0), typeof(RqlNode));
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
-                Assert.IsInstanceOfType(node.NonNullValue<int>(1), typeof(int));
 
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(int));
                 var expectedValue = 1;
-                var actualValue = node.NonNullValue<int>(1);
 
-                Assert.IsTrue(actualValue == expectedValue);
+                Assert.AreEqual(actualValue, expectedValue);
             }
             catch (Exception error)
             {
                 Assert.Fail(error.Message);
             }
         }
-
+         
         [TestMethod]
         public void NumericFormat_Byte_02()
         {
@@ -48,16 +48,16 @@ namespace Tense.Rql.UnitTests
                 Assert.IsNotNull(node);
                 Assert.IsTrue(node.Operation == RqlOperation.EQ);
                 Assert.IsTrue(node.Count == 2);
-                Assert.IsInstanceOfType(node.NonNullValue<RqlNode>(0), typeof(RqlNode));
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
-                Assert.IsInstanceOfType(node.NonNullValue<byte>(1), typeof(byte));
 
-                var expectedValue = (byte)1;
-                var actualValue = node.NonNullValue<byte>(1);
-
-                Assert.IsTrue(actualValue == expectedValue);
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(byte));
+                var expectedValue = (byte) 1;
+                
+                Assert.AreEqual(actualValue, expectedValue);
             }
             catch (Exception error)
             {
@@ -75,16 +75,16 @@ namespace Tense.Rql.UnitTests
                 Assert.IsNotNull(node);
                 Assert.IsTrue(node.Operation == RqlOperation.EQ);
                 Assert.IsTrue(node.Count == 2);
-                Assert.IsInstanceOfType(node.NonNullValue<RqlNode>(0), typeof(RqlNode));
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
-                Assert.IsInstanceOfType(node.NonNullValue<byte>(1), typeof(byte));
 
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(byte));
                 var expectedValue = (byte)1;
-                var actualValue = node.NonNullValue<byte>(1);
 
-                Assert.IsTrue(actualValue == expectedValue);
+                Assert.AreEqual(actualValue, expectedValue);
             }
             catch (Exception error)
             {
@@ -102,16 +102,16 @@ namespace Tense.Rql.UnitTests
                 Assert.IsNotNull(node);
                 Assert.IsTrue(node.Operation == RqlOperation.EQ);
                 Assert.IsTrue(node.Count == 2);
-                Assert.IsInstanceOfType(node.NonNullValue<RqlNode>(0), typeof(RqlNode));
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
-                Assert.IsInstanceOfType(node.NonNullValue<sbyte>(1), typeof(sbyte));
 
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(sbyte));
                 var expectedValue = (sbyte)12;
-                var actualValue = node.NonNullValue<byte>(1);
 
-                Assert.IsTrue(actualValue == expectedValue);
+                Assert.AreEqual(actualValue, expectedValue);
             }
             catch (Exception error)
             {
@@ -129,16 +129,16 @@ namespace Tense.Rql.UnitTests
                 Assert.IsNotNull(node);
                 Assert.IsTrue(node.Operation == RqlOperation.EQ);
                 Assert.IsTrue(node.Count == 2);
-                Assert.IsInstanceOfType(node.NonNullValue<RqlNode>(0), typeof(RqlNode));
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
-                Assert.IsInstanceOfType(node.NonNullValue<sbyte>(1), typeof(sbyte));
 
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(sbyte));
                 var expectedValue = (sbyte)33;
-                var actualValue = node.NonNullValue<sbyte>(1);
 
-                Assert.IsTrue(actualValue == expectedValue);
+                Assert.AreEqual(actualValue, expectedValue);
             }
             catch (Exception error)
             {
@@ -156,16 +156,16 @@ namespace Tense.Rql.UnitTests
                 Assert.IsNotNull(node);
                 Assert.IsTrue(node.Operation == RqlOperation.EQ);
                 Assert.IsTrue(node.Count == 2);
-                Assert.IsInstanceOfType(node.NonNullValue<RqlNode>(0), typeof(RqlNode));
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
-                Assert.IsInstanceOfType(node.NonNullValue<sbyte>(1), typeof(sbyte));
 
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(sbyte));
                 var expectedValue = (sbyte)-104;
-                var actualValue = node.NonNullValue<sbyte>(1);
 
-                Assert.IsTrue(actualValue == expectedValue);
+                Assert.AreEqual(actualValue, expectedValue);
             }
             catch (Exception error)
             {
@@ -183,16 +183,16 @@ namespace Tense.Rql.UnitTests
                 Assert.IsNotNull(node);
                 Assert.IsTrue(node.Operation == RqlOperation.EQ);
                 Assert.IsTrue(node.Count == 2);
-                Assert.IsInstanceOfType(node.NonNullValue<RqlNode>(0), typeof(RqlNode));
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
-                Assert.IsInstanceOfType(node.NonNullValue<sbyte>(1), typeof(sbyte));
 
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(sbyte));
                 var expectedValue = (sbyte)32;
-                var actualValue = node.NonNullValue<sbyte>(1);
 
-                Assert.IsTrue(actualValue == expectedValue);
+                Assert.AreEqual(actualValue, expectedValue);
             }
             catch (Exception error)
             {
@@ -210,16 +210,16 @@ namespace Tense.Rql.UnitTests
                 Assert.IsNotNull(node);
                 Assert.IsTrue(node.Operation == RqlOperation.EQ);
                 Assert.IsTrue(node.Count == 2);
-                Assert.IsInstanceOfType(node.NonNullValue<RqlNode>(0), typeof(RqlNode));
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
-                Assert.IsInstanceOfType(node.NonNullValue<sbyte>(1), typeof(sbyte));
 
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(sbyte));
                 var expectedValue = (sbyte)32;
-                var actualValue = node.NonNullValue<sbyte>(1);
 
-                Assert.IsTrue(actualValue == expectedValue);
+                Assert.AreEqual(actualValue, expectedValue);
             }
             catch (Exception error)
             {
@@ -237,16 +237,16 @@ namespace Tense.Rql.UnitTests
                 Assert.IsNotNull(node);
                 Assert.IsTrue(node.Operation == RqlOperation.EQ);
                 Assert.IsTrue(node.Count == 2);
-                Assert.IsInstanceOfType(node.NonNullValue<RqlNode>(0), typeof(RqlNode));
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
-                Assert.IsInstanceOfType(node.NonNullValue<byte>(1), typeof(byte));
 
-                var expectedValue = (byte)0x01;
-                var actualValue = node.NonNullValue<byte>(1);
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(byte));
+                var expectedValue = (byte)1;
 
-                Assert.IsTrue(actualValue == expectedValue);
+                Assert.AreEqual(actualValue, expectedValue);
             }
             catch (Exception error)
             {
@@ -264,16 +264,16 @@ namespace Tense.Rql.UnitTests
                 Assert.IsNotNull(node);
                 Assert.IsTrue(node.Operation == RqlOperation.EQ);
                 Assert.IsTrue(node.Count == 2);
-                Assert.IsInstanceOfType(node.NonNullValue<RqlNode>(0), typeof(RqlNode));
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
-                Assert.IsInstanceOfType(node.NonNullValue<byte>(1), typeof(byte));
 
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(byte));
                 var expectedValue = (byte)0xe3;
-                var actualValue = node.NonNullValue<byte>(1);
 
-                Assert.IsTrue(actualValue == expectedValue);
+                Assert.AreEqual(actualValue, expectedValue);
             }
             catch (Exception error)
             {
@@ -291,16 +291,16 @@ namespace Tense.Rql.UnitTests
                 Assert.IsNotNull(node);
                 Assert.IsTrue(node.Operation == RqlOperation.EQ);
                 Assert.IsTrue(node.Count == 2);
-                Assert.IsInstanceOfType(node.NonNullValue<RqlNode>(0), typeof(RqlNode));
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
-                Assert.IsInstanceOfType(node.NonNullValue<byte>(1), typeof(byte));
 
-                var expectedValue = (byte)1;
-                var actualValue = node.NonNullValue<byte>(1);
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(bool));
+                var expectedValue = true;
 
-                Assert.IsTrue(actualValue == expectedValue);
+                Assert.AreEqual(actualValue, expectedValue);
             }
             catch (Exception error)
             {
@@ -318,16 +318,16 @@ namespace Tense.Rql.UnitTests
                 Assert.IsNotNull(node);
                 Assert.IsTrue(node.Operation == RqlOperation.EQ);
                 Assert.IsTrue(node.Count == 2);
-                Assert.IsInstanceOfType(node.NonNullValue<RqlNode>(0), typeof(RqlNode));
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
-                Assert.IsInstanceOfType(node.NonNullValue<bool>(1), typeof(bool));
 
-                var expectedValue = (bool)true;
-                var actualValue = node.NonNullValue<bool>(1);
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(bool));
+                var expectedValue = true;
 
-                Assert.IsTrue(actualValue == expectedValue);
+                Assert.AreEqual(actualValue, expectedValue);
             }
             catch (Exception error)
             {
@@ -341,20 +341,20 @@ namespace Tense.Rql.UnitTests
             try
             {
                 var node = RqlNode.Parse("Id=bool:false");
-                
+
                 Assert.IsNotNull(node);
                 Assert.IsTrue(node.Operation == RqlOperation.EQ);
                 Assert.IsTrue(node.Count == 2);
-                Assert.IsInstanceOfType(node.NonNullValue<RqlNode>(0), typeof(RqlNode));
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
-                Assert.IsInstanceOfType(node.NonNullValue<bool>(1), typeof(bool));
 
-                var expectedValue = (bool)false;
-                var actualValue = node.NonNullValue<bool>(1);
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(bool));
+                var expectedValue = false;
 
-                Assert.IsTrue(actualValue == expectedValue);
+                Assert.AreEqual(actualValue, expectedValue);
             }
             catch (Exception error)
             {
@@ -374,16 +374,16 @@ namespace Tense.Rql.UnitTests
                 Assert.IsNotNull(node);
                 Assert.IsTrue(node.Operation == RqlOperation.EQ);
                 Assert.IsTrue(node.Count == 2);
-                Assert.IsInstanceOfType(node.NonNullValue<RqlNode>(0), typeof(RqlNode));
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
-                Assert.IsInstanceOfType(node.NonNullValue<short>(1), typeof(short));
 
-                var expectedValue = 1;
-                var actualValue = node.NonNullValue<short>(1);
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(short));
+                var expectedValue = (short) 1;
 
-                Assert.IsTrue(actualValue == expectedValue);
+                Assert.AreEqual(actualValue, expectedValue);
             }
             catch (Exception error)
             {
@@ -401,16 +401,504 @@ namespace Tense.Rql.UnitTests
                 Assert.IsNotNull(node);
                 Assert.IsTrue(node.Operation == RqlOperation.EQ);
                 Assert.IsTrue(node.Count == 2);
-                Assert.IsInstanceOfType(node.NonNullValue<RqlNode>(0), typeof(RqlNode));
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
                 Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
-                Assert.IsInstanceOfType(node.NonNullValue<short>(1), typeof(short));
 
-                var expectedValue = 1;
-                var actualValue = node.NonNullValue<short>(1);
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(short));
+                var expectedValue = (short)1;
 
-                Assert.IsTrue(actualValue == expectedValue);
+                Assert.AreEqual(actualValue, expectedValue);
+            }
+            catch (Exception error)
+            {
+                Assert.Fail(error.Message);
+            }
+        }
+
+        [TestMethod]
+        public void NumericFormat_Short_03()
+        {
+            try
+            {
+                var node = RqlNode.Parse("Id=0x0001");
+
+                Assert.IsNotNull(node);
+                Assert.IsTrue(node.Operation == RqlOperation.EQ);
+                Assert.IsTrue(node.Count == 2);
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
+
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(ushort));
+                var expectedValue = (ushort)1;
+
+                Assert.AreEqual(actualValue, expectedValue);
+            }
+            catch (Exception error)
+            {
+                Assert.Fail(error.Message);
+            }
+        }
+
+        [TestMethod]
+        public void NumericFormat_Short_04()
+        {
+            try
+            {
+                var node = RqlNode.Parse("Id=ushort:27");
+
+                Assert.IsNotNull(node);
+                Assert.IsTrue(node.Operation == RqlOperation.EQ);
+                Assert.IsTrue(node.Count == 2);
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
+
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(ushort));
+                var expectedValue = (ushort)27;
+
+                Assert.AreEqual(actualValue, expectedValue);
+            }
+            catch (Exception error)
+            {
+                Assert.Fail(error.Message);
+            }
+        }
+
+        [TestMethod]
+        public void NumericFormat_Short_05()
+        {
+            try
+            {
+                var node = RqlNode.Parse("Id=uint16:88");
+
+                Assert.IsNotNull(node);
+                Assert.IsTrue(node.Operation == RqlOperation.EQ);
+                Assert.IsTrue(node.Count == 2);
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
+
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(ushort));
+                var expectedValue = (ushort)88;
+
+                Assert.AreEqual(actualValue, expectedValue);
+            }
+            catch (Exception error)
+            {
+                Assert.Fail(error.Message);
+            }
+        }
+        #endregion
+
+        #region int formats
+        [TestMethod]
+        public void NumericFormat_Int_01()
+        {
+            try
+            {
+                var node = RqlNode.Parse("Id=5347");
+
+                Assert.IsNotNull(node);
+                Assert.IsTrue(node.Operation == RqlOperation.EQ);
+                Assert.IsTrue(node.Count == 2);
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
+
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(int));
+                var expectedValue = (int)5347;
+
+                Assert.AreEqual(actualValue, expectedValue);
+            }
+            catch (Exception error)
+            {
+                Assert.Fail(error.Message);
+            }
+        }
+
+        [TestMethod]
+        public void NumericFormat_Int_02()
+        {
+            try
+            {
+                var node = RqlNode.Parse("Id=int:5347");
+
+                Assert.IsNotNull(node);
+                Assert.IsTrue(node.Operation == RqlOperation.EQ);
+                Assert.IsTrue(node.Count == 2);
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
+
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(int));
+                var expectedValue = (int)5347;
+
+                Assert.AreEqual(actualValue, expectedValue);
+            }
+            catch (Exception error)
+            {
+                Assert.Fail(error.Message);
+            }
+        }
+
+        [TestMethod]
+        public void NumericFormat_Int_03()
+        {
+            try
+            {
+                var node = RqlNode.Parse("Id=integer:5347");
+
+                Assert.IsNotNull(node);
+                Assert.IsTrue(node.Operation == RqlOperation.EQ);
+                Assert.IsTrue(node.Count == 2);
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
+
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(int));
+                var expectedValue = (int)5347;
+
+                Assert.AreEqual(actualValue, expectedValue);
+            }
+            catch (Exception error)
+            {
+                Assert.Fail(error.Message);
+            }
+        }
+
+        [TestMethod]
+        public void NumericFormat_Int_04()
+        {
+            try
+            {
+                var node = RqlNode.Parse("Id=int32:5347");
+
+                Assert.IsNotNull(node);
+                Assert.IsTrue(node.Operation == RqlOperation.EQ);
+                Assert.IsTrue(node.Count == 2);
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
+
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(int));
+                var expectedValue = (int)5347;
+
+                Assert.AreEqual(actualValue, expectedValue);
+            }
+            catch (Exception error)
+            {
+                Assert.Fail(error.Message);
+            }
+        }
+
+        [TestMethod]
+        public void NumericFormat_Int_05()
+        {
+            try
+            {
+                var node = RqlNode.Parse("Id=INT:5347");
+
+                Assert.IsNotNull(node);
+                Assert.IsTrue(node.Operation == RqlOperation.EQ);
+                Assert.IsTrue(node.Count == 2);
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
+
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(int));
+                var expectedValue = (int)5347;
+
+                Assert.AreEqual(actualValue, expectedValue);
+            }
+            catch (Exception error)
+            {
+                Assert.Fail(error.Message);
+            }
+        }
+
+        [TestMethod]
+        public void NumericFormat_Int_06()
+        {
+            try
+            {
+                var node = RqlNode.Parse("Id=INTEGER:5347");
+
+                Assert.IsNotNull(node);
+                Assert.IsTrue(node.Operation == RqlOperation.EQ);
+                Assert.IsTrue(node.Count == 2);
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
+
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(int));
+                var expectedValue = (int)5347;
+
+                Assert.AreEqual(actualValue, expectedValue);
+            }
+            catch (Exception error)
+            {
+                Assert.Fail(error.Message);
+            }
+        }
+
+        [TestMethod]
+        public void NumericFormat_Int_07()
+        {
+            try
+            {
+                var node = RqlNode.Parse("Id=INT32:5347");
+
+                Assert.IsNotNull(node);
+                Assert.IsTrue(node.Operation == RqlOperation.EQ);
+                Assert.IsTrue(node.Count == 2);
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
+
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(int));
+                var expectedValue = (int)5347;
+
+                Assert.AreEqual(actualValue, expectedValue);
+            }
+            catch (Exception error)
+            {
+                Assert.Fail(error.Message);
+            }
+        }
+
+        [TestMethod]
+        public void NumericFormat_Int_08()
+        {
+            try
+            {
+                var node = RqlNode.Parse("Id=5347u");
+
+                Assert.IsNotNull(node);
+                Assert.IsTrue(node.Operation == RqlOperation.EQ);
+                Assert.IsTrue(node.Count == 2);
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
+
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(uint));
+                var expectedValue = (uint)5347;
+
+                Assert.AreEqual(actualValue, expectedValue);
+            }
+            catch (Exception error)
+            {
+                Assert.Fail(error.Message);
+            }
+        }
+
+        [TestMethod]
+        public void NumericFormat_Int_09()
+        {
+            try
+            {
+                var node = RqlNode.Parse("Id=uint:5347");
+
+                Assert.IsNotNull(node);
+                Assert.IsTrue(node.Operation == RqlOperation.EQ);
+                Assert.IsTrue(node.Count == 2);
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
+
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(uint));
+                var expectedValue = (uint)5347;
+
+                Assert.AreEqual(actualValue, expectedValue);
+            }
+            catch (Exception error)
+            {
+                Assert.Fail(error.Message);
+            }
+        }
+
+        [TestMethod]
+        public void NumericFormat_Int_10()
+        {
+            try
+            {
+                var node = RqlNode.Parse("Id=UINT:5347");
+
+                Assert.IsNotNull(node);
+                Assert.IsTrue(node.Operation == RqlOperation.EQ);
+                Assert.IsTrue(node.Count == 2);
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
+
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(uint));
+                var expectedValue = (uint)5347;
+
+                Assert.AreEqual(actualValue, expectedValue);
+            }
+            catch (Exception error)
+            {
+                Assert.Fail(error.Message);
+            }
+        }
+
+        [TestMethod]
+        public void NumericFormat_Int_11()
+        {
+            try
+            {
+                var node = RqlNode.Parse("Id=uint32:5347");
+
+                Assert.IsNotNull(node);
+                Assert.IsTrue(node.Operation == RqlOperation.EQ);
+                Assert.IsTrue(node.Count == 2);
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
+
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(uint));
+                var expectedValue = (uint)5347;
+
+                Assert.AreEqual(actualValue, expectedValue);
+            }
+            catch (Exception error)
+            {
+                Assert.Fail(error.Message);
+            }
+        }
+
+        [TestMethod]
+        public void NumericFormat_Int_12()
+        {
+            try
+            {
+                var node = RqlNode.Parse("Id=UINT32:5347");
+
+                Assert.IsNotNull(node);
+                Assert.IsTrue(node.Operation == RqlOperation.EQ);
+                Assert.IsTrue(node.Count == 2);
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
+
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(uint));
+                var expectedValue = (uint)5347;
+
+                Assert.AreEqual(actualValue, expectedValue);
+            }
+            catch (Exception error)
+            {
+                Assert.Fail(error.Message);
+            }
+        }
+
+        [TestMethod]
+        public void NumericFormat_Int_13()
+        {
+            try
+            {
+                var node = RqlNode.Parse("Id=5347U");
+
+                Assert.IsNotNull(node);
+                Assert.IsTrue(node.Operation == RqlOperation.EQ);
+                Assert.IsTrue(node.Count == 2);
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
+
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(uint));
+                var expectedValue = (uint)5347;
+
+                Assert.AreEqual(actualValue, expectedValue);
+            }
+            catch (Exception error)
+            {
+                Assert.Fail(error.Message);
+            }
+        }
+
+        [TestMethod]
+        public void NumericFormat_Int_14()
+        {
+            try
+            {
+                var node = RqlNode.Parse("Id=UINT32:5347U");
+
+                Assert.IsNotNull(node);
+                Assert.IsTrue(node.Operation == RqlOperation.EQ);
+                Assert.IsTrue(node.Count == 2);
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
+
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(uint));
+                var expectedValue = (uint)5347;
+
+                Assert.AreEqual(actualValue, expectedValue);
+            }
+            catch (Exception error)
+            {
+                Assert.Fail(error.Message);
+            }
+        }
+
+        [TestMethod]
+        public void NumericFormat_Int_15()
+        {
+            try
+            {
+                var node = RqlNode.Parse("Id=uint32:5347u");
+
+                Assert.IsNotNull(node);
+                Assert.IsTrue(node.Operation == RqlOperation.EQ);
+                Assert.IsTrue(node.Count == 2);
+                Assert.IsInstanceOfType(node[0], typeof(RqlNode));
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Operation == RqlOperation.PROPERTY);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).Count == 1);
+                Assert.IsTrue(node.NonNullValue<RqlNode>(0).NonNullValue<string>(0).Equals("Id"));
+
+                var actualValue = node[1];
+                Assert.IsInstanceOfType(actualValue, typeof(uint));
+                var expectedValue = (uint)5347;
+
+                Assert.AreEqual(actualValue, expectedValue);
             }
             catch (Exception error)
             {
