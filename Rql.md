@@ -152,7 +152,7 @@ or(                                        ,                                    
 <pre><code>limit(&lt;start&gt;,&lt;pagesize&gt;)
 </code></pre>
 <p>The start value is a one based index value. For example, suppose I called /customers?limit(1,10). This statement would return the first 10 customers in the list. The call /customers?limit(11,10) would return the next 10 customers, starting with the 11th customer. Unless otherwise specified, the returned set will be ordered by the primary key(s) of the table in question.</p>
-<h2>The Sort operator</h>
+<h2>The Sort operator</h2>
 <p>You can specifiy the order of a collection using the <b>SORT</b> operator. The syntax is:</p>
 <pre><code>sort(+/-member,+/-member,...+/-member)</code></pre>
 <p>Here, <i>member</i> is the name of a member in the table. If preceeded with the + symbol (or no symbol at all) the result set will be sorted by the values of that member in ascending order. Placing an - before the member causes the set to be sorted by the values of that member in descending order.</p>
@@ -163,4 +163,3 @@ or(                                        ,                                    
 <p>Sometimes, you don't need to get all the members of a record. If you are constructing a list of items on a Web Page, all you really need is the id and the name of that records. We can limit the members returned using the <b>SELECT</b> operator (not to be confused with the SELECT clause of a SQL Statement).</p>
 <pre><code>select(Id,FirstName,LastName)</code></pre>
 <p>A customer record, for example, is likely to have many columns: Id, FirstName, LastName, Address1, Address2, City, State, PostalCode, PhoneNumber, etc. If we were to apply the above select operator, then only the Id, FirstName and LastName members would be returned for each customer in the list.</p>
- 
