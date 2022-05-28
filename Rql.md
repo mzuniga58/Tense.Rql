@@ -148,6 +148,19 @@ or(                                        ,                                    
 <pre></code>aggregate(Age,mean(Cost),Mean(List))</code></pre>
 <p>This query will return one record for each Age value, and that record will contain two values, the average cost and averge list price for that age.</p>
 <h2>Paging Operator</h2>
-<p>A collection of items is returned in a <b>PageSet</b> class, and is limited to batch-size defined in your service. For example, suppose we have table of customers, and we are fortunate enough to have 100,000 customers. The endpoint to retrive the list of customers is /customer. You can call this endpoint, with no filters, and it will return the entire list. But it won't do it all in one shot. Instead of returning 100,000 records, it will only return the first 100 records (assuming your batch-size is 100). To get the remaining records, you have to specify a start and page size. In RQl, we use the <b>LIMIT</b> operator.</p>
+<p>A collection of items is returned in a <b>PageSet</b> class, and is limited to batch-size defined in your service. For example, suppose we have table of customers, and we are fortunate enough to have 100,000 customers. The endpoint to retrive the list of customers is /customers. You can call this endpoint, with no filters, and it will return the entire list. But it won't do it all in one shot. Instead of returning 100,000 records, it will only return the first 100 records (assuming your batch-size is 100). To get the remaining records, you have to specify a start and page size. In RQl, we use the <b>LIMIT</b> operator.</p>
 <pre><code>limit(&lt;start&gt;,&lt;pagesize&gt;)
 </code></pre>
+<p>The start value is a one based index value. For example, suppose I called /customers?limit(1,10). This statement would return the first 10 customers in the list. The call /customers?limit(11,10) would return the next 10 customers, starting with the 11th customer. Unless otherwise specified, the returned set will be ordered by the primary key(s) of the table in question.</p>
+<h2>The Sort operator</h>
+<p>You can specifiy the order of a collection using the <b>SORT</b> operator. The syntax is:</p>
+<pre><code>sort(+/-member,+/-member,...+/-member)</code></pre>
+<p>Here, <i>member</i> is the name of a member in the table. If preceeded with the + symbol (or no symbol at all) the result set will be sorted by the values of that member in ascending order. Placing an - before the member causes the set to be sorted by the values of that member in descending order.</p>
+<p>You can combine these operators (and all the following operators) using the &amp; symbol (or place them inside an and operator in normalized form).</p>
+<pre><code>Status=A&sort(Age,Name)&limit(1,10)</code></pre>
+<p>Unlike logical operators, the order of these operators does not matter.</p>
+<h2>Choosing your returned columns</h2>
+<p>Sometimes, you don't need to get all the members of a record. If you are constructing a list of items on a Web Page, all you really need is the id and the name of that records. We can limit the members returned using the <b>SELECT</b> operator (not to be confused with the SELECT clause of a SQL Statement).</p>
+<pre><code>select(Id,FirstName,LastName)</code></pre>
+<p>A customer record, for example, is likely to have many columns: Id, FirstName, LastName, Address1, Address2, City, State, PostalCode, PhoneNumber, etc. If we were to apply the above select operator, then only the Id, FirstName and LastName members would be returned for each customer in the list.</p>
+ 
