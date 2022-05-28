@@ -160,6 +160,6 @@ or(                                        ,                                    
 <pre><code>Status=A&sort(Age,Name)&limit(1,10)</code></pre>
 <p>Unlike logical operators, the order of these operators does not matter.</p>
 <h2>Choosing your returned columns</h2>
-<p>Sometimes, you don't need to get all the members of a record. If you are constructing a list of items on a Web Page, all you really need is the id and the name of that records. We can limit the members returned using the <b>SELECT</b> operator (not to be confused with the SELECT clause of a SQL Statement).</p>
+<p>Sometimes, you don't need to get all the members of a record. If you are constructing a list of items on a Web Page, all you really need is the id and the name of that record. We can limit the members returned using the <b>SELECT</b> operator (not to be confused with the SELECT clause of a SQL Statement).</p>
 <pre><code>select(Id,FirstName,LastName)</code></pre>
 <p>A customer record, for example, is likely to have many columns: Id, FirstName, LastName, Address1, Address2, City, State, PostalCode, PhoneNumber, etc. If we were to apply the above select operator, then only the Id, FirstName and LastName members would be returned for each customer in the list.</p>
