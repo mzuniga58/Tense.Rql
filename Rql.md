@@ -83,7 +83,7 @@ Total=int64:7000000000</code></pre>
 <li>The Date and Time operators</li>
 <ul>
 <li><b>DateTime</b> - a UTC DateTime, can take the form "mm/dd/yyyy hh:mm:ss.ffffff+/-hh:mm" or "yyyy/mm/ddThh:mm:ss.ffffff+/-hh:mm". The time and timezone information is optional.</li>
-<li><b>utc</b> - a UTC DateTime.</li>T
+<li><b>utc</b> - a UTC DateTime.</li>
 <li><b>TimeSpan</b> - a time span, of the form d.hh:mm:ss.ffffff</li>
 </ul>
 <li>The Binary operators
