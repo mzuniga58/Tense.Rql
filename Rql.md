@@ -143,7 +143,7 @@ or(                                        ,                                    
 </code></pre>
 <p>This query will return one record with one value, the average cost of all purchases. If we wanted the aveerage cost and the average list price:</p>
 <pre><code>mean(Cost)&mean(List)
-</code><pre>
+</code></pre>
 <p>But, now suppose we wanted those values broken down by age. To do that we need to introduce another operator, the <b>AGGREGATE</b> operator. The aggregate operator takes a list of properties, and a list of aggregate operations. The properties are included in the GROuP By clause of the SQL statement, and the aggregate operations are the values in the SELECT clause.</p>
 <pre></code>aggregate(Age,mean(Cost),Mean(List))</code></pre>
 <p>This query will return one record for each Age value, and that record will contain two values, the average cost and averge list price for that age.</p>
