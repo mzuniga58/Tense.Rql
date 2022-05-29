@@ -122,6 +122,10 @@ Total=int64:7000000000</code></pre>
 <p>Now that we know the general syntax, and how to encode values, let's look at some of the operations RQL provides. The filter operations are those operations that are used to filter the result set. The RQL filter operations are used to specify a condition while fetching the data from a dataset. If the given condition is satisfied, then only it returns a specific value from the set. You should use the filter operations to filter the records and fetching only the necessary records. You can think of the filter operations as corresponding to the conditions in a WHERE clause in SQL.</p>
 <p>Just as is the case with the SQL WHERE clause, the RQL filter operations are not only used in the fetching data, but they are also used in the UPDATE and DELETE operations.</p>
 <h3>Relational Operations</h3>
+<pre><code><i>&lt;PROPERTY&gt;</i><b>&lt;symbol&gt;</b><i>&lt;VALUE&gt;</i>
+<i>&lt;PROPERTY&gt;</i>=<b>&lt;operator&gt;</b>=<i>&lt;VALUE&gt;</i>
+<b>&lt;operator&gt;</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;VALUE&gt;</i>)
+</code></pre><h2>Logical Operators</h2>
 <p>The relational operations include the standard set:</p>
 <table>
      <tr>
@@ -165,11 +169,7 @@ Total=int64:7000000000</code></pre>
 <pre><code>Age&gt;18
 Age=gt=18
 gt(Age,18)</code></pre>
-<p>The meaning of each of the above statements are identitcal. The syntax for a relational operator is:</p>
-<pre><code><i>&lt;PROPERTY&gt;</i><b>&lt;symbol&gt;</b><i>&lt;VALUE&gt;</i>
-<i>&lt;PROPERTY&gt;</i>=<b>&lt;operator&gt;</b>=<i>&lt;VALUE&gt;</i>
-<b>&lt;operator&gt;</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;VALUE&gt;</i>)
-</code></pre><h2>Logical Operators</h2>
+<p>The meaning of each of the above statements are identitcal.</p>
 <p>Now that we have the basics of relational operators, let's take a look at the logical operations. There are two, and they are fairly self-explanatory:</p>
 <ul>
 <li>AND</li>
