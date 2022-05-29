@@ -124,7 +124,7 @@ Total=int64:7000000000</code></pre>
 <pre><code>Category=1&Status=A
 </code></pre>
 <p>We can write the same statement using alphasymbols, or in normalized form:</p>
-<pre><code>Category=eq-1&Status=eq=A
+<pre><code>Category=eq=1&Status=eq=A
 and(eq(Category,1),eq(Status,A))</code></pre>
 <p>We can also combine logical operators using paranthesis. Suppose we want the records in category 1 that are active, combined with the records in category 2 that are in process:</p>
 <pre><code>(Category=1&Status=A)|(Category=2&Status=P)
