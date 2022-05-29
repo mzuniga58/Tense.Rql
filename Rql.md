@@ -136,7 +136,7 @@ or(                                        ,                                    
           eq(Category,1)   eq(Status,A)              eq(Category,2)    eq(Status,P)
 </code></pre>
 <h2>The Aggregation Operators</h2>
-<p>Along with the relational and logical operators, RQl also supports aggregation. Think of this as the GROUP BY clause in SQL. The aggregation operator are:<p>
+<p>Along with the relational and logical operators, RQL also supports aggregation. Think of this as the GROUP BY clause in SQL. The aggregation operators are:<p>
 <ul>
 <li><b>MAX</b> - delivers the maximum value of a member in a set</li>
 <li><b>MIN</b> - delivers teh minimum value of a member in a set</li>
@@ -144,7 +144,7 @@ or(                                        ,                                    
 <li><b>COUNT</b> - delivers the total number of members in a set</li>
 <li><b>SUM</b> - delivers the sum of the members in a set</li>
 </ul>
-<p>Used by themselves, these operators will return one record with the specified value. If these operators are used, they can only be used with other aggregation operators. Again, think of the GROUP BY clause in SQL. For example, suppose we have a list of customers purchases, and suppose that the customer purchaes record has the members PurchaseDate, ProductId, Age (the age of the customer in years), Quantity, Cost, List, and Discount. Now, suppose we wanted to get the average cost of all purchases.</p>
+<p>Used by themselves, these operators will return one record with the specified value. If these operators are used, they can only be used with filter operations and other aggregation operators. Again, think of the GROUP BY clause in SQL. For example, suppose we have a list of customers purchases, and suppose that the customer purchaes record has the members PurchaseDate, ProductId, Age (the age of the customer in years), Quantity, Cost, List, and Discount. Now, suppose we wanted to get the average cost of all purchases.</p>
 <pre><code>mean(Cost)
 </code></pre>
 <p>This query will return one record with one value, the average cost of all purchases. If we wanted the aveerage cost and the average list price:</p>
