@@ -14,36 +14,12 @@
 LastName=Smith
 LastName=eq=Smith</code></pre>
 <p>All three of the above statements are equivalent.</p>
-
-
-<h2>Filter Operations</h2>
-<p>The filter operations are those operations that are used to filter the result set. The RQL filter operations are used to specify a condition while fetching the data from a dataset. If the given condition is satisfied, then only it returns a specific value from the set. You should use the filter operations to filter the records and fetching only the necessary records. You can think of the filter operations as corresponding to the conditions in a WHERE clause in SQL.</p>
-<p>Just as is the case with the SQL WHERE clause, the RQL filter operations are not only used in the fetching data, but they are also used in the UPDATE and DELETE operations.</p>
-<h3>Relational Operations</h3>
-<p>The relational operations include the standard set:</p>
-<ul>
-<li><b>=</b> - can also be written as <b>=eq</b></li>
-<li><b>&lt;</b> - can also be written as <b>=lt</b></li>
-<li><b>&lt;=</b> - can also be written as <b>=le</b></li>
-<li><b>&gt;</b> - can also be written as <b>=gt</b></li>
-<li><b>&gt;=</b> - can also be written as <b>=ge</b></li>
-<li><b>!=</b> - can also be written as <b>=ne</b></li>
-</ul>
-<p>Each of these operations can also be written in the paranthesized nested form of &lt;op&gt;(&lt;arg&gt;,&lt;arg&gt;). For example, if we wanted to create a filter that returns all the records in a dataset where Age is greater than 18, we could write:</p>
-<pre><code>Age&gt;18
-Age=gt=18
-gt(Age,18)</code></pre>
-<p>The meaning of each of the above statements are identitcal. The syntax for a relational operator is:</p>
-<pre><code>&lt;property&gt;&lt;symboloperator&gt;&lt;value&gt;
-&lt;property&gt;&lt;alphaoperator&gt;=&lt;value&gt;
-&lt;operator&gt;(&lt;property&gt;,&lt;value&gt;)
-</code></pre>
-<h2>Encoding Values</h2>
-<p>The &lt;value&gt; argument is evaluated as in integer, double or string for most values, and translated to specialty values for specialty formats, such as Dates, Timespans or Unique Identitifers. For example, consider the following RQL statements:<p>
+<h3>Encoding Values</h3>
+<p>Unless otherwise specified, values are evalulated as a 32-bit signed integer, double or string. Specialty values, such as a Globally Unique Identifier (GUID), datetime, timespan and Universal Resource Locators (URIs) are also supported. For example, consider the following RQL statements:<p>
 <pre><code>Age=18
 FirstName=Joe
 Cost=2.15</code></pre>
-<p>In the first case, the value 18 is encoded as a signed interger (int) value, the value "Joe" is encoded as a string, and the value 2.15 is encoded as a double. However, at the time of SQL generation, the value is cast to the value of the column. So, for example, if <b>Cost</b> is a column defined in a database, and the data type of <b>Cost</b> is <i>money</i>, then the double value 2.15 will be cast as decimal(18,2) to match the column it references when the SQL Statement is generated. Likewise, a value that represents a date (such as "1/1/1960 14:32:25") would be encoded as a UTC Date. If the column to which it references is a DataTimeOffset, then the appropriate conversion will be done at the time of the SQL Statement generation.<p>
+<p>In the first case, the value <i>18</i> is encoded as a signed 32-bit interger (int) value, the value <i>Joe</i> is encoded as the string "Joe", and the value <i>2.15</i> is encoded as a double. However, at the time of SQL generation, the value is cast to the value of the column. So, for example, if <b>Cost</b> is a column defined in a database, and the data type of <b>Cost</b> is <i>money</i>, then the double value <i>2.15</i> will be cast as decimal(18,2) to match the column it references when the SQL Statement is generated. Likewise, a value that represents a date (such as "1/1/1960 14:32:25") would be encoded as a UTC Date. If the column to which it references is a DataTimeOffset, then the appropriate conversion will be done at the time of the SQL Statement generation.<p>
 <p>Sometimes, for certain queries, the default values are not suffient. What if, for example, you wanted to write this statement:<p>
 <pre><code>Total=7000000000
 </code></pre>
@@ -131,7 +107,28 @@ Total=int64:7000000000</code></pre>
 <pre><code>Website=https://bookstore.com/customer?Status=A&amp;Lastname=Jones</code></pre>
 <p>Does this statment mean to acquire the record where the Website value is <i>https://bookstore.com/customer?Status=A&amp;Lastname=Jones</i>, or does it mean to acquire the record whose Website value is <i>https://bookstore.com/customer?Status=A</i> and whose Lastname value is <i>Jones</i>? By default, the RQL parser will use the first interpretation. To make it unambigious, use double quotes:</p>
  <pre><code>Website="https://bookstore.com/customer?Status=A"&amp;Lastname=Jones</code></pre>
-<h2>Logical Operators</h2>
+<h2>Filter Operations</h2>
+<p>The filter operations are those operations that are used to filter the result set. The RQL filter operations are used to specify a condition while fetching the data from a dataset. If the given condition is satisfied, then only it returns a specific value from the set. You should use the filter operations to filter the records and fetching only the necessary records. You can think of the filter operations as corresponding to the conditions in a WHERE clause in SQL.</p>
+<p>Just as is the case with the SQL WHERE clause, the RQL filter operations are not only used in the fetching data, but they are also used in the UPDATE and DELETE operations.</p>
+<h3>Relational Operations</h3>
+<p>The relational operations include the standard set:</p>
+<ul>
+<li><b>=</b> - can also be written as <b>=eq</b></li>
+<li><b>&lt;</b> - can also be written as <b>=lt</b></li>
+<li><b>&lt;=</b> - can also be written as <b>=le</b></li>
+<li><b>&gt;</b> - can also be written as <b>=gt</b></li>
+<li><b>&gt;=</b> - can also be written as <b>=ge</b></li>
+<li><b>!=</b> - can also be written as <b>=ne</b></li>
+</ul>
+<p>Each of these operations can also be written in the paranthesized nested form of &lt;op&gt;(&lt;arg&gt;,&lt;arg&gt;). For example, if we wanted to create a filter that returns all the records in a dataset where Age is greater than 18, we could write:</p>
+<pre><code>Age&gt;18
+Age=gt=18
+gt(Age,18)</code></pre>
+<p>The meaning of each of the above statements are identitcal. The syntax for a relational operator is:</p>
+<pre><code>&lt;property&gt;&lt;symboloperator&gt;&lt;value&gt;
+&lt;property&gt;&lt;alphaoperator&gt;=&lt;value&gt;
+&lt;operator&gt;(&lt;property&gt;,&lt;value&gt;)
+</code></pre><h2>Logical Operators</h2>
 <p>Now that we have the basics of relational operators, and understand how we can encode values, let's take a look at the logical operations. There are two, and they are fairly self-explanatory:</p>
 <ul>
 <li>AND</li>
