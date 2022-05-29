@@ -124,8 +124,7 @@ Total=int64:7000000000</code></pre>
 <h3>Relational Operations</h3>
 <pre><code><i>&lt;PROPERTY&gt;</i><b>&lt;symbol&gt;</b><i>&lt;VALUE&gt;</i>
 <i>&lt;PROPERTY&gt;</i>=<b>&lt;operator&gt;</b>=<i>&lt;VALUE&gt;</i>
-<b>&lt;operator&gt;</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;VALUE&gt;</i>)
-</code></pre><h2>Logical Operators</h2>
+<b>&lt;operator&gt;</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;VALUE&gt;</i>)</code></pre>
 <p>The relational operations include the standard set:</p>
 <table>
      <tr>
@@ -170,11 +169,14 @@ Total=int64:7000000000</code></pre>
 Age=gt=18
 gt(Age,18)</code></pre>
 <p>The meaning of each of the above statements are identitcal.</p>
+<h2>Logical Operators</h2>
+<pre><code><b>&lt;<operator>&gt;</b>(<i>&lt;operation_1&gt;</i>,<i>&lt;operation_2&gt;</i>,...<i>&lt;operation_n&gt;</i>,)</pre></code>
 <p>Now that we have the basics of relational operators, let's take a look at the logical operations. There are two, and they are fairly self-explanatory:</p>
 <ul>
 <li>AND</li>
 <li>OR</li>
 </ul>
+<p>Each operator takes a list of operations (nested operator statements, such as the filter operations above).</p>
 <p>You can encode the <b>AND</b> and <b>OR</b> operations using the &amp; and | symbols respectively. For example, suppose we have a table with a member called <b>Status</b>. Suppose further that the <b>Status</b> member can take on any of three values: A - active, I - inactve and P - in process. Suppose further that there is a <b>Category</b> member. Now suppose I want the records in category 1 that are acive. The following RQL statement will give us those results:</p>
 <pre><code>Category=1&Status=A
 </code></pre>
