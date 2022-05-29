@@ -2,6 +2,9 @@
 <p>The Resource Query Language (RQL) is a query language designed for use in URIs with object style data structures. <b>Tense.Rql</b> includes the RQL specification and provides a C# implementation of query parsing and model translations. Supporting packages, such as <b>Tense.Rql.SqlServer</b> provide SQL Statement generators that can translate an RQL query into its corresponding SQL Statement. RQL can be thought as basically a set of nestable named operators which each have a set of arguments. RQL is designed to have an extremely simple, but extensible grammar that can be written in a URL friendly query string.</p>
 <h2>General Syntax</h2>
 <p>The RQL grammar is based around standard URI delimiters, and the standard rules for encoding strings with URL encoding (%xx) are observed. RQL is also a superset of the Feed Item Query Language (FIQL, pronounced "fickle"). It supports parenthesized nested operations (also called the normalized form), as well as alpha relational operations (i.e., =lt is the same as &lt;). All operator names are case insensitive, i.e., =eq is the same as =EQ.<p>
+<h2>Filter Operations</h2>
+<p>The filter operations are those operations that are used to filter the result set. The RQL filter operations are used to specify a condition while fetching the data from a dataset. If the given condition is satisfied, then only it returns a specific value from the set. You should use the filter operations to filter the records and fetching only the necessary records. You can think of the filter operations as corresponding to the conditions in a WHERE clause in SQL.</p>
+<p>Just as is the case with the SQL WHERE clause, the RQL filter operations are not only used in the fetching data, but they are also used in the UPDATE and DELETE operations.</p>
 <h3>Relational Operations</h3>
 <p>The relational operations include the standard set:</p>
 <ul>
@@ -153,20 +156,22 @@ or(                                        ,                                    
 <p>But, now suppose we wanted those values broken down by age. To do that we need to introduce another operator, the <b>AGGREGATE</b> operator. The aggregate operator takes a list of properties, and a list of aggregate operations. The properties are included in the GROuP By clause of the SQL statement, and the aggregate operations are the values in the SELECT clause.</p>
 <pre></code>aggregate(Age,mean(Cost),Mean(List))</code></pre>
 <p>This query will return one record for each Age value, and that record will contain two values, the average cost and averge list price for that age.</p>
-<h2>Limit Operator</h2>
+<h2>Specialty Operators</h2>
+<p>RQL defines a number of specialty operatiors. These operators further refine the output of a result set.</p>
+<h3>Limit Operator</h3>
 <p>A collection of items is returned in a <b>PageSet</b> class, and is limited to <i>batch-size</i> defined in your service. For example, suppose we have a table of customers, and we are fortunate enough to have 100,000 customers. The endpoint to retrive the list of customers is /customers. You can call this endpoint with no filters and it will return the entire list. But it won't do it all in one shot. Instead of returning 100,000 records, it will only return the first 100 records (assuming your <i>batch-size</i> is 100). To get the remaining records, you have to specify a start and optionally, the  page size. In RQL, we use the <b>LIMIT</b> operator.</p>
 <pre><code>limit(&lt;start&gt;[,&lt;pagesize&gt;])
 </code></pre>
 <p>The <i>start</i> value is a one based index value. For example, suppose I called /customers?limit(1,10). This statement would return the first 10 customers in the list. The call /customers?limit(11,10) would return the next 10 customers, starting with the 11th customer. Unless otherwise specified, the returned set will be ordered by the primary key(s) of the table in question.</p>
 <p>You don't need to specify the <i>pagesize</i>. If omitted, the default value for the <i>pagesize</i> is the <i>batch-size</i>, so that <b>limit(1)</b> is the same as <b>limit(1,100)</b> assuming your <i>batch-size</i> is 100. Also note that the <i>pagesize</i> value does NOT override the <i>batch-size</i> specified in your service. You can call /customers?limit(1,1000), but if your <i>batch-size</i> value is 100, you're still only going to get the first 100 records.</p>
-<h2>Sort Operator</h2>
+<h3>Sort Operator</h3>
 <p>You can specifiy the order of a collection using the <b>SORT</b> operator. The syntax is:</p>
 <pre><code>sort(+/-member,+/-member,...+/-member)</code></pre>
 <p>Here, <i>member</i> is the name of a member in the table. If preceeded with the + symbol (or no symbol at all) the result set will be sorted by the values of that member in ascending order. Placing a - before the member causes the set to be sorted by the values of that member in descending order. To get the list of customers sorted by lastname/firstname, you would use <b>sort(lastname,firstname).</b></p>
 <p>You can combine these operators (and all the following operators) using the &amp; symbol (or place them inside an and operator in normalized form).</p>
 <pre><code>Status=A&sort(Age,Name)&limit(1,10)</code></pre>
 <p>Unlike logical operators, the order of these operators does not matter.</p>
-<h2>Select Operator</h2>
+<h3>Select Operator</h3>
 <p>Sometimes, you don't need to get all the members of a record. If you are constructing a list of items on a Web Page, all you really need is the id and the name of that record. We can limit the members returned using the <b>SELECT</b> operator (not to be confused with the SELECT clause of a SQL Statement).</p>
 <pre><code>select(Id,FirstName,LastName)</code></pre>
 <p>A customer record, for example, is likely to have many columns: Id, FirstName, LastName, Address1, Address2, City, State, PostalCode, PhoneNumber, etc. If we were to apply the above select operator, then only the Id, FirstName and LastName members would be returned for each customer in the list.</p>
