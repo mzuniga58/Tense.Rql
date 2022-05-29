@@ -14,6 +14,34 @@
 LastName=Smith
 LastName=eq=Smith</code></pre>
 <p>All three of the above statements are equivalent.</p>
+<p>Properties can also be nested. For example, suppose we had the following two data models:</p>
+<table>
+     <tr>
+          <td><pre><code>
+    public class Customer
+    {
+        public int CustomerId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public Address HomeAddress { get; set; }
+        public Address BillingAddress { get; set; }
+        public Address ShippingAddress { get; set; }
+    }
+     </code></pre>
+     </td>
+     <td><pre><code>
+     public class Address
+    {
+        public string Address1 { get; set; }
+        public string Address2 { get; set; }
+        public string City { get; set; }
+        public string State { get; set; }
+        public string PostalCode { get; set; }
+    }
+    </code></pre>
+    </td>
+     <tr>
+</table>
 <h3>Encoding Values</h3>
 <p>RQL has only three reserved words: <i>NULL</i>, <i>True</i> and <i>False</i>. Case does not matter. <i>TRUE</i> is the same as <i>True</i>, is the same as <i>true</i>.</p>
 <p>Unless otherwise specified, values are evalulated as a 32-bit signed integer, double or string. Specialty values, such as Globally Unique Identifiers (GUIDs), DateTime, TimeSpan and Uniform Resource Identifiers (URIs) are also supported. For example, consider the following RQL statements:<p>
@@ -193,13 +221,14 @@ Status=A&amp;(Age&lt;=18|Category=4)</code></pre>
 <h3>Like Operator</h3>
 <pre><code><b>LIKE</b>(<i>&lt;property&gt;</i>,<i>&lt;pattern&gt;</i>)</code></pre>
 <p>The <b>LIKE</b> operator only works on string columns. The first paramter is a property, the name of a member in the model. The second parameter is a string pattern, where * matches anything and ? matches a single character. For example, <b>LIKE(LastName, T*)</b> will return all records where the <i>Lastname</i> begins with the letter T. Likewise, <b>LIKE(FirstName,?ill)</b> would match Bill and Jill.</p>
+<h2>Specialty Operators</h2>
+<p>RQL defines a number of specialty operatiors. These operators further refine the output of a result set.</p>
 <h3>Limit Operator</h3>
 <p>A collection of items is returned in a <b>PageSet</b> class, and is limited to <i>batch-size</i> defined in your service. For example, suppose we have a table of customers, and we are fortunate enough to have 100,000 customers. The endpoint to retrive the list of customers is /customers. You can call this endpoint with no filters and it will return the entire list. But it won't do it all in one shot. Instead of returning 100,000 records, it will only return the first 100 records (assuming your <i>batch-size</i> is 100). To get the remaining records, you have to specify a start and optionally, the  page size. In RQL, we use the <b>LIMIT</b> operator.</p>
 <pre><code>limit(&lt;start&gt;[,&lt;pagesize&gt;])
 </code></pre>
 <p>The <i>start</i> value is a one based index value. For example, suppose I called /customers?limit(1,10). This statement would return the first 10 customers in the list. The call /customers?limit(11,10) would return the next 10 customers, starting with the 11th customer. Unless otherwise specified, the returned set will be ordered by the primary key(s) of the table in question.</p>
-<p>You don't need to specify the <i>pagesize</i>. If omitted, the default value for the <i>pagesize</i> is the <i>batch-size</i>, so that <b>limit(1)</b> is the same as <b>limit(1,100)</b> assuming your <i>batch-size</i> is 100. Also note that the <i>pagesize</i> value does NOT override the <i>batch-size</i> specified in your service. You can call /customers?limit(1,1000), but if your <i>batch-size</i> value is 100, you're still only going to get the first 100 records.</p><h2>Specialty Operators</h2>
-<p>RQL defines a number of specialty operatiors. These operators further refine the output of a result set.</p>
+<p>You don't need to specify the <i>pagesize</i>. If omitted, the default value for the <i>pagesize</i> is the <i>batch-size</i>, so that <b>limit(1)</b> is the same as <b>limit(1,100)</b> assuming your <i>batch-size</i> is 100. Also note that the <i>pagesize</i> value does NOT override the <i>batch-size</i> specified in your service. You can call /customers?limit(1,1000), but if your <i>batch-size</i> value is 100, you're still only going to get the first 100 records.</p>
 <h3>The Aggregation Operators</h3>
 <p>Along with the relational and logical operators, RQL also supports aggregation. Think of this as the GROUP BY clause in SQL. The aggregation operators are:<p>
 <ul>
