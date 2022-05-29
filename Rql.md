@@ -170,7 +170,7 @@ Age=gt=18
 gt(Age,18)</code></pre>
 <p>The meaning of each of the above statements are identitcal.</p>
 <h2>Logical Operators</h2>
-<pre><code><b>&lt;operator&gt;</b>(<i>&lt;operation_1&gt;</i>,<i>&lt;operation_2&gt;</i>,...<i>&lt;operation_n&gt;</i>,)</pre></code>
+<pre><code><b>&lt;operator&gt;</b>(<i>&lt;operation_1&gt;</i>,<i>&lt;operation_2&gt;</i>,...<i>&lt;operation_n&gt;</i>)</pre></code>
 <p>Now that we have the basics of relational operators, let's take a look at the logical operations. There are two, and they are fairly self-explanatory:</p>
 <ul>
 <li>AND</li>
