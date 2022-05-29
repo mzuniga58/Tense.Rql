@@ -123,15 +123,44 @@ Total=int64:7000000000</code></pre>
 <p>Just as is the case with the SQL WHERE clause, the RQL filter operations are not only used in the fetching data, but they are also used in the UPDATE and DELETE operations.</p>
 <h3>Relational Operations</h3>
 <p>The relational operations include the standard set:</p>
-<ul>
-<li><b>=</b>  <b>eq</b> - Equality, checks to see if a property value is equal to a constant value
-<li><b>&lt;</b>  <b>lt</b> - Less than, checks to see if a property value is less than a constant value
-<li><b>&lt;=</b>  <b>le</b> - Less than or equal, checks to see if a property value is less than or equal to a constant value
-<li><b>&gt;</b>  <b>gt</b> - greater than, checks to see if a property value is greater than a constant value
-<li><b>&gt;=</b>  <b>ge</b> - greater than or equal, checks to see if a property value is greater than or equal to a constant value
-<li><b>!=</b>  <b>ne</b> - not equal, checks to see if a propery value is not equal to a constant value
-</ul>
-<p>As with the reserved words, case does not matter. <b>EQ</b> is the same as <b>Eq</p> is the same as <b>eq</b></p>.
+<table>
+     <tr>
+          <th>Symbol</th>
+          <th>Operator</th>
+          <th>Description</th>
+     </tr>
+     <tr>
+          <td>=</td>
+          <td>eq</td>
+          <td>Equality, checks to see if a property value is equal to a constant value</td>
+     </tr>
+     <tr>
+          <td>&lt;</td>
+          <td>lt</td>
+          <td>Less than, checks to see if a property value is less than a constant value</td>
+     </tr>
+     <tr>
+          <td>&lt;=</td>
+          <td>le</td>
+          <td>Less than or equal, checks to see if a property value is less than or equal to a constant value</td>
+     </tr>
+     <tr>
+          <td>&gt;</td>
+          <td>gt</td>
+          <td>greater than, checks to see if a property value is greater than a constant value</td>
+     </tr>
+     <tr>
+          <td>&gt;=</td>
+          <td>ge</td>
+          <td>greater than or equal, checks to see if a property value is greater than or equal to a constant value</td>
+     </tr>
+     <tr>
+          <td>!=</td>
+          <td>ne</td>
+          <td>not equal, checks to see if a propery value is not equal to a constant value</td>
+     </tr>
+</table>
+<p>As with the reserved words, case does not matter. <b>EQ</b> is the same as <b>Eq</b> is the same as <b>eq</b></p>.
 <p>Each of these operations can also be written in the paranthesized nested form of <b>&lt;op&gt;</b>(<i>&lt;PROPERTY&gt;</i><i>&lt;VALUE&gt;</i>). For example, if we wanted to create a filter that returns all the records in a dataset where Age is greater than 18, we could write:</p>
 <pre><code>Age&gt;18
 Age=gt=18
