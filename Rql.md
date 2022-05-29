@@ -157,9 +157,8 @@ or(                                        ,                                    
 <pre></code>aggregate(Age,mean(Cost),Mean(List))</code></pre>
 <p>This query will return one record for each Age value, and that record will contain two values, the average cost and averge list price for that age.</p>
 <h3>Like Operator</h3>
-<pre><code><b>LIKE(<i>&lt;property&gt;</i>,<i>&lt;pattern&gt;</i>)</code></pre>
+<pre><code><b>LIKE</b>(<i>&lt;property&gt;</i>,<i>&lt;pattern&gt;</i>)</code></pre>
 <p>The <b>LIKE</b> operator only works on string columns. The first paramter is a property, the name of a member in the model. The second parameter is a string pattern, where * matches anything and ? matches a single character. For example, <b>LIKE(LastName, T*)</b> will return all records where the <i>Lastname</i> begins with the letter T. Likewise, <b>LIKE(FirstName,?ill)</b> would match Bill and Jill.</p>
-<p>The <b>LIKE</b> operator only works on string columns. The syntax is
 <h2>Specialty Operators</h2>
 <p>RQL defines a number of specialty operatiors. These operators further refine the output of a result set.</p>
 <h3>Limit Operator</h3>
