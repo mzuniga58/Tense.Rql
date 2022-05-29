@@ -107,7 +107,7 @@ Total=int64:7000000000</code></pre>
 <p>A word about strings and uris. The values of strings and Uris need not be enclosed in quotes where the meaning of the string is unambigious. However, sometimes, the meaning isn't perfectly clear. Consider the following statement:</p>
 <pre><code>ProductBin=004U
 </code></pre>
-<p>The RQL parser will interpret the value 004U as an unsigned 32-bit interger with the value of 4. The problem here is that the column ProductBin is a string column. This particular product bin value tells us that this product can be located in the U aisle under box number 004. We may have product bin values like 122J or 023R, and those values are unambigousely strings. But 004U is not, nor would be 071M or 037L. So, we nned some way to tell the RQL Parser that the value 004U is to be treated as a string value in this case. We can do that simply enough using the string or str cast operator, or we can enclose the value in double quotes.</p>
+<p>TThe RQL parser will interpret the value 004U as an unsigned 32-bit integer with a value of 4. The problem here is that the column ProductBin is a string column. This product bin value tells us that this product is found in the U aisle under box number 004. We may have product bin values like 122J or 023R, and those values are unambiguously strings. But 004U is not, nor would be 071M or 037L. So, we need some way to tell the RQL Parser that the value 004U is to be treated as a string value in this case. We can do that simply enough using the string or str cast operator, or we can enclose the value in double-quotes.</p>
 <pre><code>ProductBin="004U"</code></pre>
 <p>The above statement will produce the desired effect.</p>
 <p>Likewise, consider this statement:</p>
