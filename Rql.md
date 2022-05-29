@@ -112,7 +112,7 @@ Total=int64:7000000000</code></pre>
 <p>The above statement will produce the desired effect.</p>
 <p>Likewise, consider this statement:</p>
 <pre><code>Website=https://bookstore.com/customer?Status=A&amp;Lastname=Jones</code></pre>
-<p>Does this statment mean to acquire the record where teh Website value is <i>https://bookstore.com/customer?Status=A&amp;Lastname=Jones</i>, or does it mean to acquire the reocrd whose Website value is <i>https://bookstore.com/customer?Status=A</i> and whose Lastname value is <i>Jones</i>? By default, the RQL parser will use the first interpretation. To make it unambigious, use double quotes:</p>
+<p>Does this statment mean to acquire the record where the Website value is <i>https://bookstore.com/customer?Status=A&amp;Lastname=Jones</i>, or does it mean to acquire the record whose Website value is <i>https://bookstore.com/customer?Status=A</i> and whose Lastname value is <i>Jones</i>? By default, the RQL parser will use the first interpretation. To make it unambigious, use double quotes:</p>
  <pre><code>Website="https://bookstore.com/customer?Status=A"&amp;Lastname=Jones</code></pre>
 <h2>Logical Operators</h2>
 <p>Now that we have the basics of relational operators, and understand how we can encode values, let's take a look at the logical operations. There are two, and they are fairly self-explanatory:</p>
