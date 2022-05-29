@@ -294,19 +294,34 @@ namespace Tense.Rql
 
 			if ( CurrentState != ParseState.INITIAL_STATE)
             {
-				if (CurrentState == ParseState.PROPERTY4 || CurrentState == ParseState.LIMIT5)
+				if (CurrentState == ParseState.PROPERTY4)
+				{
+					_stateStack.Pop();
+
+					if (CurrentState == ParseState.PROPEXP2)
+						throw new RqlFormatException("RQL Query syntax error, expecting VALUE.");
+					else if (CurrentState == ParseState.SELECT2)
+						throw new RqlFormatException("RQL Query syntax error, expecting PROPERTY.");
+					else if (CurrentState == ParseState.SORT3)
+						throw new RqlFormatException("RQL Query syntax error, expecting PROPERTY.");
+					else
+						throw new RqlFormatException("RQL Query syntax error, expecting closing ).");
+				}
+				
+				else if (CurrentState == ParseState.LIMIT5 || CurrentState == ParseState.PROPEXP2)
 					throw new RqlFormatException("RQL Query syntax error, expecting closing ).");
 
 				else if (CurrentState == ParseState.PROPERTY1)
 					throw new RqlFormatException("RQL Query syntax error, expecting PROPERTY.");
 
-				else if (CurrentState == ParseState.SORT1 || CurrentState == ParseState.SELECT1 || CurrentState == ParseState.LIMIT1 || CurrentState == ParseState.NOARGS1)
+				else if (CurrentState == ParseState.SORT1 || CurrentState == ParseState.SELECT1 || CurrentState == ParseState.LIMIT1 ||
+						 CurrentState == ParseState.NOARGS1 || CurrentState == ParseState.PROPEXP1)
 					throw new RqlFormatException("RQL Query syntax error, expecting (.");
 
 				else if (CurrentState == ParseState.SORT2)
 					throw new RqlFormatException("RQL Query syntax error, expecting PROPERTY.");
 
-				else if (CurrentState == ParseState.LIMIT2 || CurrentState == ParseState.LIMIT4)
+				else if (CurrentState == ParseState.LIMIT2 || CurrentState == ParseState.LIMIT4 || CurrentState == ParseState.PROPEXP3)
 					throw new RqlFormatException("RQL Query syntax error, expecting VALUE.");
 
 				else if (CurrentState == ParseState.LIMIT3)
@@ -679,7 +694,7 @@ namespace Tense.Rql
 				SetNode(new RqlNode(RqlOperation.PROPERTY), ParseState.PROPERTY1);
 			}
 			else
-				throw new RqlFormatException($"Invalid RQL syntax at {token}.");
+				throw new RqlFormatException($"RQL Query syntax error at {token.Value<string>()}, expecting (.");
 		}
 
 		internal void ProcessPropertyExpression2(Token token)
@@ -693,7 +708,7 @@ namespace Tense.Rql
 				Popup();
 			}
 			else
-				throw new RqlFormatException($"Invalid RQL syntax at {token}.");
+				throw new RqlFormatException($"RQL Query syntax error at {token.Value<string>()}.");
 		}
 
 		internal void ProcessPropertyExpression3(Token token)
@@ -705,10 +720,10 @@ namespace Tense.Rql
 				if (CurrentNode != null)
 					CurrentNode.Add(token.NonNullValue<object>());
 				else
-					throw new RqlFormatException($"Invalid RQL syntax at {token}.");
+					throw new RqlFormatException($"RQL Query syntax error at {token.Value<string>()}.");
 			}
 			else
-				throw new RqlFormatException($"Invalid RQL syntax at {token}.");
+				throw new RqlFormatException($"RQL Query syntax error at {token.Value<string>()}.");
 		}
 
 		internal void ProcessPropertyExpression4(Token token)
@@ -719,7 +734,7 @@ namespace Tense.Rql
 				SetState(ParseState.PROPEXP5);
 			}
 			else
-				throw new RqlFormatException($"Invalid RQL syntax at {token}.");
+				throw new RqlFormatException($"RQL Query syntax error at {token.Value<string>()}, expecting VALUE.");
 		}
 
 		internal void ProcessPropertyExpression5(Token token)
@@ -754,13 +769,13 @@ namespace Tense.Rql
 						SetNode(node, ParseState.INITIAL_STATE);
 					}
 					else
-						throw new RqlFormatException($"Invalid RQL syntax at {token}.");
+						throw new RqlFormatException($"RQL Query syntax error at {token.Value<string>()}, expecting closing ).");
 				}
 				else
-					throw new RqlFormatException($"Invalid RQL syntax at {token}.");
+					throw new RqlFormatException($"RQL Query syntax error at {token.Value<string>()}, expecting closing ).");
 			}
 			else
-				throw new RqlFormatException($"Invalid RQL syntax at {token}.");
+				throw new RqlFormatException($"RQL Query syntax error at {token.Value<string>()}, expecting closing ).");
 		}
 
 		internal void ProcessConditionalOperation1(Token token)

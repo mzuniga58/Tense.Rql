@@ -156,6 +156,10 @@ or(                                        ,                                    
 <p>But, now suppose we wanted those values broken down by age. To do that we need to introduce another operator, the <b>AGGREGATE</b> operator. The aggregate operator takes a list of properties, and a list of aggregate operations. The properties are included in the GROuP By clause of the SQL statement, and the aggregate operations are the values in the SELECT clause.</p>
 <pre></code>aggregate(Age,mean(Cost),Mean(List))</code></pre>
 <p>This query will return one record for each Age value, and that record will contain two values, the average cost and averge list price for that age.</p>
+<h3>Like Operator</h3>
+<pre><code><b>LIKE(<i>&lt;property&gt;</i>,<i>&lt;pattern&gt;</i>)</code></pre>
+<p>The <b>LIKE</b> operator only works on string columns. The first paramter is a property, the name of a member in the model. The second parameter is a string pattern, where * matches anything and ? matches a single character. For example, <b>LIKE(LastName, T*)</b> will return all records where the <i>Lastname</i> begins with the letter T. Likewise, <b>LIKE(FirstName,?ill)</b> would match Bill and Jill.</p>
+<p>The <b>LIKE</b> operator only works on string columns. The syntax is
 <h2>Specialty Operators</h2>
 <p>RQL defines a number of specialty operatiors. These operators further refine the output of a result set.</p>
 <h3>Limit Operator</h3>
@@ -175,3 +179,4 @@ or(                                        ,                                    
 <p>Sometimes, you don't need to get all the members of a record. If you are constructing a list of items on a Web Page, all you really need is the id and the name of that record. We can limit the members returned using the <b>SELECT</b> operator (not to be confused with the SELECT clause of a SQL Statement).</p>
 <pre><code>select(Id,FirstName,LastName)</code></pre>
 <p>A customer record, for example, is likely to have many columns: Id, FirstName, LastName, Address1, Address2, City, State, PostalCode, PhoneNumber, etc. If we were to apply the above select operator, then only the Id, FirstName and LastName members would be returned for each customer in the list.</p>
+

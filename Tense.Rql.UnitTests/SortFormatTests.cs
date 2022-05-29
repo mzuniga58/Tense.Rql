@@ -109,7 +109,7 @@ namespace Tense.Rql.UnitTests
                 if (error.GetType() != typeof(RqlFormatException))
                     Assert.Fail(error.Message);
 
-                Assert.AreEqual(error.Message, "RQL Query syntax error, expecting closing ).");
+                Assert.AreEqual(error.Message, "RQL Query syntax error, expecting PROPERTY.");
             }
         }
 
