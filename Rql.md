@@ -105,9 +105,11 @@ Total=int64:7000000000</code></pre>
 </ul>
 </ul>
 <p>A word about strings and uris. The values of strings and Uris need not be enclosed in quotes where the meaning of the string is unambigious. However, sometimes, the meaning isn't perfectly clear. Consider the following statement:</p>
-<pre><code>Name=Tom &amp; Jerry's=Good Ice Creame
+<pre><code>ProductBin=004U
 </code></pre>
-<p>This statement can be interpreted in either of two ways. Either we are searching for the name "Tom &amp; Gerrys=Good Ice Creame", or we are searching for the name "Tom" and a column called "Jerry's" which should be equal to "Good Ice Creame". When the RQL parser sees the &amp; character, it interprets it as the end of the previous clause and the beginning of a new clause joined by the AND operation. Therefore, a statement like Name=Tom &amp; Jerry's would throw an RQL Format Exception, because it would interpret Jerry's as the beginning of the next clause, and that clause is incomplete. The same issue can happen with Uris. To avoid situations like this, you an enclose the the value in double quotes: Name="Tom &amp; Jerry's". This statement will compile corretly, because it will interpret "Tom &amp; Jerry's" as a single string.</p>
+<p>The RQL parser will interpret the value 004U as an unsigned 32-bit interger with the value of 4. The problem here is that the column ProductBin is a string column. This particular product bin value tells us that this product can be located in the U aisle under box number 004. We may have product bin values like 122J or 023R, and those values are unambigousely strings. But 004U is not, nor would be 071M or 037L. So, we nned some way to tell the RQL Parser that the value 004U is to be treated as a string value in this case. We can do that simply enough using the string or str cast operator, or we can enclose the value in double quotes.</p>
+<pre><code>ProductBin="004U"</code></pre>
+<p>The above statement will produce the desired effect.</p>
 <h2>Logical Operators</h2>
 <p>Now that we have the basics of relational operators, and understand how we can encode values, let's take a look at the logical operations. There are two, and they are fairly self-explanatory:</p>
 <ul>
