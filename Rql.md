@@ -169,29 +169,26 @@ Total=int64:7000000000</code></pre>
 Age=gt=18
 gt(Age,18)</code></pre>
 <p>The meaning of each of the above statements are identitcal.</p>
-<h2>Logical Operators</h2>
+<h3>Logical Operations</h3>
 <pre><code><b>&lt;operator&gt;</b>(<i>&lt;operation_1&gt;</i>,<i>&lt;operation_2&gt;</i>,...<i>&lt;operation_n&gt;</i>)</pre></code>
 <p>Now that we have the basics of relational operators, let's take a look at the logical operations. There are two, and they are fairly self-explanatory:</p>
 <ul>
 <li>AND</li>
 <li>OR</li>
 </ul>
-<p>Each operator takes a list of operations (nested operator statements, such as the filter operations above).</p>
-<p>You can encode the <b>AND</b> and <b>OR</b> operations using the &amp; and | symbols respectively. For example, suppose we have a table with a member called <b>Status</b>. Suppose further that the <b>Status</b> member can take on any of three values: A - active, I - inactve and P - in process. Suppose further that there is a <b>Category</b> member. Now suppose I want the records in category 1 that are acive. The following RQL statement will give us those results:</p>
-<pre><code>Category=1&Status=A
-</code></pre>
-<p>We can write the same statement using alphasymbols, or in normalized form:</p>
-<pre><code>Category=eq=1&Status=eq=A
-and(eq(Category,1),eq(Status,A))</code></pre>
-<p>We can also combine logical operators using paranthesis. Suppose we want the records in category 1 that are active, combined with the records in category 2 that are in process:</p>
-<pre><code>(Category=1&Status=A)|(Category=2&Status=P)
-or(and(eq(Category,1),eq(Status,A)),and(eq(Category,2),eq(Status,P)))</code></pre>
-<p>The normalized form is a bit difficult to read, but it does the same as the statement above it. It's easier to read if we break it down in a hierarchial form:</p>
-<pre><code>
-or(                                        ,                                          )
-     and(                ,              )     and (                 ,               )
-          eq(Category,1)   eq(Status,A)              eq(Category,2)    eq(Status,P)
-</code></pre>
+<p>Each operator takes a list of operations (nested operator statements, such as the relational operations above). Consider the following statement:</p>
+<pre><code><b>and</b><(<b>eq</b>(<i>Status</i>,<i>A</i>),<b>ge</b>(<i>Age</i>,<i>18</i>))</code></pre>
+<p>This statement will return the records where the Status is equal to A <b>AND</b> the Age is greater than or equal to 18. You can have more than two conditions. For example, the statement:</p>
+<pre><code><b>and</b><(<b>eq</b>(<i>Status</i>,<i>A</i>),<b>ge</b>(<i>Age</i>,<i>18</i>,<b>eq</b>(<i>Category</i>,<i>4</i>)))</code></pre>
+<p>would return the records where the Status is equal to A <b>AND</b> the Age is greater than or equal to 18 <b>AND</b> the Category is equala to 4. Likewise, the statement</p>
+<pre><code><b>or</b><(<b>eq</b>(<i>Status</i>,<i>A</i>),<b>ge</b>(<i>Age</i>,<i>18</i>,<b>eq</b>(<i>Category</i>,<i>4</i>)))</code></pre>
+<p>would return the records where the Status is equal to A <b>OR</b> the Age is greater than or equal to 18 <b>OR</b> the Category is equala to 4.</p>
+<p>Each of these statements can also embed the other. You can place an OR operation as one of the operations inside an AND operation, or vice versa. Consider this statement:</p>
+<pre><code><b>and</b><(<b>eq</b>(<i>Status</i>,<i>A</i>),<b>or</b>(<b>ge</b>(<i>Age</i>,<i>18</i>,<b>eq</b>(<i>Category</i>,<i>4</i>))))</code></pre>
+<p>This statement will return the records where Status is equal to A, <b>AND</b> (Age is greater than or equal to 18 <b>OR</b> Category is equal to 4).</p>
+<p>You can encode the <b>AND</b> and <b>OR</b> operations using the &amp; and | symbols respectively, and you can use parantheisis to group them. For example, the above statements can be written as:</p>
+<pre><code>Status=A&amp;Age&lt;=18&amp;Category=4
+Status=A&amp;(Age&lt;=18|Category=4)</code></pre>
 <h3>Like Operator</h3>
 <pre><code><b>LIKE</b>(<i>&lt;property&gt;</i>,<i>&lt;pattern&gt;</i>)</code></pre>
 <p>The <b>LIKE</b> operator only works on string columns. The first paramter is a property, the name of a member in the model. The second parameter is a string pattern, where * matches anything and ? matches a single character. For example, <b>LIKE(LastName, T*)</b> will return all records where the <i>Lastname</i> begins with the letter T. Likewise, <b>LIKE(FirstName,?ill)</b> would match Bill and Jill.</p>
