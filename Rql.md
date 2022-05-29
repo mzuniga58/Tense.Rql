@@ -15,6 +15,7 @@ LastName=Smith
 LastName=eq=Smith</code></pre>
 <p>All three of the above statements are equivalent.</p>
 <h3>Encoding Values</h3>
+<p>RQL has only three reserved words: <i>NULL</i>, <i>True</i> and <i>False</i>. Case does not matter. <i>TRUE</i> is the same as <i>True</i>, is the same as <i>true</i>.</p>
 <p>Unless otherwise specified, values are evalulated as a 32-bit signed integer, double or string. Specialty values, such as a Globally Unique Identifier (GUID), datetime, timespan and Universal Resource Locators (URIs) are also supported. For example, consider the following RQL statements:<p>
 <pre><code>Age=18
 FirstName=Joe
