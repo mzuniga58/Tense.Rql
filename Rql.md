@@ -36,7 +36,7 @@ LastName=eq=Smith</code></pre>
 }</code></pre></td>
      <tr>
 </table>
-<p>In this case, the model <b>Customer</b> embeds the model <b>Address</b>. What if we wanted to write an RQL statement that returns all the records where the customer's state is in KS?</p>
+<p>In this case, the model <b>Customer</b> embeds the model <b>Address</b>. What if we wanted to write an RQL statement that returns all the records where the customer's state is KS?</p>
 <pre><code>HomeAddress/State=KS</code></pre>
 <p>We simply seperate the properties by level, using the / symbol. The above statement checks the value of the State property who is a member of the HomeAddress property, to see if it is equal to the constant string KS.
 <h3>Encoding Values</h3>
