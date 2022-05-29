@@ -4,10 +4,18 @@
 <p>The RQL grammar is based around standard URI delimiters, and the standard rules for encoding strings with URL encoding (%xx) are observed. RQL is also a superset of the Feed Item Query Language (FIQL, pronounced "fickle"). It supports parenthesized nested operations (also called the normalized form), as well as symbol and alpha relational operations (see Relational Operators).<p>
 <p>The RQL grammer consists of a set of hierarchial operations. The general forms are:</p>
 <pre><code><b>&lt;operator&gt;</b>(<i>&lt;argument_1&gt;</i>,<i>&lt;argument_2&gt;</i>,...<i>&lt;argument_n&gt;</i>)</code></pre>
-<p>The arguments to an operation can be either a <i>PROPERTY</i> or a <i>VALUE</i>. A <i>PROPERTY</i> is the name of a member of the model referencing the data in a dataset. A <i>VALUE</i> is a hard-coded constant value. There are no variables in RQL. Certain operators, primarily the filter operations, take only two agruments, one <i>PROPERTY</i> and one <i>VALUE</i>. The Equality operator is one such operator. The equality operator takes the value of the <i>PROPERTY</i> and checks to see if it is equal to a constant <i>VALUE</i>. For example, to see if the value of LastName is equal to Smith, we would write <b>eq</b>(<i>LastName</i>,<i>Smith</i>). This statement would check each record in the dataset, and any record whose LastName equals Smith would be returned.</p>
+<p>The arguments to an operation can be either a <i>PROPERTY</i> or a <i>VALUE</i>, depending on the requirements of the operator. A <i>PROPERTY</i> is the name of a member of the model referencing the data in a dataset. A <i>VALUE</i> is a hard-coded constant value. There are no variables in RQL. Certain operators, primarily the filter operations, take only two agruments, one <i>PROPERTY</i> and one <i>VALUE</i>.</p>
 <pre><code><b>eq</b>(<i>PROPERTY</i>,<i>VALUE</i>)</code></pre>
-<p>These arguments can be written in the alternante symbol ore alpha relational form.</p>
-<pre><code>
+<p>The Equality operator is one such operator. The equality operator takes the value of the <i>PROPERTY</i> and checks to see if it is equal to a constant <i>VALUE</i>. For example, to see if the value of LastName is equal to Smith, we would write <b>eq</b>(<i>LastName</i>,<i>Smith</i>). This statement would check each record in the dataset, and any record whose LastName equals Smith would be returned. Operations of this type can be written using the alternante symbol or alpha relational form.</p>
+<pre><code><i>PROPERTY</i><b>Symbol_Operator</b><i>VALUE</i>   - the symbol relational form
+<i>PROPERTY</i>=<b>Operator</b>=<i>VALUE</i> - the alpha relational form</code></pre>
+<p>This is called the relational form. In the symbol relational form, the <b>Symbol_Operator</b> consists of a set of symbols: =, &lt;, &lt;=, &gt;, &gt;=, and !=, where as in the alpah form, the <b>Operator</b> takes on its alphanumeric value: eq, lt, le, gt, ge, and ne.</p>
+<pre><code>eq(LastName,Smith)
+LastName=Smith
+LastName=eq=Smith</code></pre>
+<p>All three of the above statements are equivalent.</p>
+
+
 <h2>Filter Operations</h2>
 <p>The filter operations are those operations that are used to filter the result set. The RQL filter operations are used to specify a condition while fetching the data from a dataset. If the given condition is satisfied, then only it returns a specific value from the set. You should use the filter operations to filter the records and fetching only the necessary records. You can think of the filter operations as corresponding to the conditions in a WHERE clause in SQL.</p>
 <p>Just as is the case with the SQL WHERE clause, the RQL filter operations are not only used in the fetching data, but they are also used in the UPDATE and DELETE operations.</p>
