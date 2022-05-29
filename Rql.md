@@ -21,7 +21,7 @@ LastName=eq=Smith</code></pre>
 {
 &nbsp;&nbsp;&nbsp;&nbsp;public int CustomerId { get; set; }
 &nbsp;&nbsp;&nbsp;&nbsp;public string FirstName { get; set; }
-&nbsp;&nbsp;&nbsp;&nbsp; public string LastName { get; set; }
+&nbsp;&nbsp;&nbsp;&nbsp;public string LastName { get; set; }
 &nbsp;&nbsp;&nbsp;&nbsp;public Address HomeAddress { get; set; }
 &nbsp;&nbsp;&nbsp;&nbsp;public Address BillingAddress { get; set; }
 &nbsp;&nbsp;&nbsp;&nbsp;public Address ShippingAddress { get; set; }
@@ -36,6 +36,9 @@ LastName=eq=Smith</code></pre>
 }</code></pre></td>
      <tr>
 </table>
+<p>In this case, the model <b>Customer</b> embeds the model <b>Address</b>. What if we wanted to write an RQL statement that returns all the records where the customer's state is in KS?</p>
+<pre><code>HomeAddress/State=KS</code></pre>
+<p>We simply seperate the properties by level, using the / symbol. The above statement checks the value of the State property who is a member of the HomeAddress property, to see if it is equal to the constant string KS.
 <h3>Encoding Values</h3>
 <p>RQL has only three reserved words: <i>NULL</i>, <i>True</i> and <i>False</i>. Case does not matter. <i>TRUE</i> is the same as <i>True</i>, is the same as <i>true</i>.</p>
 <p>Unless otherwise specified, values are evalulated as a 32-bit signed integer, double or string. Specialty values, such as Globally Unique Identifiers (GUIDs), DateTime, TimeSpan and Uniform Resource Identifiers (URIs) are also supported. For example, consider the following RQL statements:<p>
