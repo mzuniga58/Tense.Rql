@@ -7,8 +7,8 @@
 <p>The arguments to an operation can be either a <i>PROPERTY</i> or a <i>VALUE</i>, depending on the requirements of the operator. A <i>PROPERTY</i> is the name of a member of the model referencing the data in a dataset. A <i>VALUE</i> is a hard-coded constant value. There are no variables in RQL. Certain operators, primarily the filter operations, take only two agruments, one <i>PROPERTY</i> and one <i>VALUE</i>.</p>
 <pre><code><b>eq</b>(<i>PROPERTY</i>,<i>VALUE</i>)</code></pre>
 <p>The Equality operator is one such operator. The equality operator takes the value of the <i>PROPERTY</i> and checks to see if it is equal to a constant <i>VALUE</i>. For example, to see if the value of LastName is equal to Smith, we would write <b>eq</b>(<i>LastName</i>,<i>Smith</i>). This statement would check each record in the dataset, and any record whose LastName equals Smith would be returned. Operations of this type can be written using the alternante symbol or alpha relational form.</p>
-<pre><code><i>PROPERTY</i><b>Symbol_Operator</b><i>VALUE</i>   - the symbol relational form
-<i>PROPERTY</i>=<b>Operator</b>=<i>VALUE</i> - the alpha relational form</code></pre>
+<pre><code><i>&lt;PROPERTY&gt;</i><b>&lt;Symbol_Operator&gt;</b><i>&lt;VALUE&gt;</i>   - the symbol relational form
+<i>&lt;PROPERTY&gt;</i>=<b>&lt;Operator&gt;</b>=<i>&lt;VALUE&gt;</i> - the alpha relational form</code></pre>
 <p>This is called the relational form. In the symbol relational form, the <b>Symbol_Operator</b> consists of a set of symbols: =, &lt;, &lt;=, &gt;, &gt;=, and !=, where as in the alpah form, the <b>Operator</b> takes on its alphanumeric value: eq, lt, le, gt, ge, and ne.</p>
 <pre><code>eq(LastName,Smith)
 LastName=Smith
