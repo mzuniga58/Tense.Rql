@@ -17,29 +17,23 @@ LastName=eq=Smith</code></pre>
 <p>Properties can also be nested. For example, suppose we had the following two data models:</p>
 <table>
      <tr>
-          <td><pre><code>
-    public class Customer
-    {
-        public int CustomerId { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public Address HomeAddress { get; set; }
-        public Address BillingAddress { get; set; }
-        public Address ShippingAddress { get; set; }
-    }
-     </code></pre>
-     </td>
-     <td><pre><code>
-     public class Address
-    {
-        public string Address1 { get; set; }
-        public string Address2 { get; set; }
-        public string City { get; set; }
-        public string State { get; set; }
-        public string PostalCode { get; set; }
-    }
-    </code></pre>
-    </td>
+          <td><pre><code>public class Customer
+{
+&nbsp;&nbsp;&nbsp;&nbsp;public int CustomerId { get; set; }
+&nbsp;&nbsp;&nbsp;&nbsp;public string FirstName { get; set; }
+&nbsp;&nbsp;&nbsp;&nbsp; public string LastName { get; set; }
+&nbsp;&nbsp;&nbsp;&nbsp;public Address HomeAddress { get; set; }
+&nbsp;&nbsp;&nbsp;&nbsp;public Address BillingAddress { get; set; }
+&nbsp;&nbsp;&nbsp;&nbsp;public Address ShippingAddress { get; set; }
+}</code></pre></td>
+     <td><pre><code>public class Address
+{
+&nbsp;&nbsp;&nbsp;&nbsp;public string Address1 { get; set; }
+&nbsp;&nbsp;&nbsp;&nbsp;public string Address2 { get; set; }
+&nbsp;&nbsp;&nbsp;&nbsp;public string City { get; set; }
+&nbsp;&nbsp;&nbsp;&nbsp;public string State { get; set; }
+&nbsp;&nbsp;&nbsp;&nbsp;public string PostalCode { get; set; }
+}</code></pre></td>
      <tr>
 </table>
 <h3>Encoding Values</h3>
