@@ -110,6 +110,10 @@ Total=int64:7000000000</code></pre>
 <p>The RQL parser will interpret the value 004U as an unsigned 32-bit interger with the value of 4. The problem here is that the column ProductBin is a string column. This particular product bin value tells us that this product can be located in the U aisle under box number 004. We may have product bin values like 122J or 023R, and those values are unambigousely strings. But 004U is not, nor would be 071M or 037L. So, we nned some way to tell the RQL Parser that the value 004U is to be treated as a string value in this case. We can do that simply enough using the string or str cast operator, or we can enclose the value in double quotes.</p>
 <pre><code>ProductBin="004U"</code></pre>
 <p>The above statement will produce the desired effect.</p>
+<p>Likewise, consider this statement:</p>
+<pre><code>Website=https://bookstore.com/customer?Status=A&amp;Lastname=Jones</code></pre>
+<p>Does this statment mean to acquire the record where teh Website value is <i>https://bookstore.com/customer?Status=A&amp;Lastname=Jones</i>, or does it mean to acquire the reocrd whose Website value is <i>https://bookstore.com/customer?Status=A</i> and whose Lastname value is <i>Jones</i>? By default, the RQL parser will use the first interpretation. To make it unambigious, use double quotes:</p>
+ <pre><code>Website="https://bookstore.com/customer?Status=A"&amp;Lastname=Jones</code></pre>
 <h2>Logical Operators</h2>
 <p>Now that we have the basics of relational operators, and understand how we can encode values, let's take a look at the logical operations. There are two, and they are fairly self-explanatory:</p>
 <ul>
