@@ -27,7 +27,7 @@ Cost=2.15</code></pre>
 <p>Both dates above represent the same date, and both are in Greenwich Meridian time.</p>
 <p>Timespans take the form</p>
 <pre><code>ddd.hh:mm:ss.ffffff</code></pre>
-<p>So that the value 3.2:30 represents 3 days, 2 hours and 30 minutes. Likewise, the value 6:45:15.2244 represents 6 hours, 35 minutes, 15.2244 seconds.</p>
+<p>So that the value 3.2:30 represents 3 days, 2 hours and 30 minutes. Likewise, the value 6:45:15.2244 represents 6 hours, 45 minutes, 15.2244 seconds.</p>
 <p>Globally Unique Identifiers (GUIDs) take the form xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx, where x can be 0-9, a-f or A-F.</p>
 <p>Finally, a Universal Resource Identifier (URI) must start with either http: or https:. The format is the standard format for URIs.</p>
 <p>Sometimes, for certain queries, the default values are not suffient. What if, for example, you wanted to write this statement:<p>
