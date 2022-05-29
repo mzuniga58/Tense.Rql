@@ -10,7 +10,6 @@ namespace Tense.Rql.UnitTests
     [TestClass]
     public class SortFormatTests
     {
-        #region short Formats
         [TestMethod]
         public void SortFormat_01()
         {
@@ -77,6 +76,258 @@ namespace Tense.Rql.UnitTests
                 Assert.Fail(error.Message);
             }
         }
-        #endregion
+
+        [TestMethod]
+        public void SortFormat_03()
+        {
+            try
+            {
+                var node = RqlNode.Parse("sort(");
+
+                Assert.Fail("RQL invalid syntax undetected.");
+            }
+            catch (Exception error)
+            {
+                if (error.GetType() != typeof(RqlFormatException))
+                    Assert.Fail(error.Message);
+
+                Assert.AreEqual(error.Message, "RQL Query syntax error, expecting PROPERTY.");
+            }
+        }
+
+        [TestMethod]
+        public void SortFormat_04()
+        {
+            try
+            {
+                var node = RqlNode.Parse("sort(LastName, FirstName");
+
+                Assert.Fail("RQL invalid syntax undetected.");
+            }
+            catch (Exception error)
+            {
+                if (error.GetType() != typeof(RqlFormatException))
+                    Assert.Fail(error.Message);
+
+                Assert.AreEqual(error.Message, "RQL Query syntax error, expecting closing ).");
+            }
+        }
+
+        [TestMethod]
+        public void SortFormat_05()
+        {
+            try
+            {
+                var node = RqlNode.Parse("sort(LastName,");
+
+                Assert.Fail("RQL invalid syntax undetected.");
+            }
+            catch (Exception error)
+            {
+                if (error.GetType() != typeof(RqlFormatException))
+                    Assert.Fail(error.Message);
+
+                Assert.AreEqual(error.Message, "RQL Query syntax error, expecting PROPERTY.");
+            }
+        }
+
+        [TestMethod]
+        public void SortFormat_06()
+        {
+            try
+            {
+                var node = RqlNode.Parse("sort(LastName,-");
+
+                Assert.Fail("RQL invalid syntax undetected.");
+            }
+            catch (Exception error)
+            {
+                if (error.GetType() != typeof(RqlFormatException))
+                    Assert.Fail(error.Message);
+
+                Assert.AreEqual(error.Message, "RQL Query syntax error, expecting PROPERTY.");
+            }
+        }
+
+        [TestMethod]
+        public void SortFormat_07()
+        {
+            try
+            {
+                var node = RqlNode.Parse("sort(LastName,%2b");
+
+                Assert.Fail("RQL invalid syntax undetected.");
+            }
+            catch (Exception error)
+            {
+                if (error.GetType() != typeof(RqlFormatException))
+                    Assert.Fail(error.Message);
+
+                Assert.AreEqual(error.Message, "RQL Query syntax error, expecting PROPERTY.");
+            }
+        }
+
+        [TestMethod]
+        public void SortFormat_08()
+        {
+            try
+            {
+                var node = RqlNode.Parse("sort(LastName,(");
+
+                Assert.Fail("RQL invalid syntax undetected.");
+            }
+            catch (Exception error)
+            {
+                if (error.GetType() != typeof(RqlFormatException))
+                    Assert.Fail(error.Message);
+
+                Assert.AreEqual(error.Message, "RQL Query syntax error at (, expecting PROPERTY.");
+            }
+        }
+
+        [TestMethod]
+        public void SortFormat_09()
+        {
+            try
+            {
+                var node = RqlNode.Parse("sort");
+
+                Assert.Fail("RQL invalid syntax undetected.");
+            }
+            catch (Exception error)
+            {
+                if (error.GetType() != typeof(RqlFormatException))
+                    Assert.Fail(error.Message);
+
+                Assert.AreEqual(error.Message, "RQL Query syntax error, expecting (.");
+            }
+        }
+
+        [TestMethod]
+        public void SortFormat_10()
+        {
+            try
+            {
+                var node = RqlNode.Parse("sort(&Id=10");
+
+                Assert.Fail("RQL invalid syntax undetected.");
+            }
+            catch (Exception error)
+            {
+                if (error.GetType() != typeof(RqlFormatException))
+                    Assert.Fail(error.Message);
+
+                Assert.AreEqual(error.Message, "RQL Query syntax error at &, expecting PROPERTY.");
+            }
+        }
+
+        [TestMethod]
+        public void SortFormat_11()
+        {
+            try
+            {
+                var node = RqlNode.Parse("sort(LastName, FirstName&Id=10");
+
+                Assert.Fail("RQL invalid syntax undetected.");
+            }
+            catch (Exception error)
+            {
+                if (error.GetType() != typeof(RqlFormatException))
+                    Assert.Fail(error.Message);
+
+                Assert.AreEqual(error.Message, "RQL Query syntax error at &, expected PROPERTY or closing ).");
+            }
+        }
+
+        [TestMethod]
+        public void SortFormat_12()
+        {
+            try
+            {
+                var node = RqlNode.Parse("sort(LastName,&Id=10");
+
+                Assert.Fail("RQL invalid syntax undetected.");
+            }
+            catch (Exception error)
+            {
+                if (error.GetType() != typeof(RqlFormatException))
+                    Assert.Fail(error.Message);
+
+                Assert.AreEqual(error.Message, "RQL Query syntax error at &, expecting PROPERTY.");
+            }
+        }
+
+        [TestMethod]
+        public void SortFormat_13()
+        {
+            try
+            {
+                var node = RqlNode.Parse("sort(LastName,-&Id=10");
+
+                Assert.Fail("RQL invalid syntax undetected.");
+            }
+            catch (Exception error)
+            {
+                if (error.GetType() != typeof(RqlFormatException))
+                    Assert.Fail(error.Message);
+
+                Assert.AreEqual(error.Message, "RQL Query syntax error at &.");
+            }
+        }
+
+        [TestMethod]
+        public void SortFormat_14()
+        {
+            try
+            {
+                var node = RqlNode.Parse("sort(LastName,%2b&Id=10");
+
+                Assert.Fail("RQL invalid syntax undetected.");
+            }
+            catch (Exception error)
+            {
+                if (error.GetType() != typeof(RqlFormatException))
+                    Assert.Fail(error.Message);
+
+                Assert.AreEqual(error.Message, "RQL Query syntax error at &.");
+            }
+        }
+
+        [TestMethod]
+        public void SortFormat_15()
+        {
+            try
+            {
+                var node = RqlNode.Parse("sort(LastName,&Id=10");
+
+                Assert.Fail("RQL invalid syntax undetected.");
+            }
+            catch (Exception error)
+            {
+                if (error.GetType() != typeof(RqlFormatException))
+                    Assert.Fail(error.Message);
+
+                Assert.AreEqual(error.Message, "RQL Query syntax error at &, expecting PROPERTY.");
+            }
+        }
+
+        [TestMethod]
+        public void SortFormat_16()
+        {
+            try
+            {
+                var node = RqlNode.Parse("sort&Id=10");
+
+                Assert.Fail("RQL invalid syntax undetected.");
+            }
+            catch (Exception error)
+            {
+                if (error.GetType() != typeof(RqlFormatException))
+                    Assert.Fail(error.Message);
+
+                Assert.AreEqual(error.Message, "RQL Query syntax error at &, expecting (.");
+            }
+        }
     }
 }
+        

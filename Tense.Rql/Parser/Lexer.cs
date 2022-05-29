@@ -4869,7 +4869,7 @@ namespace Tense.Rql
 				if (_input.EndOfStream)
 				{
 					//	If nothing follows a +, - or ., then the character is meaningless
-					throw new RqlFormatException($"Unrecognized token {yytext}. Aborting scan.");
+					throw new RqlFormatException($"RQL Query syntax error, expecting PROPERTY.");
 				}
 				else if (c == '+' && (_input.Peek() < '0' || _input.Peek() > '9'))
 				{
