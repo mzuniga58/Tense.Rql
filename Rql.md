@@ -178,11 +178,11 @@ gt(Age,18)</code></pre>
 </ul>
 <p>Each operator takes a list of operations (nested operator statements, such as the relational operations above). Consider the following statement:</p>
 <pre><code><b>and</b>(<b>eq</b>(<i>Status</i>,<i>A</i>),<b>ge</b>(<i>Age</i>,<i>18</i>))</code></pre>
-<p>This statement will return the records where the Status is equal to A <b>AND</b> the Age is greater than or equal to 18. You can have more than two conditions. For example, the statement:</p>
+<p>This statement will return the records where the Status is equal to A, <b>AND</b> the Age is greater than or equal to 18. You can have more than two conditions. For example, the statement:</p>
 <pre><code><b>and</b>(<b>eq</b>(<i>Status</i>,<i>A</i>),<b>ge</b>(<i>Age</i>,<i>18</i>),<b>eq</b>(<i>Category</i>,<i>4</i>)))</code></pre>
-<p>would return the records where the Status is equal to A <b>AND</b> the Age is greater than or equal to 18 <b>AND</b> the Category is equala to 4. Likewise, the statement</p>
+<p>would return the records where the Status is equal to A, <b>AND</b> the Age is greater than or equal to 18, <b>AND</b> the Category is equala to 4. Likewise, the statement</p>
 <pre><code><b>or</b>(<b>eq</b>(<i>Status</i>,<i>A</i>),<b>ge</b>(<i>Age</i>,<i>18</i>),<b>eq</b>(<i>Category</i>,<i>4</i>)))</code></pre>
-<p>would return the records where the Status is equal to A <b>OR</b> the Age is greater than or equal to 18 <b>OR</b> the Category is equala to 4.</p>
+<p>would return the records where the Status is equal to A, <b>OR</b> the Age is greater than or equal to 18, <b>OR</b> the Category is equala to 4.</p>
 <p>Each of these statements can also embed the other. You can place an OR operation as one of the operations inside an AND operation, or vice versa. Consider this statement:</p>
 <pre><code><b>and</b><(<b>eq</b>(<i>Status</i>,<i>A</i>),<b>or</b>(<b>ge</b>(<i>Age</i>,<i>18</i>),<b>eq</b>(<i>Category</i>,<i>4</i>))))</code></pre>
 <p>This statement will return the records where Status is equal to A, <b>AND</b> (Age is greater than or equal to 18 <b>OR</b> Category is equal to 4).</p>
