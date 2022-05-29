@@ -53,7 +53,7 @@ Total=int64:7000000000</code></pre>
 <li><b>nnnf or nnnF</b> - single (float) value</li>
 <li><b>nnnm or nnnM</b> - decimal (money) value</li>
 </ul>
-<p>The other two forms are called the cast forms, and they simply take the raw value and cast them to the type specified. Here is a list of cast operators:</p>
+<p>The other two forms are called the cast forms, and they simply take the raw value and cast them to the type specified. They take the form <i>cast_operator</i>:<i>raw_value</i>. Here is a list of cast operators:</p>
 <ul>
 <li>Numeric cast operators</li>
 <ul>
