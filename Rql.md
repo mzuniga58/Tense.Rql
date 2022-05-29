@@ -20,6 +20,16 @@ LastName=eq=Smith</code></pre>
 FirstName=Joe
 Cost=2.15</code></pre>
 <p>In the first case, the value <i>18</i> is encoded as a signed 32-bit interger (int) value, the value <i>Joe</i> is encoded as the string "Joe", and the value <i>2.15</i> is encoded as a double. However, at the time of SQL generation, the value is cast to the value of the column. So, for example, if <b>Cost</b> is a column defined in a database, and the data type of <b>Cost</b> is <i>money</i>, then the double value <i>2.15</i> will be cast as decimal(18,2) to match the column it references when the SQL Statement is generated. Likewise, a value that represents a date (such as "1/1/1960 14:32:25") would be encoded as a UTC Date. If the column to which it references is a DataTimeOffset, then the appropriate conversion will be done at the time of the SQL Statement generation.<p>
+<p>Unless otherwise specified, datetimes are alwasy interpreted as UTC datetimes. For example, the value <i>1/1/1976</i> would be interpreted as midnight on 1/1/1976 Greenwich Meridian time, the value <i>3/7/2022 06:30:00</i> as March 7, 2022 6:30 AM Greenwich Meridian time. You can speicify the timezone, so that <i>6/12/2023 14:45:00-0500</i> is interpreted as June 12, 2023 2:45 PM Central Time. You can use either / or - to seperate date values, so that 1/1/1988 is the same as 1-1-1988.</p>
+<p>DateTimes can be written in either the standard form, or the RFC1123 pattern.</p>
+<pre><code>1/1/2022 06:00:00.000000GMT
+2022-01-01T06:00:00.000000-00:00</code></pre>
+<p>Both dates above represent the same date, and both are in Greenwich Meridian time.</p>
+<p>Timespans take the form</p>
+<pre><code>ddd.hh:mm:ss.ffffff</code></pre>
+<p>So that the value 3.2:30 represents 3 days, 2 hours and 30 minutes. Likewise, the value 6:45:15.2244 represents 6 hours, 35 minutes, 15.2244 seconds.</p>
+<p>Globally Unique Identifiers (GUIDs) take the form xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx, where x can be 0-9, a-f or A-F.</p>
+<p>Finally, a Universal Resource Identifier (URI) must start with either http: or https:. The format is the standard format for URIs.</p>
 <p>Sometimes, for certain queries, the default values are not suffient. What if, for example, you wanted to write this statement:<p>
 <pre><code>Total=7000000000
 </code></pre>
