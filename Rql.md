@@ -160,8 +160,8 @@ Total=int64:7000000000</code></pre>
           <td>not equal, checks to see if a propery value is not equal to a constant value</td>
      </tr>
 </table>
-<p>As with the reserved words, case does not matter. <b>EQ</b> is the same as <b>Eq</b> is the same as <b>eq</b></p>.
-<p>Each of these operations can also be written in the paranthesized nested form of <b>&lt;op&gt;</b>(<i>&lt;PROPERTY&gt;</i><i>&lt;VALUE&gt;</i>). For example, if we wanted to create a filter that returns all the records in a dataset where Age is greater than 18, we could write:</p>
+<p>As with the reserved words, case does not matter. <b>EQ</b> is the same as <b>Eq</b> is the same as <b>eq</b>.</p>
+<p>Each of these operations can also be written in the paranthesized nested form of <b>&lt;op&gt;</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;VALUE&gt;</i>). For example, if we wanted to create a filter that returns all the records in a dataset where Age is greater than 18, we could write:</p>
 <pre><code>Age&gt;18
 Age=gt=18
 gt(Age,18)</code></pre>
