@@ -124,23 +124,24 @@ Total=int64:7000000000</code></pre>
 <h3>Relational Operations</h3>
 <p>The relational operations include the standard set:</p>
 <ul>
-<li><b>=</b> - can also be written as <b>=eq</b></li>
-<li><b>&lt;</b> - can also be written as <b>=lt</b></li>
-<li><b>&lt;=</b> - can also be written as <b>=le</b></li>
-<li><b>&gt;</b> - can also be written as <b>=gt</b></li>
-<li><b>&gt;=</b> - can also be written as <b>=ge</b></li>
-<li><b>!=</b> - can also be written as <b>=ne</b></li>
+<li><b>=</b>  <b>eq</b> - Equality, checks to see if a property value is equal to a constant value
+<li><b>&lt;</b>  <b>lt</b> - Less than, checks to see if a property value is less than a constant value
+<li><b>&lt;=</b>  <b>le</b> - Less than or equal, checks to see if a property value is less than or equal to a constant value
+<li><b>&gt;</b>  <b>gt</b> - greater than, checks to see if a property value is greater than a constant value
+<li><b>&gt;=</b>  <b>ge</b> - greater than or equal, checks to see if a property value is greater than or equal to a constant value
+<li><b>!=</b>  <b>ne</b> - not equal, checks to see if a propery value is not equal to a constant value
 </ul>
-<p>Each of these operations can also be written in the paranthesized nested form of &lt;op&gt;(&lt;arg&gt;,&lt;arg&gt;). For example, if we wanted to create a filter that returns all the records in a dataset where Age is greater than 18, we could write:</p>
+<p>As with the reserved words, case does not matter. <b>EQ</b> is the same as <b>Eq</p> is the same as <b>eq</b></p>.
+<p>Each of these operations can also be written in the paranthesized nested form of <b>&lt;op&gt;</b>(<i>&lt;PROPERTY&gt;</i><i>&lt;VALUE&gt;</i>). For example, if we wanted to create a filter that returns all the records in a dataset where Age is greater than 18, we could write:</p>
 <pre><code>Age&gt;18
 Age=gt=18
 gt(Age,18)</code></pre>
 <p>The meaning of each of the above statements are identitcal. The syntax for a relational operator is:</p>
-<pre><code>&lt;property&gt;&lt;symboloperator&gt;&lt;value&gt;
-&lt;property&gt;&lt;alphaoperator&gt;=&lt;value&gt;
-&lt;operator&gt;(&lt;property&gt;,&lt;value&gt;)
+<pre><code><i>&lt;PROPERTY&gt;</i><b>&lt;symbol&gt;</b><i>&lt;VALUE&gt;</i>
+<i>&lt;PROPERTY&gt;</i>=<b>&lt;operator&gt;</b>=<i>&lt;VALUE&gt;</i>
+<b>&lt;operator&gt;</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;VALUE&gt;</i>)
 </code></pre><h2>Logical Operators</h2>
-<p>Now that we have the basics of relational operators, and understand how we can encode values, let's take a look at the logical operations. There are two, and they are fairly self-explanatory:</p>
+<p>Now that we have the basics of relational operators, let's take a look at the logical operations. There are two, and they are fairly self-explanatory:</p>
 <ul>
 <li>AND</li>
 <li>OR</li>
