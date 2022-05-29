@@ -184,7 +184,7 @@ gt(Age,18)</code></pre>
 <pre><code><b>or</b>(<b>eq</b>(<i>Status</i>,<i>A</i>),<b>ge</b>(<i>Age</i>,<i>18</i>),<b>eq</b>(<i>Category</i>,<i>4</i>))</code></pre>
 <p>would return the records where the Status is equal to A, <b>OR</b> the Age is greater than or equal to 18, <b>OR</b> the Category is equala to 4.</p>
 <p>Each of these statements can also embed the other. You can place an OR operation as one of the operations inside an AND operation, or vice versa. Consider this statement:</p>
-<pre><code><b>and</b><(<b>eq</b>(<i>Status</i>,<i>A</i>),<b>or</b>(<b>ge</b>(<i>Age</i>,<i>18</i>),<b>eq</b>(<i>Category</i>,<i>4</i>)))</code></pre>
+<pre><code><b>and</b>(<b>eq</b>(<i>Status</i>,<i>A</i>),<b>or</b>(<b>ge</b>(<i>Age</i>,<i>18</i>),<b>eq</b>(<i>Category</i>,<i>4</i>)))</code></pre>
 <p>This statement will return the records where Status is equal to A, <b>AND</b> (Age is greater than or equal to 18 <b>OR</b> Category is equal to 4).</p>
 <p>You can encode the <b>AND</b> and <b>OR</b> operations using the &amp; and | symbols respectively, and you can use parantheisis to group them. For example, the above statements can be written as:</p>
 <pre><code>Status=A&amp;Age&lt;=18&amp;Category=4
