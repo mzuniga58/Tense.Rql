@@ -156,7 +156,7 @@ or(                                        ,                                    
 <h2>Sort Operator</h2>
 <p>You can specifiy the order of a collection using the <b>SORT</b> operator. The syntax is:</p>
 <pre><code>sort(+/-member,+/-member,...+/-member)</code></pre>
-<p>Here, <i>member</i> is the name of a member in the table. If preceeded with the + symbol (or no symbol at all) the result set will be sorted by the values of that member in ascending order. Placing an - before the member causes the set to be sorted by the values of that member in descending order.</p>
+<p>Here, <i>member</i> is the name of a member in the table. If preceeded with the + symbol (or no symbol at all) the result set will be sorted by the values of that member in ascending order. Placing a - before the member causes the set to be sorted by the values of that member in descending order. To get the list of customers sorted by lastname/firstname, you would use <b>sort(lastname,firstname).</b></p>
 <p>You can combine these operators (and all the following operators) using the &amp; symbol (or place them inside an and operator in normalized form).</p>
 <pre><code>Status=A&sort(Age,Name)&limit(1,10)</code></pre>
 <p>Unlike logical operators, the order of these operators does not matter.</p>
