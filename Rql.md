@@ -249,6 +249,15 @@ Status=A&amp;(Age&lt;=18|Category=4)</code></pre>
 <p>Sometimes, you don't need to get all the members of a record. If you are constructing a list of items on a Web Page, all you really need is the id and the name of that record. We can limit the members returned using the <b>select</b> operator (not to be confused with the SELECT clause of a SQL Statement).</p>
 <p>A customer record, for example, is likely to have many columns: Id, FirstName, LastName, Address1, Address2, City, State, PostalCode, PhoneNumber, etc. If we were to apply the above select operator, then only the Id, FirstName and LastName members would be returned for each customer in the list.</p>
 <p>If used in an update operation, only the members in the <b>select</b> operator will be updated. If the member has the <i>SkipUpdate</i> annotation, but is included in the <b>select</b> operator, then the member will be updated. The <b>select</b> operator overrides the <i>SkipUpdate</i> annotation.</p>
+<h3>Distinct Operator</h3>
+<pre><code>distinct()</code></pre>
+<p>The <b>distinct</b> operator works exactly like its SQL counterpart. It is used to return only distinct (different) values.</p> 
+<h3>First Operator</h3>
+<pre><code><b>first</b>()</code></pre>
+<p>The <b>first</b> operator returns only one record even if the WHERE Clause conditions would return a collection. It works like TOP 1 in a SQL statement.</p> 
+<h3>Values Operator</h3>
+<pre><code><b>values</b>(<i>&lt;PROPERTY&gt;</i>)</code></pre>
+<p>The <b>values</b> operator returns all the distinct values of a given member in a data set.</p> 
 <h3>The Aggregation Operators</h3>
 <p>Along with the relational and logical operators, RQL also supports aggregation. Think of this as the GROUP BY clause in SQL. The aggregation operators are:<p>
 <ul>
