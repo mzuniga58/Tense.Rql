@@ -216,11 +216,16 @@ gt(Age,18)</code></pre>
 Status=A|Age&lt;=18|Category=4
 Status=A&amp;(Age&lt;=18|Category=4)</code></pre>
 <h3>Like Operator</h3>
-<pre><code><b>like</b>(<i>&lt;property&gt;</i>,<i>&lt;pattern&gt;</i>)</code></pre>
+<pre><code><b>like</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;PATTERN_1&gt;</i>,<i>&lt;PATTERN_2&gt;</i>,...<i>&lt;PATTERN_n&gt;</i>)</code></pre>
 <p>The <b>like</b> operator only works on string columns. The first paramter is a property, the name of a member in the model. The second parameter is a string pattern, where * matches anything and ? matches a single character. For example, <b>like</b>(<i>LastName</i>,<i>T*</i>) will return all records where the <i>Lastname</i> begins with the letter <i>T</i>. Likewise, <b>like</b>(<i>FirstName</i>,<i>?ill</i>) would match <i>Bill</i> and <i>Jill</i>, but not <i>Phill</i>.</p>
+<p>You can have more than one value in the <b>like</b> operator. The operation <b>like</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;PATTERN_1&gt;</i>,<i>&lt;PATTERN_2&gt;</i>) is merely a short-cut for <b>like</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;PATTERN_1&gt;</i>) | <b>like</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;PATTERN_2&gt;</i>).</p>
 <h3>Contains Operator</h3>
-<pre><code><b>contains</b>(<i>&lt;property&gt;</i>,<i>&lt;VALUE&gt;</i>,<i>&lt;VALUE&gt;</i>,...<i>&lt;VALUE&gt;</i>)</code></pre>
-<p>The <b>Contains</b> operator is somewhat like the <b>like</b> operator. Like the <b>like</b> operator, the <b>contains</b> operator only works on string columns, But instead of using a pattern, it uses a list of values. The operater will return any records where the value of the property is equal to any of the <i>VALUEs</i> in the list.</p>
+<pre><code><b>contains</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;PATTERN_1&gt;</i>,<i>&lt;PATTERN_2&gt;</i>,...<i>&lt;PATTERN_n&gt;</i>)</code></pre>
+<p>The <b>Contains</b> operator is merely an alias for <b>like</b>. The <b>contains</b> and <b>like</b> operators do exactly the same thing.</p>
+<h3>Excludes Operator</h3>
+<pre><code><b>excludes</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;PATTERN_1&gt;</i>,<i>&lt;PATTERN_2&gt;</i>,...<i>&lt;PATTERN_n&gt;</i>)</code></pre>
+<p>The <b>excludes</b> operator is the opposite of the <b>like</b> and <b>contains</b> operators, and like them, it only works on string columns. The first paramter is a property, the name of a member in the model. The second parameter is a string pattern, where * matches anything and ? matches a single character. However, unlike the <b>like</b> and <b>contains</b> operators, the <b>exclude</b> operators returns records where the property does not match any of the patterns. For example, <b>excludes</b>(<i>LastName</i>,<i>T*</i>) will return all records where the <i>Lastname</i> does not begin with the letter <i>T</i>. </p>
+<p>You can have more than one value in the <b>excludes</b> operator. The operation <b>excludes</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;PATTERN_1&gt;</i>,<i>&lt;PATTERN_2&gt;</i>) is merely a short-cut for <b>excludes</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;PATTERN_1&gt;</i>) & <b>excludes</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;PATTERN_2&gt;</i>).</p>
 <h2>Specialty Operators</h2>
 <p>RQL defines a number of specialty operatiors. These operators further refine the output of a result set but do not affect filtering. In other words, they have nothing to do with the definition of the WHERE clause in SQL.</p>
 <h3>Limit Operator</h3>
