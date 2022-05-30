@@ -62,7 +62,7 @@ An <b>RqlNode</b> that represents the RQL statement. The function alwasys return
         <td>0.0.10-alpha</td>
     </tr>
     <tr>
-        <td>05/28/2022</td>
+        <td>05/29/2022</td>
         <td>Fixed syntax error reporting.</td>
         <td>0.0.11-alpha</td>
     </tr>
