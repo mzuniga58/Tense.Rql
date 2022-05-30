@@ -233,7 +233,7 @@ Status=A&amp;(Age&lt;=18|Category=4)</code></pre>
 <h3>Out Operator</h3>
 <pre><code><b>out</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;VALUE_1&gt;</i>,<i>&lt;VALUE_2&gt;</i>,...<i>&lt;VALUE_n&gt;</i>)</code></pre>
 <p>The <b>out</b> operator is the opposite of the <b>in</b> operator. It returns the records where the value of the <i>PROPERTY</i> member is not equal to any of the values in the list. Unlike the <b>like</b>, <b>contains</b> and <b>excludes</b> operators, the <b>in</b> operator can work with any column types.</p>
-p>The <b>out</b> operator is a short-cut for <i>&lt;PROPERTY&gt;</i>!=<i>&lt;VALUE_1&gt;</i>&amp;<i>&lt;PROPERTY&gt;</i>!=<i>&lt;VALUE_2&gt;</i>...</p>
+<p>The <b>out</b> operator is a short-cut for <i>&lt;PROPERTY&gt;</i>!=<i>&lt;VALUE_1&gt;</i>&amp;<i>&lt;PROPERTY&gt;</i>!=<i>&lt;VALUE_2&gt;</i>...</p>
 <h2>Specialty Operators</h2>
 <p>RQL defines a number of specialty operatiors. These operators further refine the output of a result set but do not affect filtering. In other words, they have nothing to do with the definition of the WHERE clause in SQL.</p>
 <h3>Limit Operator</h3>
