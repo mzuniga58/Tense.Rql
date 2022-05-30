@@ -226,6 +226,14 @@ Status=A&amp;(Age&lt;=18|Category=4)</code></pre>
 <pre><code><b>excludes</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;PATTERN_1&gt;</i>,<i>&lt;PATTERN_2&gt;</i>,...<i>&lt;PATTERN_n&gt;</i>)</code></pre>
 <p>The <b>excludes</b> operator is the opposite of the <b>like</b> and <b>contains</b> operators, and like them, it only works on string columns. The first paramter is a property, the name of a member in the model. The second parameter is a string pattern, where * matches anything and ? matches a single character. However, unlike the <b>like</b> and <b>contains</b> operators, the <b>exclude</b> operators returns records where the property does not match any of the patterns. For example, <b>excludes</b>(<i>LastName</i>,<i>T*</i>) will return all records where the <i>Lastname</i> does not begin with the letter <i>T</i>. </p>
 <p>You can have more than one value in the <b>excludes</b> operator. The operation <b>excludes</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;PATTERN_1&gt;</i>,<i>&lt;PATTERN_2&gt;</i>) is merely a short-cut for <b>excludes</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;PATTERN_1&gt;</i>) & <b>excludes</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;PATTERN_2&gt;</i>).</p>
+<h3>In Operator</h3>
+<pre><code><b>in</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;VALUE_1&gt;</i>,<i>&lt;VALUE_2&gt;</i>,...<i>&lt;VALUE_n&gt;</i>)</code></pre>
+<p>The <b>in</b> operator returns the records where the value of the <i>PROPERTY</i> member is equal to any of the values in the list. Unlike the <b>like</b>, <b>contains</b> and <b>excludes</b> operators, the <b>in</b> operator can work with any column types.</p>
+<p>The <b>in</b> operator is a short-cut for <i>&lt;PROPERTY&gt;</i>=<i>&lt;VALUE_1&gt;</i>|<i>&lt;PROPERTY&gt;</i>=<i>&lt;VALUE_2&gt;</i>...</p>
+<h3>Out Operator</h3>
+<pre><code><b>out</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;VALUE_1&gt;</i>,<i>&lt;VALUE_2&gt;</i>,...<i>&lt;VALUE_n&gt;</i>)</code></pre>
+<p>The <b>out</b> operator is the opposite of the <b>in</b> operator. It returns the records where the value of the <i>PROPERTY</i> member is not equal to any of the values in the list. Unlike the <b>like</b>, <b>contains</b> and <b>excludes</b> operators, the <b>in</b> operator can work with any column types.</p>
+p>The <b>out</b> operator is a short-cut for <i>&lt;PROPERTY&gt;</i>!=<i>&lt;VALUE_1&gt;</i>&amp;<i>&lt;PROPERTY&gt;</i>!=<i>&lt;VALUE_2&gt;</i>...</p>
 <h2>Specialty Operators</h2>
 <p>RQL defines a number of specialty operatiors. These operators further refine the output of a result set but do not affect filtering. In other words, they have nothing to do with the definition of the WHERE clause in SQL.</p>
 <h3>Limit Operator</h3>
