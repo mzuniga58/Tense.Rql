@@ -237,22 +237,18 @@ Status=A&amp;(Age&lt;=18|Category=4)</code></pre>
 <h2>Specialty Operators</h2>
 <p>RQL defines a number of specialty operatiors. These operators further refine the output of a result set but do not affect filtering. In other words, they have nothing to do with the definition of the WHERE clause in SQL.</p>
 <h3>Limit Operator</h3>
+<pre><code>limit(&lt;start&gt;[,&lt;pagesize&gt;])</code></pre>
 <p>A collection of items is returned in a <b>PagedSet</b> class, and is limited to <i>batch-size</i> defined in your service. For example, suppose we have a table of customers, and we are fortunate enough to have 100,000 customers. The endpoint to retrive the list of customers is /customers. You can call this endpoint with no filters and it will return the entire list. But it won't do it all in one shot. Instead of returning 100,000 records, it will only return the first 100 records (assuming your <i>batch-size</i> is 100). To get the remaining records, you have to specify a start and optionally, the  page size. In RQL, we use the <b>LIMIT</b> operator.</p>
-<pre><code>limit(&lt;start&gt;[,&lt;pagesize&gt;])
-</code></pre>
 <p>The <i>start</i> value is a one based index value. For example, suppose I called /customers?limit(1,10). This statement would return the first 10 customers in the list. The call /customers?limit(11,10) would return the next 10 customers, starting with the 11th customer. Unless otherwise specified, the returned set will be ordered by the primary key(s) of the table in question.</p>
 <p>You don't need to specify the <i>pagesize</i>. If omitted, the default value for the <i>pagesize</i> is the <i>batch-size</i>, so that <b>limit(1)</b> is the same as <b>limit(1,100)</b> assuming your <i>batch-size</i> is 100. Also note that the <i>pagesize</i> value does NOT override the <i>batch-size</i> specified in your service. You can call /customers?limit(1,1000), but if your <i>batch-size</i> value is 100, you're still only going to get the first 100 records.</p>
 <h3>Sort Operator</h3>
-<p>You can specifiy the order of a collection using the <b>SORT</b> operator. The syntax is:</p>
-<pre><code>sort(+/-member,+/-member,...+/-member)</code></pre>
-<p>Here, <i>member</i> is the name of a member in the table. If preceeded with the + symbol (or no symbol at all) the result set will be sorted by the values of that member in ascending order. Placing a - before the member causes the set to be sorted by the values of that member in descending order. To get the list of customers sorted by lastname/firstname, you would use <b>sort(lastname,firstname).</b></p>
-<p>You can combine these operators (and all the following operators) using the &amp; symbol (or place them inside an and operator in normalized form).</p>
-<pre><code>Status=A&sort(Age,Name)&limit(1,10)</code></pre>
-<p>Unlike logical operators, the order of these operators does not matter.</p>
+<pre><code><b>sort</b>(+/-<i>&lt;PROPERTY&gt;</i>,+/-<i>&lt;PROPERTY&gt;</i>,...+/-<i>&lt;PROPERTY&gt;</i>)</code></pre>
+<p>You can specifiy the order of a collection using the <b>sort</b> operator. Here, <i>PROPERTY</i> is the name of a member in the table. If preceeded with the + symbol (or no symbol at all) the result set will be sorted by the values of that member in ascending order. Placing a - before the member causes the set to be sorted by the values of that member in descending order. To get the list of customers sorted by lastname/firstname, you would use <b>sort</b>(<i>lastname</i>,<i>firstname</i>).</p>
 <h3>Select Operator</h3>
-<p>Sometimes, you don't need to get all the members of a record. If you are constructing a list of items on a Web Page, all you really need is the id and the name of that record. We can limit the members returned using the <b>SELECT</b> operator (not to be confused with the SELECT clause of a SQL Statement).</p>
-<pre><code>select(Id,FirstName,LastName)</code></pre>
+<pre><code><b>select</b>(<i>&lt;PROPERTY&gt;</i>,<i>&lt;PROPERTY&gt;</i>,...<i>&lt;PROPERTY&gt;</i>)</code></pre>
+<p>Sometimes, you don't need to get all the members of a record. If you are constructing a list of items on a Web Page, all you really need is the id and the name of that record. We can limit the members returned using the <b>select</b> operator (not to be confused with the SELECT clause of a SQL Statement).</p>
 <p>A customer record, for example, is likely to have many columns: Id, FirstName, LastName, Address1, Address2, City, State, PostalCode, PhoneNumber, etc. If we were to apply the above select operator, then only the Id, FirstName and LastName members would be returned for each customer in the list.</p>
+<p>If used in an update operation, only the members in the <b>select</b> operator will be updated. If the member has the <i>SkipUpdate</i> annotation, but is included in the <b>select</b> operator, then the member will be updated. The <b>select</b> operator overrides the <i>SkipUpdate</i> annotation.</p>
 <h3>The Aggregation Operators</h3>
 <p>Along with the relational and logical operators, RQL also supports aggregation. Think of this as the GROUP BY clause in SQL. The aggregation operators are:<p>
 <ul>
