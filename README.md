@@ -66,4 +66,9 @@ An <b>RqlNode</b> that represents the RQL statement. The function alwasys return
         <td>Fixed syntax error reporting.</td>
         <td>0.0.11-alpha</td>
     </tr>
+    <tr>
+        <td>06/05/2022</td>
+        <td>Fixed inclusion of count with select.</td>
+        <td>0.0.12-alpha</td>
+    </tr>
 </table>

@@ -159,7 +159,7 @@ namespace Tense.Rql
 
                                 properties.Add(propertyName, exvalue);
                             }
-                            else if (propertyName.Equals("totalRecordsInSet", StringComparison.OrdinalIgnoreCase))
+                            else if (propertyName.Equals("count", StringComparison.OrdinalIgnoreCase))
                                 properties.Add(propertyName, propertyValue);
                             else if (propertyName.Equals("start", StringComparison.OrdinalIgnoreCase))
                                 properties.Add(propertyName, propertyValue);
