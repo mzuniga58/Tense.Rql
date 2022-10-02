@@ -1751,7 +1751,7 @@ namespace Tense.Rql
 			{
 				if (CurrentNode != null)
 				{
-					CurrentNode.Add(token.NonNullValue<object>());
+					CurrentNode.Add(token.Value<object>());
 					Popup();
 				}
 				else

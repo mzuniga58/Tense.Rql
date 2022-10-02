@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -17,7 +19,7 @@ namespace Tense.Rql
 		/// Gets or sets the RQL operation for this node
 		/// </summary>
 		public RqlOperation Operation { get; set; }
-		private readonly List<object> _list = new();
+		private readonly List<object?> _list = new();
 
 		/// <summary>
 		/// Instantiates an RQL node with a specific operation
@@ -154,13 +156,13 @@ namespace Tense.Rql
 
 				case RqlOperation.SORT:
 					{
-						foreach (RqlNode member in this)
+						foreach (RqlNode? member in this)
 						{
 							var sortPropertyNode = member;
-							var propertyNode = sortPropertyNode.NonNullValue<RqlNode>(1);
+							var propertyNode = sortPropertyNode?.NonNullValue<RqlNode>(1);
 							var propertyType = typeof(T);
 
-							for (int j = 0; j < propertyNode.Count; j++)
+							for (int j = 0; j < propertyNode?.Count; j++)
 							{
 								var propertyName = propertyNode.NonNullValue<string>(j);
 								var property = FindProperty(propertyType, propertyName);
@@ -181,12 +183,12 @@ namespace Tense.Rql
 
 				case RqlOperation.SELECT:
 					{
-						foreach (RqlNode member in this)
+						foreach (RqlNode? member in this)
 						{
 							var propertyNode = member;
 							var propertyType = typeof(T);
 
-							for (int j = 0; j < propertyNode.Count; j++)
+							for (int j = 0; j < propertyNode?.Count; j++)
 							{
 								var propertyName = propertyNode.NonNullValue<string>(j);
 								var property = FindProperty(propertyType, propertyName);
@@ -328,7 +330,7 @@ namespace Tense.Rql
 		/// <param name="index">The index of the element to get or set.</param>
 		/// <returns>The element at the specified index.</returns>
 		/// <exception cref="ArgumentOutOfRangeException">when index is out of range.</exception>
-		public object this[int index]
+		public object? this[int index]
 		{
 			get 
 			{
@@ -358,16 +360,20 @@ namespace Tense.Rql
 		{
 			if (index >= 0 && index < _list.Count)
 			{
-				if (_list[index] == null)
+				var val = _list[index];
+
+				if (val == null)
 					return default;
+				else
+				{
+					if (val.GetType() == typeof(T))
+						return (T?)val;
 
-				if (_list[index].GetType() == typeof(T))
-					return (T)_list[index];
+					if (typeof(T) == typeof(object))
+						return (T?)val;
 
-				if (typeof(T) == typeof(object))
-					return (T)_list[index];
-
-				return (T)Convert.ChangeType(_list[index], typeof(T));
+					return (T)Convert.ChangeType(val, typeof(T));
+				}
 			}
 
 			throw new ArgumentOutOfRangeException(nameof(index));
@@ -386,16 +392,22 @@ namespace Tense.Rql
 		{
 			if (index >= 0 && index < _list.Count)
 			{
-				if (_list[index] == null)
+				var val = _list[index];
+
+				if (val == null)
+				{
 					throw new NullReferenceException("RqlNode value is null.");
+				}
+				else
+				{
+					if (val.GetType() == typeof(T))
+						return (T)val;
 
-				if (_list[index].GetType() == typeof(T))
-					return (T)_list[index];
+					if (typeof(T) == typeof(object))
+						return (T)val;
 
-				if (typeof(T) == typeof(object))
-					return (T)_list[index];
-
-				return (T)Convert.ChangeType(_list[index], typeof(T));
+					return (T)Convert.ChangeType(val, typeof(T));
+				}
 			}
 
 			throw new ArgumentOutOfRangeException(nameof(index));
@@ -406,7 +418,7 @@ namespace Tense.Rql
 		/// Adds a parameter to the list of parameters in an <see cref="RqlNode"/>.
 		/// </summary>
 		/// <param name="item">The parameter item to add.</param>
-		public void Add(object item)
+		public void Add(object? item)
 		{
 			_list.Add(item);
 		}
@@ -417,8 +429,11 @@ namespace Tense.Rql
 		/// </summary>
 		/// <param name="node">The <see cref="RqlNode"/> parameter item to add.</param>
 		/// <exception cref="RqlFormatException"></exception>
-		public void Add(RqlNode node)
+		public void Add(RqlNode? node)
         {
+			if (node == null)
+				return;
+
 			if (Operation == RqlOperation.SELECT)
 			{
 				if (node.Operation == RqlOperation.PROPERTY)
@@ -497,7 +512,7 @@ namespace Tense.Rql
 					else
 						throw new RqlFormatException("An AGGREGATE operation can contain only properties and SUM, MAX, MIN, MEAN and/or COUNT operations.");
 				}
-				else if (((RqlNode)_list[^1]).Operation == RqlOperation.PROPERTY)
+				else if (((RqlNode?)_list[^1]) != null && ((RqlNode?)_list[^1])?.Operation == RqlOperation.PROPERTY)
 				{
 					if (node.Operation == RqlOperation.PROPERTY)
 					{
@@ -628,17 +643,7 @@ namespace Tense.Rql
 								{
 									if (_list.Count > 1)
 										theString.Append('(');
-									bool First = true;
-
-									foreach (var item in _list)
-									{
-										if (First)
-											First = false;
-										else
-											theString.Append(',');
-
-										theString.Append(item);
-									}
+									theString.Append(string.Join(",", _list.Cast<string>()));
 									if (_list.Count > 1)
 										theString.Append(')');
 								}
@@ -657,12 +662,15 @@ namespace Tense.Rql
 										else
 											theString.Append(',');
 
-										if ((ulong)item <= int.MaxValue)
-											theString.Append($"{item}");
-										else if ((ulong)item <= long.MaxValue)
-											theString.Append($"{item}L");
-										else
-											theString.Append($"{item}UL");
+										if (item != null)
+										{
+											if ((ulong)item <= int.MaxValue)
+												theString.Append($"{item}");
+											else if ((ulong)item <= long.MaxValue)
+												theString.Append($"{item}L");
+											else
+												theString.Append($"{item}UL");
+										}
 									}
 									theString.Append(')');
 								}
@@ -674,21 +682,24 @@ namespace Tense.Rql
 									theString.Append('(');
 									bool First = true;
 
-									foreach (RqlNode sortProperty in _list)
+									foreach (RqlNode? sortProperty in _list.Cast<RqlNode?>())
 									{
 										if (First)
 											First = false;
 										else
 											theString.Append(',');
 
-										var prop = sortProperty.NonNullValue<RqlNode>(1);
-										if (sortProperty.NonNullValue<RqlSortOrder>(0) == RqlSortOrder.Ascending)
+										if (sortProperty != null)
 										{
-											theString.Append(ConvertValueToString(prop));
-										}
-										else
-										{
-											theString.Append($"-{ConvertValueToString(prop)}");
+											var prop = sortProperty.NonNullValue<RqlNode>(1);
+											if (sortProperty.NonNullValue<RqlSortOrder>(0) == RqlSortOrder.Ascending)
+											{
+												theString.Append(ConvertValueToString(prop));
+											}
+											else
+											{
+												theString.Append($"-{ConvertValueToString(prop)}");
+											}
 										}
 									}
 									theString.Append(')');
@@ -731,7 +742,7 @@ namespace Tense.Rql
 										else
 											theString.Append(',');
 
-										if (item.GetType() == typeof(RqlNode))
+										if (item?.GetType() == typeof(RqlNode))
 											theString.Append(((RqlNode)item).ToString(RqlFormat.Normalized));
 										else
 											theString.Append(ConvertValueToString(item));
@@ -745,51 +756,69 @@ namespace Tense.Rql
 								break;
 
 							case RqlOperation.EQ:
-								theString.Append("eq(");
-								theString.Append(_list[0].ToString());
-								theString.Append(',');
-								theString.Append(ConvertValueToString(_list[1]));
-								theString.Append(')');
+								{
+									var prop = _list[0];
+									theString.Append("eq(");
+                                    theString.Append(prop == null ? "null" : prop.ToString());
+                                    theString.Append(',');
+									theString.Append(ConvertValueToString(_list[1]));
+									theString.Append(')');
+								}
 								break;
 
 							case RqlOperation.NE:
-								theString.Append("ne(");
-								theString.Append(_list[0].ToString());
-								theString.Append(',');
-								theString.Append(ConvertValueToString(_list[1]));
-								theString.Append(')');
+								{
+									var prop = _list[0];
+									theString.Append("ne(");
+									theString.Append(prop == null ? "null" : prop.ToString());
+									theString.Append(',');
+									theString.Append(ConvertValueToString(_list[1]));
+									theString.Append(')');
+								}
 								break;
 
 							case RqlOperation.LE:
-								theString.Append("le(");
-								theString.Append(_list[0].ToString());
-								theString.Append(',');
-								theString.Append(ConvertValueToString(_list[1]));
-								theString.Append(')');
+								{
+									var prop = _list[0];
+									theString.Append("le(");
+                                    theString.Append(prop == null ? "null" : prop.ToString());
+                                    theString.Append(',');
+									theString.Append(ConvertValueToString(_list[1]));
+									theString.Append(')');
+								}
 								break;
 
 							case RqlOperation.LT:
-								theString.Append("lt(");
-								theString.Append(_list[0].ToString());
-								theString.Append(',');
-								theString.Append(ConvertValueToString(_list[1]));
-								theString.Append(')');
+								{
+									var prop = _list[0];
+									theString.Append("lt(");
+									theString.Append(prop == null ? "null" : prop.ToString());
+									theString.Append(',');
+									theString.Append(ConvertValueToString(_list[1]));
+									theString.Append(')');
+								}
 								break;
 
 							case RqlOperation.GE:
-								theString.Append("ge(");
-								theString.Append(_list[0].ToString());
-								theString.Append(',');
-								theString.Append(ConvertValueToString(_list[1]));
-								theString.Append(')');
+								{
+									var prop = _list[0];
+									theString.Append("ge(");
+                                    theString.Append(prop == null ? "null" : prop.ToString());
+                                    theString.Append(',');
+									theString.Append(ConvertValueToString(_list[1]));
+									theString.Append(')');
+								}
 								break;
 
 							case RqlOperation.GT:
-								theString.Append("gt(");
-								theString.Append(_list[0].ToString());
-								theString.Append(',');
-								theString.Append(ConvertValueToString(_list[1]));
-								theString.Append(')');
+								{
+									var prop = _list[0];
+									theString.Append("gt(");
+									theString.Append(prop == null ? "null" : prop.ToString());
+									theString.Append(',');
+									theString.Append(ConvertValueToString(_list[1]));
+									theString.Append(')');
+								}
 								break;
 
 							case RqlOperation.AND:
@@ -804,7 +833,7 @@ namespace Tense.Rql
 										else
 											theString.Append(',');
 
-										theString.Append(((RqlNode)item).ToString(RqlFormat.Normalized));
+										theString.Append(((RqlNode?)item)?.ToString(RqlFormat.Normalized));
 									}
 									theString.Append(')');
 								}
@@ -822,7 +851,7 @@ namespace Tense.Rql
 										else
 											theString.Append(',');
 
-										theString.Append(((RqlNode)item).ToString(RqlFormat.Normalized));
+										theString.Append(((RqlNode?)item)?.ToString(RqlFormat.Normalized));
 									}
 									theString.Append(')');
 								}
@@ -849,7 +878,7 @@ namespace Tense.Rql
 										else
 											theString.Append(',');
 
-										theString.Append(((RqlNode)item).ToString(RqlFormat.Normalized));
+										theString.Append(((RqlNode?)item)?.ToString(RqlFormat.Normalized));
 									}
 									theString.Append(')');
 								}
@@ -872,7 +901,7 @@ namespace Tense.Rql
 										else
 											theString.Append(',');
 
-										theString.Append(((RqlNode)item).ToString(RqlFormat.Normalized));
+										theString.Append(((RqlNode?)item)?.ToString(RqlFormat.Normalized));
 									}
 									theString.Append(')');
 								}
@@ -916,17 +945,7 @@ namespace Tense.Rql
 
 				case RqlOperation.PROPERTY:
 					{
-						bool First = true;
-
-						foreach (var item in _list)
-						{
-							if (First)
-								First = false;
-							else
-								theString.Append('/');
-
-							theString.Append(item);
-						}
+						theString.Append(string.Join("/", _list.Cast<string>()));
 					}
 					break;
 
@@ -943,12 +962,15 @@ namespace Tense.Rql
 							else
 								theString.Append(',');
 
-							if ((ulong)item <= int.MaxValue)
-								theString.Append($"{item}");
-							else if ((ulong)item <= long.MaxValue)
-								theString.Append($"{item}L");
-							else
-								theString.Append($"{item}UL");
+							if (item != null)
+							{
+								if ((ulong)item <= int.MaxValue)
+									theString.Append($"{item}");
+								else if ((ulong)item <= long.MaxValue)
+									theString.Append($"{item}L");
+								else
+									theString.Append($"{item}UL");
+							}
 						}
 						theString.Append(')');
 					}
@@ -960,16 +982,16 @@ namespace Tense.Rql
 						theString.Append('(');
 						bool First = true;
 
-						foreach (RqlNode sortProperty in _list)
+						foreach (RqlNode? sortProperty in _list.Cast<RqlNode?>())
 						{
 							if (First)
 								First = false;
 							else
 								theString.Append(',');
 
-							var prop = sortProperty.NonNullValue<RqlNode>(1);
+							var prop = sortProperty?.NonNullValue<RqlNode>(1);
 
-							if (sortProperty.NonNullValue<RqlSortOrder>(0) == RqlSortOrder.Ascending)
+							if (sortProperty?.NonNullValue<RqlSortOrder>(0) == RqlSortOrder.Ascending)
 							{
 								theString.Append(ConvertValueToString(prop));
 							}
@@ -1019,7 +1041,7 @@ namespace Tense.Rql
 							else
 								theString.Append(',');
 
-							if (item.GetType() == typeof(RqlNode))
+							if (item?.GetType() == typeof(RqlNode))
 								theString.Append(item.ToString());
 							else
 								theString.Append(ConvertValueToString(item));
@@ -1041,37 +1063,37 @@ namespace Tense.Rql
 					break;
 
 				case RqlOperation.EQ:
-					theString.Append(_list[0].ToString());
+					theString.Append(_list[0]?.ToString());
 					theString.Append('=');
 					theString.Append(ConvertValueToString(_list[1]));
 					break;
 
 				case RqlOperation.NE:
-					theString.Append(_list[0].ToString());
+					theString.Append(_list[0]?.ToString());
 					theString.Append("!=");
 					theString.Append(ConvertValueToString(_list[1]));
 					break;
 
 				case RqlOperation.LE:
-					theString.Append(_list[0].ToString());
+					theString.Append(_list[0]?.ToString());
 					theString.Append("<=");
 					theString.Append(ConvertValueToString(_list[1]));
 					break;
 
 				case RqlOperation.LT:
-					theString.Append(_list[0].ToString());
+					theString.Append(_list[0]?.ToString());
 					theString.Append('<');
 					theString.Append(ConvertValueToString(_list[1]));
 					break;
 
 				case RqlOperation.GE:
-					theString.Append(_list[0].ToString());
+					theString.Append(_list[0]?.ToString());
 					theString.Append(">=");
 					theString.Append(ConvertValueToString(_list[1]));
 					break;
 
 				case RqlOperation.GT:
-					theString.Append(_list[0].ToString());
+					theString.Append(_list[0]?.ToString());
 					theString.Append('>');
 					theString.Append(ConvertValueToString(_list[1]));
 					break;
@@ -1137,7 +1159,7 @@ namespace Tense.Rql
 									theString.Append(rqlItem.ToString());
 							}
 							else
-								theString.Append(item.ToString());
+								theString.Append(item?.ToString());
 						}
 					}
 					break;
@@ -1155,7 +1177,7 @@ namespace Tense.Rql
 							else
 								theString.Append(',');
 
-							theString.Append(item.ToString());
+							theString.Append(item?.ToString());
 						}
 						theString.Append(')');
 					}
@@ -1178,7 +1200,7 @@ namespace Tense.Rql
 							else
 								theString.Append(',');
 
-							theString.Append(item.ToString());
+							theString.Append(item?.ToString());
 						}
 						theString.Append(')');
 					}
@@ -1197,7 +1219,7 @@ namespace Tense.Rql
 							else
 								theString.Append(',');
 
-							theString.Append(item.ToString());
+							theString.Append(item?.ToString());
 						}
 						theString.Append(')');
 					}
@@ -1259,9 +1281,10 @@ namespace Tense.Rql
 				case RqlOperation.AND:
 				case RqlOperation.OR:
 				case RqlOperation.AGGREGATE:
-					foreach (RqlNode child in _list)
+					foreach (RqlNode? child in _list.Cast<RqlNode?>())
 					{
-						answer |= child.Contains(memberName);
+						if ( child != null )
+							answer |= child.Contains(memberName);
 					}
 					break;
 
@@ -1332,11 +1355,12 @@ namespace Tense.Rql
 			{
 				case RqlOperation.AND:
 				case RqlOperation.OR:
-					foreach (RqlNode child in _list)
+					foreach (RqlNode? child in _list.Cast<RqlNode?>())
 					{
 						try
 						{
-							answer |= child.Contains(op, member);
+							if ( child != null )
+								answer |= child.Contains(op, member);
 						}
 						catch (InvalidOperationException)
 						{
@@ -1347,15 +1371,15 @@ namespace Tense.Rql
 				case RqlOperation.AGGREGATE:
 					if (op == RqlOperation.AGGREGATE)
 					{
-						foreach ( RqlNode child in _list )
+						foreach ( RqlNode? child in _list.Cast<RqlNode?>())
 						{
-							if (child.Operation == RqlOperation.PROPERTY)
+							if (child?.Operation == RqlOperation.PROPERTY)
 							{
 								answer |= child.Equals(member);
                            }
 							else
 							{
-								var cnode = child.Value<RqlNode>(0);
+								var cnode = child?.Value<RqlNode>(0);
 								if ( cnode != null )
 									answer |= cnode.Equals(member);
 							}
@@ -1363,11 +1387,12 @@ namespace Tense.Rql
 					}
 					else
 					{
-						foreach (RqlNode child in _list)
+						foreach (RqlNode? child in _list.Cast<RqlNode?>())
 						{
 							try
 							{
-								answer |= child.Contains(op, member);
+								if ( child != null )
+									answer |= child.Contains(op, member);
 							}
 							catch (InvalidOperationException)
 							{
@@ -1466,6 +1491,23 @@ namespace Tense.Rql
         }
 
 		/// <summary>
+		/// Find the node that references a property
+		/// </summary>
+		/// <param name="op">The operation to search for</param>
+		/// <param name="property">The referenced property</param>
+		/// <returns></returns>
+		public RqlNode? Find(RqlOperation op, string property)
+		{
+			var node = new RqlNode(RqlOperation.PROPERTY);
+			var properties = property.Split(new char[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
+
+			foreach (var v in properties)
+				node.Add(v);
+
+			return Find(op, node);
+		}
+
+		/// <summary>
 		/// Finds the first <see cref="RqlNode"/> of a certain operation that references a certian member
 		/// </summary>
 		/// <param name="op">The operation to search for</param>
@@ -1473,36 +1515,44 @@ namespace Tense.Rql
 		/// <returns>The property node if found; otherwise, <see langword="null"/></returns>
 		public RqlNode? Find(RqlOperation op, RqlNode member)
         {
-			var firstNode = Value<RqlNode>(0);
+			RqlNode? foundNode;
+			if (Operation == RqlOperation.AND)
+            {
+                foreach (RqlNode? childNode in _list.Cast<RqlNode?>())
+                {
+					foundNode = childNode?.Find(op, member);
 
-			if (firstNode != null)
-			{
-				if (this.Operation == op && firstNode.IsEqualProperty(member))
+					if (foundNode != null)
+						return foundNode;
+                }
+            }
+            else if (Operation == RqlOperation.OR)
+            {
+                foreach (RqlNode? childNode in _list.Cast<RqlNode?>())
 				{
+                    foundNode = childNode?.Find(op, member);
+
+                    if (foundNode != null)
+                        return foundNode;
+                }
+            }
+            else if (Operation == op)
+            {
+				var propertyNode = this.NonNullValue<RqlNode>(0);
+
+				if (propertyNode.IsEqualProperty(member))
 					return this;
-				}
-			}
+            }
 
-			foreach (var child in _list)
-			{
-				if (child is RqlNode childnode)
-				{
-					var result = childnode.Find(op, member);
+            return null;
+        }
 
-					if (result != null)
-						return result;
-				}
-			}
-
-			return null;
-		}
-
-		/// <summary>
-		/// Returns a collection of RQL Nodes of a specified type
-		/// </summary>
-		/// <param name="op">The <see cref="RqlOperation"/> of the node list</param>
-		/// <returns></returns>
-		public List<RqlNode> FindAll(RqlOperation op)
+        /// <summary>
+        /// Returns a collection of RQL Nodes of a specified type
+        /// </summary>
+        /// <param name="op">The <see cref="RqlOperation"/> of the node list</param>
+        /// <returns></returns>
+        public List<RqlNode> FindAll(RqlOperation op)
 		{
 			var theList = new List<RqlNode>();
 
@@ -1565,12 +1615,16 @@ namespace Tense.Rql
 				}
 				else if (_list.Count == 1)
 				{
-					var node = (RqlNode)_list[0];
+					var node = (RqlNode?)_list[0];
 
 					_list.Clear();
-					Operation = node.Operation;
-					foreach (var childNode in node)
-						_list.Add(childNode);
+
+					if (node != null)
+					{
+						Operation = node.Operation;
+						foreach (var childNode in node)
+							_list.Add(childNode);
+					}
 				}
 			}
 		}
@@ -1597,7 +1651,7 @@ namespace Tense.Rql
 				switch (Operation)
 				{
 					case RqlOperation.PROPERTY:
-						foreach (string member in source)
+						foreach (string? member in source)
 							Add(member);
 						break;
 
@@ -1610,7 +1664,7 @@ namespace Tense.Rql
 					case RqlOperation.OR:
 					case RqlOperation.SELECT:
 					case RqlOperation.SORT:
-						foreach (RqlNode child in source)
+						foreach (RqlNode? child in source)
 							Add(Copy(child));
 						break;
 
@@ -1669,7 +1723,7 @@ namespace Tense.Rql
 		/// <returns>A new <see cref="RqlNode"/> with the same value as node.</returns>
 		/// <exception cref="ArgumentNullException">Throws a <see cref="ArgumentNullException"/> if node is null.</exception>
 		/// <exception cref="FormatException">Throws a <see cref="FormatException"/> if the node is improperly formed.</exception>
-		public static RqlNode Copy(RqlNode node)
+		public static RqlNode Copy(RqlNode? node)
 		{
 			if (node == null)
 				throw new ArgumentNullException(nameof(node));
@@ -1679,7 +1733,7 @@ namespace Tense.Rql
 			switch (node.Operation)
 			{
 				case RqlOperation.PROPERTY:
-					foreach (string member in node)
+					foreach (string? member in node)
 						newNode.Add(member);
 					break;
 
@@ -1719,7 +1773,7 @@ namespace Tense.Rql
 				case RqlOperation.AND:
 				case RqlOperation.OR:
 				case RqlOperation.VALUES:
-					foreach (RqlNode child in node)
+					foreach (RqlNode? child in node)
 					{
 						newNode.Add(Copy(child));
 					}
@@ -1762,8 +1816,11 @@ namespace Tense.Rql
 		/// will be consolidated into a single node during the merge.
 		/// </summary>
 		/// <param name="source">The source <see cref="RqlNode"/> to merge.</param>
-		public RqlNode Merge(RqlNode source)
+		public RqlNode Merge(RqlNode? source)
 		{
+			if (source == null)
+				return this;
+
 			if (source.Operation == RqlOperation.NOOP)
 				return this;
 
@@ -1791,9 +1848,9 @@ namespace Tense.Rql
 					case RqlOperation.AND:
 						if (Operation == RqlOperation.AND)
 						{
-							foreach (RqlNode child in source)
+							foreach (RqlNode? child in source)
 							{
-								if (child.Operation != RqlOperation.NOOP)
+								if (child?.Operation != RqlOperation.NOOP)
 									Merge(child);
 							}
 						}
@@ -1807,9 +1864,9 @@ namespace Tense.Rql
 							if (childNode.Operation != RqlOperation.NOOP)
 								Add(childNode);
 
-							foreach (RqlNode child in source)
+							foreach (RqlNode? child in source)
 							{
-								if (child.Operation != RqlOperation.NOOP)
+								if (child?.Operation != RqlOperation.NOOP)
 									Merge(child);
 							}
 						}
@@ -1818,9 +1875,9 @@ namespace Tense.Rql
 					case RqlOperation.OR:
 						if (Operation == RqlOperation.OR)
 						{
-							foreach (RqlNode child in source)
+							foreach (RqlNode? child in source)
 							{
-								if (child.Operation != RqlOperation.NOOP)
+								if (child?.Operation != RqlOperation.NOOP)
 									Merge(child);
 							}
 						}
@@ -1834,9 +1891,9 @@ namespace Tense.Rql
 							if (childNode.Operation != RqlOperation.NOOP)
 								Add(childNode);
 
-							foreach (RqlNode child in source)
+							foreach (RqlNode? child in source)
 							{
-								if (child.Operation != RqlOperation.NOOP)
+								if (child?.Operation != RqlOperation.NOOP)
 									Merge(child);
 							}
 						}
@@ -1880,12 +1937,12 @@ namespace Tense.Rql
 
 				if (nonConditionals.Operation == RqlOperation.AND)
 				{
-					foreach (RqlNode child in nonConditionals)
+					foreach (RqlNode? child in nonConditionals)
 						Add(Copy(child));
 				}
 				else if (nonConditionals.Operation == RqlOperation.OR)
 				{
-					foreach (RqlNode child in nonConditionals)
+					foreach (RqlNode? child in nonConditionals)
 						Add(Copy(child));
 				}
 				else
@@ -1912,10 +1969,10 @@ namespace Tense.Rql
 			if (string.IsNullOrWhiteSpace(propertyName))
 				throw new ArgumentNullException(nameof(propertyName));
 
-			foreach (RqlNode childProperty in _list)
+			foreach (RqlNode? childProperty in _list.Cast<RqlNode?>())
 			{
 				var parts = propertyName.Split('/');
-				if (childProperty.Count >= parts.Length)
+				if (childProperty?.Count >= parts.Length)
 				{
 					bool referencedNode = true;
 
@@ -1953,16 +2010,18 @@ namespace Tense.Rql
 			switch (Operation)
 			{
 				case RqlOperation.AND:
-					foreach (RqlNode child in _list)
+					foreach (RqlNode? child in _list.Cast<RqlNode?>())
 					{
-						answer |= child.References(property, caseInsensitive);
+						if ( child != null )
+							answer |= child.References(property, caseInsensitive);
 					}
 					break;
 
 				case RqlOperation.OR:
-					foreach (RqlNode child in _list)
+					foreach (RqlNode? child in _list.Cast<RqlNode?>())
 					{
-						answer |= child.References(property, caseInsensitive);
+						if ( child != null)
+							answer |= child.References(property, caseInsensitive);
 					}
 					break;
 
@@ -2004,9 +2063,9 @@ namespace Tense.Rql
 					}
 
 				case RqlOperation.AGGREGATE:
-					foreach (RqlNode child in _list)
+					foreach (RqlNode? child in _list.Cast<RqlNode?>())
 					{
-						if (child.Operation == RqlOperation.PROPERTY)
+						if (child?.Operation == RqlOperation.PROPERTY)
 						{
 							var childProperty = NonNullValue<RqlNode>(0);
 							var result = true;
@@ -2029,18 +2088,19 @@ namespace Tense.Rql
 						}
 						else
 						{
-							answer |= child.References(property, caseInsensitive);
+							if ( child != null )
+								answer |= child.References(property, caseInsensitive);
 						}
 					}
 					break;
 
 				case RqlOperation.SELECT:
 					{
-						foreach (RqlNode childProperty in _list)
+						foreach (RqlNode? childProperty in _list.Cast<RqlNode?>())
 						{
 							var result = true;
 
-							if ( childProperty.Count >= property.Count)
+							if ( childProperty?.Count >= property.Count)
                             {
 								for (int i = 0; i < property.Count && result; i++)
 								{
@@ -2114,7 +2174,7 @@ namespace Tense.Rql
 		/// Returns an enumerator that iterates through the list of parameters of the <see cref="RqlNode"/>.
 		/// </summary>
 		/// <returns>A <see cref="List{Object}.Enumerator"/> for the <see cref="RqlNode"/></returns>
-		public List<Object>.Enumerator GetEnumerator()
+		public List<Object?>.Enumerator GetEnumerator()
 		{
 			return _list.GetEnumerator();
 		}
@@ -2123,100 +2183,195 @@ namespace Tense.Rql
 		/// Extracts the list of properties used by any aggregate functions
 		/// </summary>
 		/// <returns></returns>
-		public RqlNode ExtractValueField()
+		public RqlNode? ExtractValueField()
 		{
 			return ExtractValueField(this);
 		}
 
-		/// <summary>
-		/// Removes the First node that is of <see cref="RqlOperation"/> from the current <see cref="RqlNode"/>.
-		/// </summary>
-		/// <param name="op">The <see cref="RqlOperation"/> of the node to remove</param>
-		/// <returns>The removed <see cref="RqlNode"/>, or <see langword="null"/> if none was found.</returns>
-		public RqlNode? Remove(RqlOperation op)
-		{
-			RqlNode? removedNode = null;
+        /// <summary>
+        /// Removes the First node that is of <see cref="RqlOperation"/> from the current <see cref="RqlNode"/>.
+        /// </summary>
+        /// <param name="op">The <see cref="RqlOperation"/> of the node to remove</param>
+        /// <returns>The removed <see cref="RqlNode"/>, or <see langword="null"/> if none was found.</returns>
+        public RqlNode? Remove(RqlOperation op)
+        {
+            RqlNode? removedNode = null;
 
-			if (Operation == RqlOperation.AND)
-			{
-				var newList = new List<object>();
+            if (Operation == RqlOperation.AND)
+            {
+                var newList = new List<object?>();
 
-				foreach (RqlNode childNode in _list)
-				{
-					var xnode = childNode.Remove(op);
+                foreach (RqlNode? childNode in _list.Cast<RqlNode?>())
+                {
+                    var xnode = childNode?.Remove(op);
 
-					if (xnode == null)
-						newList.Add(childNode);
-					else
-						removedNode = xnode;
-				}
+                    if (xnode == null)
+                        newList.Add(childNode);
+                    else
+                        removedNode = xnode;
+                }
 
-				_list.Clear();
+                _list.Clear();
 
-				if (newList.Count == 0)
-				{
-					Operation = RqlOperation.NOOP;
-				}
-				else if (newList.Count == 1)
-				{
-					var child = (RqlNode)newList[0];
+                if (newList.Count == 0)
+                {
+                    Operation = RqlOperation.NOOP;
+                }
+                else if (newList.Count == 1)
+                {
+                    var child = (RqlNode?)newList[0];
 
-					Operation = child.Operation;
-					_list.AddRange(child._list);
-				}
-				else
-				{
-					_list.AddRange(newList);
-				}
-			}
-			else if (Operation == RqlOperation.OR)
-			{
-				var newList = new List<object>();
+					if (child != null)
+					{
+						Operation = child.Operation;
+						_list.AddRange(child._list);
+					}
+                }
+                else
+                {
+                    _list.AddRange(newList);
+                }
+            }
+            else if (Operation == RqlOperation.OR)
+            {
+                var newList = new List<object?>();
 
-				foreach (RqlNode childNode in _list)
-				{
-					var xnode = childNode.Remove(op);
+                foreach (RqlNode? childNode in _list.Cast<RqlNode?>())
+                {
+                    var xnode = childNode?.Remove(op);
 
-					if (xnode == null)
-						newList.Add(childNode);
-					else
-						removedNode = xnode;
-				}
+                    if (xnode == null)
+                        newList.Add(childNode);
+                    else
+                        removedNode = xnode;
+                }
 
-				_list.Clear();
+                _list.Clear();
 
-				if (newList.Count == 0)
-				{
-					Operation = RqlOperation.NOOP;
-				}
-				else if (newList.Count == 1)
-				{
-					var child = (RqlNode)newList[0];
+                if (newList.Count == 0)
+                {
+                    Operation = RqlOperation.NOOP;
+                }
+                else if (newList.Count == 1)
+                {
+                    var child = (RqlNode?)newList[0];
 
-					Operation = child.Operation;
-					_list.AddRange(child._list);
-				}
-				else
-				{
-					_list.AddRange(newList);
-				}
-			}
-			else if (Operation == op)
-			{
-				removedNode = Copy(this);
-				this.Operation = RqlOperation.NOOP;
-				this._list.Clear();
-			}
+					if (child != null)
+					{
+						Operation = child.Operation;
+						_list.AddRange(child._list);
+					}
+                }
+                else
+                {
+                    _list.AddRange(newList);
+                }
+            }
+            else if (Operation == op)
+            {
+                removedNode = Copy(this);
+                this.Operation = RqlOperation.NOOP;
+                this._list.Clear();
+            }
 
-			return removedNode;
-		}
+            return removedNode;
+        }
 
-		/// <summary>
-		/// Determines whether the specified object is equal ot the current object
-		/// </summary>
-		/// <param name="obj">The object to compare with the current object.</param>
-		/// <returns><see langword="true"/> if the specified object is equal to the current object; <see langword="false"/> otherwise.</returns>
-		public override bool Equals(object obj)
+        /// <summary>
+        /// Removes the given node from the current <see cref="RqlNode"/>.
+        /// </summary>
+        /// <param name="node">The <see cref="RqlNode"/> to remove</param>
+        /// <returns>The removed <see cref="RqlNode"/>, or <see langword="null"/> if none was found.</returns>
+        public RqlNode? Remove(RqlNode node)
+        {
+            RqlNode? removedNode = null;
+
+            if (Operation == RqlOperation.AND)
+            {
+                var newList = new List<object?>();
+
+                foreach (RqlNode? childNode in _list.Cast<RqlNode?>())
+                {
+                    var xnode = childNode?.Remove(node);
+
+                    if (xnode == null)
+                        newList.Add(childNode);
+                    else
+                        removedNode = xnode;
+                }
+
+                _list.Clear();
+
+                if (newList.Count == 0)
+                {
+                    Operation = RqlOperation.NOOP;
+                }
+                else if (newList.Count == 1)
+                {
+                    var child = (RqlNode?)newList[0];
+
+					if (child != null)
+					{
+						Operation = child.Operation;
+						_list.AddRange(child._list);
+					}
+                }
+                else
+                {
+                    _list.AddRange(newList);
+                }
+            }
+            else if (Operation == RqlOperation.OR)
+            {
+                var newList = new List<object?>();
+
+                foreach (RqlNode? childNode in _list.Cast<RqlNode?>())
+                {
+                    var xnode = childNode?.Remove(node);
+
+                    if (xnode == null)
+                        newList.Add(childNode);
+                    else
+                        removedNode = xnode;
+                }
+
+                _list.Clear();
+
+                if (newList.Count == 0)
+                {
+                    Operation = RqlOperation.NOOP;
+                }
+                else if (newList.Count == 1)
+                {
+                    var child = (RqlNode?)newList[0];
+
+					if (child != null)
+					{
+						Operation = child.Operation;
+						_list.AddRange(child._list);
+					}
+                }
+                else
+                {
+                    _list.AddRange(newList);
+                }
+            }
+            else if (node.Equals(this))
+            {
+                removedNode = Copy(this);
+                this.Operation = RqlOperation.NOOP;
+                this._list.Clear();
+            }
+
+            return removedNode;
+        }
+
+        /// <summary>
+        /// Determines whether the specified object is equal ot the current object
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><see langword="true"/> if the specified object is equal to the current object; <see langword="false"/> otherwise.</returns>
+        public override bool Equals(object obj)
 		{
 			if (obj == null)
 				return false;
@@ -2234,13 +2389,22 @@ namespace Tense.Rql
 
 					for (int i = 0; i < Count; i++)
 					{
-						if (_list[i].GetType() == typeof(string) && candidate[i].GetType() == typeof(string))
+						if (_list[i]?.GetType() == typeof(string) && candidate[i]?.GetType() == typeof(string))
 						{
-							answer &= string.Equals(_list[i].ToString(), candidate[i].ToString(), StringComparison.OrdinalIgnoreCase);
+							answer &= string.Equals(_list[i]?.ToString(), candidate[i]?.ToString(), StringComparison.OrdinalIgnoreCase);
 						}
 						else
 						{
-							answer &= _list[i].Equals(candidate[i]);
+							if (_list[i] != null && candidate[i] != null)
+							{
+								var node1 = _list[i];
+
+								if (node1 != null)
+								{
+									var node2 = candidate[i];
+									answer &= node1.Equals(node2);
+								}
+							}
 						}
 					}
 
@@ -2289,21 +2453,9 @@ namespace Tense.Rql
         {
             get
             {
-				if ( this.Operation == RqlOperation.PROPERTY)
+				if ( Operation == RqlOperation.PROPERTY)
                 {
-					StringBuilder propertyName = new();
-					bool first = true;
-					foreach ( var val in _list)
-                    {
-						if (first)
-							first = false;
-						else
-							propertyName.Append('/');
-
-						propertyName.Append(val.ToString());
-                    }
-
-					return propertyName.ToString();
+					return string.Join("/", _list.Cast<string>());
                 }
 
 				throw new InvalidOperationException("Property names can only be extracted from property nodes.");
@@ -2361,7 +2513,7 @@ namespace Tense.Rql
 		/// Extracts the list of properties used by any aggregate functions
 		/// </summary>
 		/// <returns></returns>
-		public RqlNode ExtractAggregateFields()
+		public RqlNode? ExtractAggregateFields()
 		{
 			return ExtractAggregateFields(this);
 		}
@@ -2372,20 +2524,24 @@ namespace Tense.Rql
 		/// </summary>
 		/// <param name="node"></param>
 		/// <returns></returns>
-		private RqlNode ExtractAggregateFields(RqlNode node)
+		private RqlNode? ExtractAggregateFields(RqlNode? node)
 		{
+			if (node == null)
+				return null;
+
 			var resultNode = new RqlNode(RqlOperation.SELECT);
 
 			switch (node.Operation)
 			{
 				case RqlOperation.AND:
 				case RqlOperation.OR:
-					foreach (RqlNode childnode in node)
+					foreach (RqlNode? childnode in node)
 					{
 						var agg = ExtractAggregateFields(childnode);
 
-						foreach (var child in agg)
-							resultNode.Add(child);
+						if ( agg != null)
+							foreach (var child in agg)
+								resultNode.Add(child);
 					}
 					break;
 
@@ -2393,24 +2549,24 @@ namespace Tense.Rql
 				case RqlOperation.MIN:
 				case RqlOperation.SUM:
 				case RqlOperation.MEAN:
-					resultNode.Add((RqlNode)node[0]);
+					resultNode.Add((RqlNode?)node[0]);
 					break;
 
 				case RqlOperation.COUNT:
 					if (node.Count > 0)
-						resultNode.Add((RqlNode)node[0]);
+						resultNode.Add((RqlNode?)node[0]);
 					break;
 
 				case RqlOperation.AGGREGATE:
-					foreach (RqlNode childNode in node)
+					foreach (RqlNode? childNode in node)
 					{
-						if (childNode.Operation == RqlOperation.PROPERTY)
+						if (childNode?.Operation == RqlOperation.PROPERTY)
 						{
 							resultNode.Add(childNode);
 						}
 						else
 						{
-							resultNode.Add((RqlNode)childNode[0]);
+							resultNode.Add((RqlNode?)childNode?[0]);
 						}
 					}
 					break;
@@ -2424,7 +2580,7 @@ namespace Tense.Rql
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        private static string ConvertValueToString(object value)
+        private static string ConvertValueToString(object? value)
 		{
 			if (value == null)
 			{
@@ -2485,18 +2641,23 @@ namespace Tense.Rql
 
 			if (Operation == RqlOperation.PROPERTY)
 			{
-				if (Count == member.Count)
+				if (member.Operation == RqlOperation.PROPERTY)
 				{
-					for (int i = 0; i < Count; i++)
+					if (Count == member.Count)
 					{
-						if (!string.Equals(Value<string>(i), member.Value<string>(i), StringComparison.OrdinalIgnoreCase))
+						for (int i = 0; i < Count; i++)
 						{
-							areEqual = false;
+							if (!string.Equals(Value<string>(i), member.Value<string>(i), StringComparison.OrdinalIgnoreCase))
+							{
+								areEqual = false;
+							}
 						}
 					}
+					else
+						areEqual = false;
 				}
 				else
-					areEqual = false;
+					areEqual= false;
 			}
 			else
 				areEqual = false;
@@ -2512,14 +2673,15 @@ namespace Tense.Rql
 			{
 				case RqlOperation.AND:
 					{
-						var newList = new List<object>();
+						var newList = new List<object?>();
 
-						foreach (RqlNode child in _list)
+						foreach (RqlNode? child in _list.Cast<RqlNode?>())
 						{
-							var s1 = child.ExtractNonConditional();
+							var s1 = child?.ExtractNonConditional();
 
-							if (child.Operation != RqlOperation.NOOP)
-								newList.Add(child);
+							if (child != null)
+								if (child?.Operation != RqlOperation.NOOP)
+									newList.Add(child);
 
 							if (s1 != null)
 							{
@@ -2563,13 +2725,13 @@ namespace Tense.Rql
 
 				case RqlOperation.OR:
 					{
-						var newList = new List<object>();
+						var newList = new List<object?>();
 
-						foreach (RqlNode child in _list)
+						foreach (RqlNode? child in _list.Cast<RqlNode?>())
 						{
-							var s1 = child.ExtractNonConditional();
+							var s1 = child?.ExtractNonConditional();
 
-							if (child.Operation != RqlOperation.NOOP)
+							if (child?.Operation != RqlOperation.NOOP)
 								newList.Add(child);
 
 							if (s1 != null)
@@ -2639,7 +2801,8 @@ namespace Tense.Rql
 
 			return staticNode;
 		}
-		private void MergeNonConditionals(RqlNode source)
+
+		private void MergeNonConditionals(RqlNode? source)
 		{
 			if (source == null)
 				return;
@@ -2654,7 +2817,7 @@ namespace Tense.Rql
 					case RqlOperation.AND:
 						if (Operation == RqlOperation.AND)
 						{
-							foreach (RqlNode child in source)
+							foreach (RqlNode? child in source)
 							{
 								MergeNonConditionals(Copy(child));
 							}
@@ -2666,7 +2829,7 @@ namespace Tense.Rql
 							_list.Clear();
 							Add(childNode);
 
-							foreach (RqlNode child in source)
+							foreach (RqlNode? child in source)
 							{
 								MergeNonConditionals(Copy(child));
 							}
@@ -2676,7 +2839,7 @@ namespace Tense.Rql
 					case RqlOperation.OR:
 						if (Operation == RqlOperation.OR)
 						{
-							foreach (RqlNode child in source)
+							foreach (RqlNode? child in source)
 							{
 								MergeNonConditionals(Copy(child));
 							}
@@ -2688,7 +2851,7 @@ namespace Tense.Rql
 							_list.Clear();
 							Add(childNode);
 
-							foreach (RqlNode child in source)
+							foreach (RqlNode? child in source)
 							{
 								MergeNonConditionals(Copy(child));
 							}
@@ -3020,9 +3183,12 @@ namespace Tense.Rql
 		/// <param name="source">The source <see cref="RqlNode"/> to purge</param>
 		/// <param name="caseInsensitive">If <see langword="true"/> then searchs for properties do not take case into consideration; if <see langword="false"/> they do.</param>
 		/// <returns>The source <see cref="RqlNode"/> purged of conflicting elements</returns>
-		private RqlNode? Purge(RqlNode source, bool caseInsensitive)
+		private RqlNode? Purge(RqlNode? source, bool caseInsensitive)
 		{
 			RqlNode? result = null;
+
+			if (source == null)
+				return result;
 
 			switch (source.Operation)
 			{
@@ -3030,7 +3196,7 @@ namespace Tense.Rql
 					{
 						result = new RqlNode(RqlOperation.AND);
 
-						foreach (RqlNode node in source)
+						foreach (RqlNode? node in source)
 						{
 							var childNode = Purge(node, caseInsensitive);
 
@@ -3049,7 +3215,7 @@ namespace Tense.Rql
 					{
 						result = new RqlNode(RqlOperation.OR);
 
-						foreach (RqlNode node in source)
+						foreach (RqlNode? node in source)
 						{
 							var childNode = Purge(node, caseInsensitive);
 
@@ -3133,15 +3299,17 @@ namespace Tense.Rql
 			return result;
 		}
 
-		internal RqlNode ExtractValueField(RqlNode node)
+		internal RqlNode? ExtractValueField(RqlNode? node)
 		{
+			if (node == null) return null;
+
 			var resultNode = new RqlNode(RqlOperation.SELECT);
 
 			switch (node.Operation)
 			{
 				case RqlOperation.AND:
 				case RqlOperation.OR:
-					foreach (RqlNode childnode in node)
+					foreach (RqlNode? childnode in node)
 					{
 						var selectNode = ExtractValueField(childnode);
 						if (selectNode != null)

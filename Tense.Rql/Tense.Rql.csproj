@@ -10,7 +10,7 @@
 	  <Description>A library to add RQL support to RESTful Web Services</Description>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <RepositoryUrl>https://github.com/mzuniga58/Tense.Rql</RepositoryUrl>
-	  <Version>0.0.12-alpha</Version>
+	  <Version>0.0.14-alpha</Version>
 	  <PackageReleaseNotes>Pre-release. DO NOT USE.</PackageReleaseNotes>
 	  <PackageId>Tense.Rql</PackageId>
 	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -27,11 +27,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="11.0.1" />
+    <PackageReference Include="AutoMapper" Version="12.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
-    <PackageReference Include="Tense" Version="0.0.4-alpha" />
+    <PackageReference Include="Tense" Version="0.0.6-alpha" />
   </ItemGroup>
 
 	<ItemGroup>
@@ -42,7 +42,7 @@
 		<None Include="Resources\ico64.png" Pack="true" PackagePath="\" />
 		<None Include="Resources\MZ.ico" Pack="true" PackagePath="\" />
 	</ItemGroup>
-	
+
 	<ItemGroup>
     <Compile Update="Resources\Resources.Designer.cs">
       <DesignTime>True</DesignTime>

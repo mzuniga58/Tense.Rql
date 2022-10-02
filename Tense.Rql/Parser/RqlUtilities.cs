@@ -16,16 +16,16 @@ namespace Tense.Rql
 			{
 				if (node.Operation == RqlOperation.AND)
 				{
-					foreach (RqlNode child in node)
+					foreach (RqlNode? child in node)
 					{
-						theList.AddRange(child.ExtractKeyList());
+						theList.AddRange(child?.ExtractKeyList());
 					}
 				}
 				else if (node.Operation == RqlOperation.OR)
 				{
-					foreach (RqlNode child in node)
+					foreach (RqlNode? child in node)
 					{
-						theList.AddRange(child.ExtractKeyList());
+						theList.AddRange(child?.ExtractKeyList());
 					}
 				}
 				else if (node.Operation == RqlOperation.EQ)

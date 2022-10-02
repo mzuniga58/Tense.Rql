@@ -52,7 +52,7 @@ namespace Tense.Rql
 		/// <returns></returns>
 		public IEnumerable<string> TranslateMemberR2E(Type TResource, string resourceMember)
 		{
-			var entityAttribute = TResource.GetCustomAttribute<EntityAttribute>();
+			var entityAttribute = TResource.GetCustomAttribute<EntityAttribute?>();
 
 			if (entityAttribute != null)
 			{
@@ -91,8 +91,11 @@ namespace Tense.Rql
         /// <param name="entityMember">The entity member</param>
         /// <param name="originalValue">The original resource value</param>
         /// <returns></returns>
-        public object TranslateValueR2E<TResource>(RqlNode resourceMember, string entityMember, object originalValue)
+        public object? TranslateValueR2E<TResource>(RqlNode resourceMember, string entityMember, object? originalValue)
 		{
+			if (originalValue == null)
+				return originalValue;
+
 			if (typeof(TResource).GetCustomAttribute<EntityAttribute>() is not null)
 			{
 				if (GetInstance<TResource>() is TResource resource)
@@ -130,7 +133,7 @@ namespace Tense.Rql
 		/// <typeparam name="TResource">The domain type</typeparam>
 		/// <param name="queryString">The query string</param>
 		/// <returns></returns>
-		public RqlNode TranslateQueryStringR2E<TResource>(string? queryString)
+		public RqlNode? TranslateQueryStringR2E<TResource>(string? queryString)
 		{
 			return TranslateQueryR2E<TResource>(RqlParser.Parse(queryString));
 		}
@@ -143,7 +146,7 @@ namespace Tense.Rql
 		/// <typeparam name="TResource">The Resource type</typeparam>
 		/// <param name="request">The <see cref="HttpRequestMessage"/> that contains the query string.</param>
 		/// <returns></returns>
-		public RqlNode TranslateQueryStringR2E<TResource>(HttpRequestMessage request)
+		public RqlNode? TranslateQueryStringR2E<TResource>(HttpRequestMessage request)
 		{
 			var queryString = HttpUtility.UrlDecode(request.RequestUri.Query);
 			return TranslateQueryR2E<TResource>(RqlParser.Parse(queryString));
@@ -155,7 +158,7 @@ namespace Tense.Rql
 		/// <typeparam name="TResource">The Resource type</typeparam>
 		/// <param name="rqlStatement">The RQL Statement to translate.</param>
 		/// <returns></returns>
-		public RqlNode TranslateRQLR2E<TResource>(string rqlStatement)
+		public RqlNode? TranslateRQLR2E<TResource>(string rqlStatement)
 		{
 			var queryString = HttpUtility.UrlDecode(rqlStatement);
 			return TranslateQueryR2E<TResource>(RqlParser.Parse(queryString));
@@ -167,8 +170,11 @@ namespace Tense.Rql
 		/// <typeparam name="TResource">The Resource Type</typeparam>
 		/// <param name="node">The <see cref="RqlNode"/> that represents the query</param>
 		/// <returns></returns>
-		public RqlNode TranslateQueryR2E<TResource>(RqlNode node)
+		public RqlNode? TranslateQueryR2E<TResource>(RqlNode? node)
 		{
+			if (node == null)
+				return node;
+
 			if (node.Operation == RqlOperation.NOOP)
 				return node;
 
@@ -237,14 +243,14 @@ namespace Tense.Rql
 										if (result.NonNullValue<RqlNode>(0).Count == 1)
 										{
 											var destinationMember = destinationMembers.ToList()[0];
-											var objectValue = node.NonNullValue<object>(1);
+											var objectValue = node.Value<object>(1);
 											var value = TranslateValueR2E<TResource>(subNode, destinationMember, objectValue);
 
 											result.Add(value);
 										}
 										else if (result.NonNullValue<RqlNode>(0).Count == subNode.Count)
 										{
-											var objectValue = node.NonNullValue<object>(1);
+											var objectValue = node.Value<object>(1);
 											result.Add(objectValue);
 										}
 									}
@@ -300,12 +306,12 @@ namespace Tense.Rql
 						{
 							result = new RqlNode(RqlOperation.SORT);
 
-							foreach (RqlNode member in node)
+							foreach (RqlNode? member in node)
 							{
 								var newMember = new RqlNode(RqlOperation.SORTPROPERTY);
-								newMember.Add(member.NonNullValue<RqlSortOrder>(0));
+								newMember.Add(member?.NonNullValue<RqlSortOrder>(0));
 
-								if (TranslateQueryR2E<TResource>(member.NonNullValue<RqlNode>(1)) is RqlNode translatedNode)
+								if (TranslateQueryR2E<TResource>(member?.NonNullValue<RqlNode>(1)) is RqlNode translatedNode)
 								{
 									newMember.Add(translatedNode);
 									result.Add(newMember);
@@ -320,7 +326,7 @@ namespace Tense.Rql
 						{
 							result = new RqlNode(RqlOperation.SELECT);
 
-							foreach (RqlNode member in node)
+							foreach (RqlNode? member in node)
 							{
 								if ( TranslateQueryR2E<TResource>(member) is RqlNode translated )
 									result.Add(translated);
@@ -438,9 +444,9 @@ namespace Tense.Rql
         /// </summary>
         /// <param name="kvp">The list of key/value pairs to translate</param>
         /// <returns></returns>
-        public IEnumerable<KeyValuePair<string, object>> TranslateKeysR2E<TResource>(IEnumerable<KeyValuePair<string, object>> kvp)
+        public IEnumerable<KeyValuePair<string, object?>> TranslateKeysR2E<TResource>(IEnumerable<KeyValuePair<string, object?>> kvp)
 		{
-			var newList = new List<KeyValuePair<string, object>>();
+			var newList = new List<KeyValuePair<string, object?>>();
 
 			foreach (var pair in kvp)
 			{
@@ -452,7 +458,7 @@ namespace Tense.Rql
 				foreach (var entityMember in entityMembers)
 				{
 					var value = TranslateValueR2E<TResource>(resourceMember, entityMember, pair.Value);
-					newList.Add(new KeyValuePair<string, object>(entityMember, value));
+					newList.Add(new KeyValuePair<string, object?>(entityMember, value));
 				}
 			}
 
@@ -1861,7 +1867,7 @@ namespace Tense.Rql
 			PropertyInfo? resourceProperty = null;
 			var resourceType = typeof(TResource);
 
-			foreach (string memberName in resourceMember)
+			foreach (string? memberName in resourceMember)
 			{
 				resourceProperty = FindProperty(resourceType, memberName); ;
 				
@@ -1915,8 +1921,11 @@ namespace Tense.Rql
 		/// <param name="propertyType"></param>
 		/// <param name="propertyName"></param>
 		/// <returns></returns>
-		public PropertyInfo? FindProperty(Type propertyType, string propertyName)
+		public PropertyInfo? FindProperty(Type propertyType, string? propertyName)
         {
+			if (string.IsNullOrWhiteSpace(propertyName))
+				return null; 
+
 			var jsonSettings = (JsonSerializerOptions?) _serviceProvider.GetService(typeof(JsonSerializerOptions));
 			var caseInSensitiveSearch = (jsonSettings == null) || jsonSettings.PropertyNameCaseInsensitive;
 			var properties = propertyType.GetProperties();
